@@ -1,24 +1,29 @@
 ## Description
-This repository is my source control for zsh config which I use on various environements. It sets up:
-* plugins which are loaded if binary exists: 
+This repository is my source control for [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) config which I use on various environements. The setup contains:
+* plugins which are always loaded:
+    * `copyfile`
+    * `copydir`
+    * `history`
+    * `encode64`
+    * `extract`
+    * [`zsh-syntax-highlighting`](https://github.com/zsh-users/zsh-syntax-highlighting)
+    * [`zsh-autosuggestions`](https://github.com/zsh-users/zsh-autosuggestions)
+* plugins which are loaded if command exists: 
     * `docker-compose`
     * `docker`
     * `yarn`
     * `vault`
     * `terraform`
     * `minikube`
-* plugins whic are always loaded:
-    * `history`
-* custom plugins which are always loaded:
-    * [https://github.com/zsh-users/zsh-syntax-highlighting](zsh-syntax-highlighting)
-    * [https://github.com/zsh-users/zsh-autosuggestions](zsh-autosuggestions)
-* sets up bin path for:
-    * yarn if exists as `yarn global bin`
-    * custom `bin` directory at `$HOME`
-* theme: fork of `agnoster` which shorts the directory to current CWD and avoids user info
+    * `helm`
+    * `kubectl`
+* sets up extra $PATH for:
+    * `yarn global bin` if yarn exists 
+    * `$HOME/bin` if `bin` dir exists in $HOME
+* theme: my edited version of `agnoster` which shorts the directory to current CWD and avoids user info
 * git:
     * sets up default editor as `vim`
-    * aliases:
+    * adds aliases:
         * `bd` or `branch-delete` - removes branch locally and on remote
         * `td` or `tag-delete` - removes tag locally and on remote
         * `aa` - stands for add --all
