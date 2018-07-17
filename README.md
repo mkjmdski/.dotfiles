@@ -1,9 +1,18 @@
 ## Description
 This repository is my source control for zsh config which I use on various environements. It sets up:
-* plugins: 
+* plugins which are loaded if binary exists: 
     * git 
-    * zsh-syntax-highlighting 
-    * zsh-autosuggestions
+    * docker-compose
+    * docker
+    * yarn
+    * vault
+    * terraform
+    * minikube
+* plugins whic are always loaded:
+    * history
+* custom plugins which are always loaded:
+    * [https://github.com/zsh-users/zsh-syntax-highlighting](zsh-syntax-highlighting)
+    * [https://github.com/zsh-users/zsh-autosuggestions](zsh-autosuggestions)
 * sets up bin path for:
     * yarn
     * custom bin in $HOME

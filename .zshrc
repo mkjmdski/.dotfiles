@@ -58,8 +58,13 @@ ZSH_THEME="agnoster-fork"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
-
+plugins_to_load=(history zsh-syntax-highlighting zsh-autosuggestions minikube) #minikube checks itself
+for binary in git docker docker-compose yarn vault terraform; do
+  if $binary --version &>/dev/null; then
+    plugins_to_load+=($binary)
+  fi
+done
+plugins=(${plugins_to_load[@]}) 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
