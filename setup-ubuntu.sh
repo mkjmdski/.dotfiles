@@ -8,7 +8,7 @@ git clone https://github.com/mkjmdski/shell-config.git #get repository with my e
 (
     cd shell-config
     sed -i "/export ZSH=/c\export ZSH=$ZSH" .zshrc #replace ZSH config with current config
-    for file in .zshrc .zshenv .oh-my-zsh/themes/agnoster-fork.zsh-theme; do
+    for file in .zshrc .zshenv .oh-my-zsh/custom/themes/agnoster-fork.zsh-theme; do
     (
         cd ..
         ln -s "$PWD/shell-config/$file" $file
