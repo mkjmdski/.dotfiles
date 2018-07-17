@@ -1,18 +1,23 @@
+#!/bin/bash
+export ZSH="$HOME/.oh-my-zsh" #default root of ZSH
 apt-get install -y zsh #install zsh core
 chsh -s $(which zsh) #set zsh as current default shell
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" #install oh-my-zsh
-cd ~
-git clone https://github.com/mkjmdski/shell-config.git #get current repository
-cd shell-config
-grep -lr mlodzikos | xargs sed -i "s/mlodzikos/$(whoami)/g" #replace my username with current user 
-shopt -s dotglob; cp -R ./* ~ #copy all config files to the home directory with .dotfiles
-for custom_plugin in $(cat .custom-plugins); do #install all custom plugins listed in the file
+cd "$ZSH/.."
+git clone https://github.com/mkjmdski/shell-config.git #get repository with my extensions
 (
-    cd ~/.oh-my-zsh/custom/plugins
-    git clone $custom_plugin
+    cd shell-config
+    sed -i "/export ZSH=/c\export ZSH=$ZSH" .zshrc #replace ZSH config with current config
+    for file in .zshrc .zshenv .oh-my-zsh/themes/agnoster-fork.zsh-theme; do
+    (
+        cd ..
+        ln -s "$PWD/shell-config/$file" $file
+    ) 
+    done #create absolute symlinks to every configuration so you can easily modify them on system and in repo
+    for custom_plugin in $(cat .custom-plugins); do #install all custom plugins listed in the file
+    (
+        cd $ZSH/custom/plugins
+        git clone $custom_plugin
+    )
+    done
 )
-done
-for temporary_file in $(cat .temporary_files); do
-    rm ~/$temporary_file
-done # remove files necessary during the install
-zsh
