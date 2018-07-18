@@ -22,5 +22,10 @@ git clone https://github.com/mkjmdski/shell-config.git #get repository with my e
         git clone $custom_plugin
     )
     done
-    bash setup-git.sh
+    for dir in provisioning/*; do
+        (
+            cd $dir
+            bash run.sh
+        )
+    done
 )

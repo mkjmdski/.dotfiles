@@ -20,7 +20,7 @@ This repository is my source control for [oh-my-zsh](https://github.com/robbyrus
 * sets up extra $PATH for:
     * `yarn global bin` if yarn exists 
     * `$HOME/bin` if `bin` dir exists in $HOME
-* theme: my edited version of `agnoster` which shorts the directory to current CWD and avoids user info
+* theme: my edited version of `agnoster` which shorts the directory to current CWD and avoids user info, also shows git tag in repositories
 * git:
     * sets up default editor as `vim`
     * adds aliases:
