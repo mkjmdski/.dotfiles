@@ -127,6 +127,14 @@ prompt_git() {
   fi
 }
 
+prompt_tag(){
+  if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
+      if [ $(git describe 2> /dev/null) ]; then
+        prompt_segment red black "\0xF0\0x9F\0x91\0x81  $(git describe)"
+      fi
+  fi
+}
+
 prompt_bzr() {
     (( $+commands[bzr] )) || return
     if (bzr status >/dev/null 2>&1); then
@@ -187,7 +195,7 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment blue black "`basename $PWD`" #display currnet cwd instead of '%~' which is full $PWD
+  prompt_segment cyan white "`basename $PWD`" #display currnet cwd instead of '%~' which is full $PWD
 }
 
 # Virtualenv: current working virtualenv
@@ -219,6 +227,7 @@ build_prompt() {
   prompt_virtualenv
   # prompt_context dont display user info
   prompt_dir
+  prompt_tag
   prompt_git
   prompt_bzr
   prompt_hg

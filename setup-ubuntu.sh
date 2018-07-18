@@ -8,6 +8,7 @@ cd $ZSH/..
 git clone https://github.com/mkjmdski/shell-config.git #get repository with my extensions
 (
     cd shell-config
+    curl -L git.io/antigen > .oh-my-zsh/custom/antigen.zsh #install antigen
     sed -i "/export ZSH=/c\export ZSH=$ZSH" .zshrc #replace ZSH config with current config
     for file in .zshrc .zshenv .oh-my-zsh/custom/; do
     (
