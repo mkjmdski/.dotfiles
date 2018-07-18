@@ -32,8 +32,14 @@ This repository is my source control for [oh-my-zsh](https://github.com/robbyrus
         * `mark` - tags commit with version $1 and message $2 (or $1 if not given)
 
 ## Installation
-For installation run:
+### Instruction:
+
+To install run:
 
 `sh -c "$(curl -fsSL https://raw.githubusercontent.com/mkjmdski/shell-config/master/setup-ubuntu.sh)"`
 
 Currently only ubuntu is supported, for other systems you need to edit file `setup-ubuntu.sh` manually and run it on the system if it fails.
+
+### Additional info
+
+All files in this repository are not copied but the symlinks in proper places are created so while you edit this repository config on your machines changes
