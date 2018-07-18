@@ -12,4 +12,3 @@ currDir=$PWD
     cd ~
     ln $currDir/.vimrc .vimrc
 )
-vim +PluginInstall +qall
