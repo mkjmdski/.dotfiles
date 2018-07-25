@@ -70,7 +70,7 @@ ZSH_THEME="agnoster-fork"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins_to_load=(history copyfile copydir encode64 zsh-syntax-highlighting zsh-autosuggestions) #minikube and helm check themselves
-for binary in docker docker-compose yarn vault terraform minikube helm kubectl; do
+for binary in docker docker-compose docker-machine yarn vault terraform minikube helm kubectl; do
   if [ $commands[$binary] ];then 
     plugins_to_load+=($binary)
   fi
