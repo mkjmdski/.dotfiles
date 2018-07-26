@@ -47,9 +47,8 @@ my edited version of `agnoster` which shorts the directory to current CWD and av
 
 To install run:
 
-`sh -c "$(curl -fsSL https://raw.githubusercontent.com/mkjmdski/shell-config/master/setup-ubuntu.sh)"`
+`sh -c "$(curl -fsSL https://raw.githubusercontent.com/mkjmdski/shell-config/master/install.sh)"`
 
-Currently only ubuntu is supported, for other systems you need to edit file `setup-ubuntu.sh` manually and run it on the system if it fails.
 
 ### Additional info
 
