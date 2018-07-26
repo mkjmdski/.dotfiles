@@ -33,12 +33,14 @@ function install_zsh {
         Ubuntu*) 
             $prefix apt-get install -y \
                 git \
+                vim \
                 zsh
         ;;
         CentOS*) 
             $prefix yum install -y \
                 git \
                 which \
+                vim \
                 zsh
             $prefix yum clean all
         ;;

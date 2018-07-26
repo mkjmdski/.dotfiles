@@ -1,8 +1,4 @@
 #!/bin/bash
-if [ ! $commands[vim] ];then
-    apt-get update
-    apt-get install -y vim
-fi
 if [ ! -d ~/.vim/bundle ]; then 
     mkdir -p ~/.vim/bundle; 
 fi
@@ -12,3 +8,4 @@ currDir=$PWD
     cd ~
     ln $currDir/.vimrc .vimrc
 )
+vim +PluginInstall +qall
