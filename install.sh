@@ -42,7 +42,6 @@ function install_zsh {
                 which \
                 vim \
                 zsh
-            $prefix yum clean all
         ;;
         Darwin*)
             if echo "$(which brew)" | grep --quiet brew; then
