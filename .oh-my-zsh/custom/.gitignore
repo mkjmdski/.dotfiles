@@ -1,2 +1,5 @@
 antigen.zsh
-plugins/docker-machine
+plugins/*
+!plugins/.gitkeep
+themes/*
+!themes/agnoster-fork

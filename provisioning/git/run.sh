@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 git config --global core.editor vim
 git config --global alias.A add --all
 git config --global alias.amend commit --amend
