@@ -27,6 +27,14 @@ function get_platform {
 
 ### ENDEF 
 
+function install_powerline_font {(
+    git clone https://github.com/powerline/fonts.git --depth=1
+    cd fonts
+    ./install.sh
+    cd ..
+    rm -rf fonts
+)}
+
 function install_zsh {
     [ "$(whoami)" = root ] && prefix="" || prefix="sudo"
     case "$1" in
@@ -42,10 +50,17 @@ function install_zsh {
                 which \
                 vim \
                 zsh
+            install_powerline_font
         ;;
         Darwin*)
             if echo "$(which brew)" | grep --quiet brew; then
-                brew install zsh git
+                brew cask install iterm2
+                for pack in zsh git; do
+                    if [ ! $commands[$pack] ]; then
+                        brew install $pack
+                    fi
+                done
+                install_powerline_font
             else
                 echo "You have to install brew before..." && exit -1
             fi
