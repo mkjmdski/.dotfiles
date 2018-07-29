@@ -213,7 +213,7 @@ fi
 
 # GIT TAG
 if [ ! -n "${BULLETTRAIN_GIT_TAG_PROMPT_CMD+1}" ]; then
-  BULLETTRAIN_GIT_TAG_PROMPT_CMD="\$(git describe --abbrev=0 --tags)"
+  BULLETTRAIN_GIT_TAG_PROMPT_CMD="\$(git describe --abbrev=1 --tags)"
 fi
 
 # PERL
