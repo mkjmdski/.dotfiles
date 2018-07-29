@@ -41,6 +41,7 @@ function install_zsh {
         Ubuntu*) 
             $prefix apt-get install -y \
                 git \
+                fonts-powerline \
                 ttf-ancient-fonts \
                 tmux \
                 vim \
@@ -72,39 +73,37 @@ function install_zsh {
     chsh -s $(which zsh) #set zsh as current default shell
 }
 
+function install_oh_my_zsh {
+    #install oh-my-zsh
+    sh -ct "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > /dev/null &
+    sh_pid=$!
+    while ! ps -a | grep --quiet zsh; do
+        echo "" > /dev/null
+    done
+    kill $sh_pid > /dev/null
+}
+
+function link_config_files {
+    git clone https://github.com/mkjmdski/shell-config.git #get repository with shell-config
+    for symlink in .zshrc .zshenv .oh-my-zsh/custom; do
+        rm -rf $symlink
+        ln -s "$PWD/shell-config/$symlink" $symlink
+    done #create absolute symlinks to every configuration in this repo
+}
+
+function install_plugins {
+    for custom_plugin in $(cat shell-config/.custom-plugins); do (
+            cd $ZSH/custom/plugins
+            git clone $custom_plugin
+    ) done #install all custom plugins listed in the file
+}
+
 platform="$(get_platform)"
 install_zsh ${platform}
 
 export ZSH="$HOME/.oh-my-zsh" #default root of ZSH
-#install oh-my-zsh
-sh -ct "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > /dev/null &
-sh_pid=$!
-while ! ps -a | grep --quiet zsh; do
-    echo "" > /dev/null
-done
-kill $sh_pid > /dev/null
+install_oh_my_zsh
 
-cd $ZSH/.. #enter directory above ssh
-git clone https://github.com/mkjmdski/shell-config.git #get repository with shell-config
-(
-    cd shell-config
-    curl -L git.io/antigen > .oh-my-zsh/custom/antigen.zsh #install antigen
-
-    for symlink in .zshrc .zshenv .oh-my-zsh/custom; do (
-        cd ..
-        rm -rf $symlink
-        ln -s "$PWD/shell-config/$symlink" $symlink
-    ) done #create absolute symlinks to every configuration in this repo
-
-    for custom_plugin in $(cat .custom-plugins); do (
-            cd $ZSH/custom/plugins
-            git clone $custom_plugin
-    ) done #install all custom plugins listed in the file
-
-    # for dir in provisioning/*; do
-    #     (
-    #         cd $dir
-    #         bash run.sh
-    #     )
-    # done
-)
+cd $HOME
+link_config_files
+install_plugins
