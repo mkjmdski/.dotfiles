@@ -42,7 +42,8 @@ function install_zsh {
             $prefix apt-get install -y \
                 git \
                 vim \
-                zsh
+                zsh \
+                ttf-ancient-fonts
         ;;
         CentOS*) 
             $prefix yum install -y \
@@ -86,23 +87,22 @@ git clone https://github.com/mkjmdski/shell-config.git #get repository with shel
 (
     cd shell-config
     curl -L git.io/antigen > .oh-my-zsh/custom/antigen.zsh #install antigen
-    for symlink in .zshrc .zshenv .oh-my-zsh/custom; do
-    (
+
+    for symlink in .zshrc .zshenv .oh-my-zsh/custom; do (
         cd ..
         rm -rf $symlink
         ln -s "$PWD/shell-config/$symlink" $symlink
-    ) 
-    done #create absolute symlinks to every configuration in this repo
-    for custom_plugin in $(cat .custom-plugins); do #install all custom plugins listed in the file
-    (
-        cd $ZSH/custom/plugins
-        git clone $custom_plugin
-    )
-    done
-    for dir in provisioning/*; do
-        (
-            cd $dir
-            bash run.sh
-        )
-    done
+    ) done #create absolute symlinks to every configuration in this repo
+
+    for custom_plugin in $(cat .custom-plugins); do (
+            cd $ZSH/custom/plugins
+            git clone $custom_plugin
+    ) done #install all custom plugins listed in the file
+
+    # for dir in provisioning/*; do
+    #     (
+    #         cd $dir
+    #         bash run.sh
+    #     )
+    # done
 )

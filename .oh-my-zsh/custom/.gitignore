@@ -2,4 +2,5 @@ antigen.zsh
 plugins/*
 !plugins/.gitkeep
 themes/*
-!themes/agnoster-fork
+!themes/agnoster-fork.zsh-theme
+!themes/bullet-train-fork.zsh-theme
