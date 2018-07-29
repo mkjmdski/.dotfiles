@@ -41,14 +41,16 @@ function install_zsh {
         Ubuntu*) 
             $prefix apt-get install -y \
                 git \
+                ttf-ancient-fonts \
+                tmux \
                 vim \
-                zsh \
-                ttf-ancient-fonts
+                zsh
         ;;
         CentOS*) 
             $prefix yum install -y \
                 git \
                 which \
+                tmux \
                 vim \
                 zsh
             install_powerline_font
@@ -56,7 +58,7 @@ function install_zsh {
         Darwin*)
             if echo "$(which brew)" | grep --quiet brew; then
                 brew cask install iterm2
-                for pack in zsh git; do
+                for pack in git tmux zsh; do
                     if [ ! $commands[$pack] ]; then
                         brew install $pack
                     fi
