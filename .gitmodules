@@ -1,0 +1,3 @@
+[submodule "provisioning/goto"]
+	path = provisioning/goto
+	url = git@github.com:mkjmdski/goto.git
