@@ -71,13 +71,13 @@ ZSH_THEME="bullet-train-fork"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins_to_load=(history copyfile copydir encode64 zsh-syntax-highlighting zsh-autosuggestions) #minikube and helm check themselves
+plugins_to_load=(history extract copyfile copydir encode64 zsh-syntax-highlighting zsh-autosuggestions) #minikube and helm check themselves
 for binary in docker docker-compose docker-machine yarn vault tmux terraform minikube helm kubectl; do
-  if [ $commands[$binary] ];then 
+  if [ $commands[$binary] ];then
     plugins_to_load+=($binary)
   fi
 done
-plugins=(${plugins_to_load[@]}) 
+plugins=(${plugins_to_load[@]})
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
