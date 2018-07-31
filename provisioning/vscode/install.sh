@@ -25,4 +25,24 @@ function link_config {
     )
 }
 
+function install_extensions {
+    extensions=(
+        bungcip.better-toml
+        marcostazi.VS-code-vagrantfile
+        mauve.terraform
+        PeterJausovec.vscode-docker
+        redhat.vscode-yaml
+        robertohuertasm.vscode-icons
+        rogalmic.bash-debug
+        secanis.jenkinsfile-support
+        shanoor.vscode-nginx
+        shd101wyy.markdown-preview-enhanced
+        tinkertrain.theme-panda
+        wholroyd.jinja
+    )
+    for extension in extensions; do
+        code --install-extension $extension
+    done
+}
+
 link_config
