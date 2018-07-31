@@ -1,6 +1,25 @@
 {
+    "workbench.iconTheme": "material-icon-theme",
+    "gitlens.advanced.messages": {
+        "suppressShowKeyBindingsNotice": true,
+        "suppressWelcomeNotice": true
+    },
+    "explorer.confirmDragAndDrop": false,
     "explorer.confirmDelete": false,
-    "git.ignoreMissingGitWarning": true,
-    "window.zoomLevel": 0,
-    "explorer.confirmDragAndDrop": false
+    "extensions.ignoreRecommendations": true,
+    "gitlens.keymap": "alternate",
+    "gitlens.historyExplorer.enabled": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "eslint.alwaysShowStatus": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 3000,
+    "editor.insertSpaces": true,
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true
+    },
+    "json.format.enable": true
 }

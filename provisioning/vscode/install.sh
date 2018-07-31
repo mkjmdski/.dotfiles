@@ -19,7 +19,9 @@ function link_config {
     currDir=$PWD
     (
         cd "${config_path}"
-        ln -s "${currDir}/settings.json" settings.json
+        for conf_file in settings.json snippets; do
+            ln -s "${currDir}/${conf_file}" "${conf_file}"
+        done
     )
 }
 
