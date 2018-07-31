@@ -2,7 +2,7 @@
 set -e
 ### DEFINE INSTALATION PLATFROM
 function get_distro {
-    echo "$(cat /etc/*-release | head -n 1 | cut -d= -f 2 | cut -d" " -f 1)" #why the fuck this works even if -d" " stop quoting?
+    echo "$(cat /etc/*-release | head -n 1 | cut -d= -f 2 | cut -d" " -f 1)"
 }
 function get_platform {
     unameOut="$(uname -s)"
@@ -92,10 +92,14 @@ function link_config_files {
 }
 
 function install_plugins {
-    for custom_plugin in $(cat shell-config/.custom-plugins); do (
-            cd $ZSH/custom/plugins
-            git clone $custom_plugin
-    ) done #install all custom plugins listed in the file
+    declare -a plugins=(
+        https://github.com/zsh-users/zsh-autosuggestions.git
+        https://github.com/zsh-users/zsh-syntax-highlighting.git
+        https://github.com/leonhartX/docker-machine-zsh-completion.git
+    )
+    for custom_plugin in "${plugins[@]}"; do
+        git clone $custom_plugin $ZSH/custom/plugins
+    done
 }
 
 platform="$(get_platform)"
@@ -106,4 +110,5 @@ install_oh_my_zsh
 
 cd $HOME
 link_config_files
+
 install_plugins
