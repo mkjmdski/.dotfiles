@@ -1,0 +1,12 @@
+[core]
+	editor = vim
+[alias]
+	a = add --all
+	s = status --branch --show-stash
+	com = commit --all --message
+	amend = commit --amend --no-edit
+	force = push --force-with-lease
+	branch-delete = !sh -c \"git branch -D $1 && git push origin :$1\" -
+	tag-delete = !sh -c \"git tag -d $1 && git push origin :refs/tags/$1\" -
+	mark = "! bash -c \"if [[ $# -eq 2 ]]; then git tag -a $1 -m $2; elif [[ $# -eq 1 ]]; then git tag -a $1 -m $1; fi\" -"
+	replace-tag = "! bash -c \"git tag-delete $1 && git mark $1 && git push origin --tags\""

@@ -39,6 +39,8 @@ function install_extensions {
         shd101wyy.markdown-preview-enhanced
         tinkertrain.theme-panda
         wholroyd.jinja
+        dunstontc.viml
+
     )
     for extension in extensions; do
         code --install-extension $extension
