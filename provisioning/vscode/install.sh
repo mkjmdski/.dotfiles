@@ -48,9 +48,11 @@ function install_extensions {
         file-icons.file-icons
     )
     installed_extensions="$(code --list-extensions)"
-    for extension in $extensions; do
+    for extension in "${extensions[@]}"; do
         if [[ ! $installed_extensions = *"$extension"* ]]; then
             code --install-extension $extension
+        else
+            echo "$extension is installed"
         fi
     done
 }
