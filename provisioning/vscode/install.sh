@@ -44,6 +44,8 @@ function install_extensions {
         mauve.terraform
         mindginative.terraform-snippets
         mrmlnc.vscode-apache
+        vangware.dark-plus-material
+        file-icons.file-icons
     )
     installed_extensions="$(code --list-extensions)"
     for extension in $extensions; do

@@ -2,8 +2,8 @@
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
-    "workbench.colorTheme": "Panda Syntax",
-    "workbench.iconTheme": "vscode-icons",
+    "workbench.iconTheme": "file-icons",
+    "workbench.colorTheme": "Dark+ Material",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 3000,
     "files.trimFinalNewlines": true,
