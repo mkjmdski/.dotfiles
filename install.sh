@@ -7,7 +7,7 @@ function get_distro {
 function get_platform {
     unameOut="$(uname -s)"
     case "${unameOut}" in
-        Linux*)  
+        Linux*)
             distro="$(get_distro)"
             case "${distro}" in
                 Ubuntu|CentOS) echo "${distro}"
@@ -25,20 +25,20 @@ function get_platform {
     esac
 }
 
-### ENDEF 
+### ENDEF
 
-function install_powerline_font {(
+function install_powerline_font { (
     git clone https://github.com/powerline/fonts.git --depth=1
     cd fonts
     ./install.sh
     cd ..
     rm -rf fonts
-)}
+) }
 
 function install_zsh {
     [ "$(whoami)" = root ] && prefix="" || prefix="sudo"
     case "$1" in
-        Ubuntu*) 
+        Ubuntu*)
             $prefix apt-get install -y \
                 git \
                 fonts-powerline \
@@ -47,7 +47,7 @@ function install_zsh {
                 vim \
                 zsh
         ;;
-        CentOS*) 
+        CentOS*)
             $prefix yum install -y \
                 git \
                 which \
@@ -99,6 +99,14 @@ function install_plugins {
     )
     for custom_plugin in "${plugins[@]}"; do
         git clone $custom_plugin $ZSH/custom/plugins
+    done
+    declare -A raw_plugins=(
+        [lpass]=https://raw.githubusercontent.com/lastpass/lastpass-cli/master/contrib/lpass_zsh_completion
+    )
+    for raw_plugin in "${!raw_plugins[@]}"; do
+        local plugin_location="$ZSH/custom/plugins/${raw_plugin}"
+        mkdir -p $plugin_location
+        curl -L ${raw_plugins[$raw_plugin]} > "${plugin_location}/_${raw_plugin}"
     done
 }
 
