@@ -1,6 +1,7 @@
 antigen.zsh
 plugins/*
 !plugins/.gitkeep
+!plugins/lpass
 themes/*
 !themes/agnoster-fork.zsh-theme
 !themes/bullet-train-fork.zsh-theme
