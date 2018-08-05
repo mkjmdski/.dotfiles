@@ -1,6 +1,5 @@
 #!/bin/bash
-function link_config {
+function main {
     git config --global include.path $PWD/.gitconfig
 }
-
-link_config
+main

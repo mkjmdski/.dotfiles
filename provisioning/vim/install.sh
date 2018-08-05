@@ -1,21 +1,10 @@
 #!/bin/bash
 set -e
-function setup {
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-}
-
-function link_config {
-    currDir=$PWD
-    (
-        cd ~
-        ln -s $currDir/.vimrc .vimrc
-    )
-}
-
-function install_plugins {
+source "../.lib/link_config.sh"
+function main {
+    git clone --depth=1 https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    link_config .vimrc
     vim +PluginInstall +qall
 }
 
-setup
-link_config
-install_plugins
+main

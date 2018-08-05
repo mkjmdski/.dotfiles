@@ -1,21 +1,7 @@
 #!/bin/bash
 set -e
-
-# rogalmic.bash-debug
-# apt package manager {r, engine='bash'} sudo apt-get install bashdb
-# sudo gdebi Downloads/bashdb_4.3.0.91+ds-4build1_amd64.deb
-# yum package manager {r, engine='bash'} sudo yum install bashdb
-# installation from sources (advanced): {r, engine='bash'} tar -xvf bashdb-*.tar.gz cd bashdb-* ./configure make sudo make install
-# verification {r, engine='bash'} bashdb --version
-
-# timonwong.shellcheck
-# apt-get install shellcheck
-# yum -y install epel-release
-# yum install ShellCheck
-# brew install shellcheck
-
-# ms-python.python
-# pip3 install pylint
+source "../.lib/link_config.sh"
+source "../.lib/install_packs.sh"
 
 function set_config_path {
     unameOut="$(uname -s)"
@@ -28,18 +14,6 @@ function set_config_path {
         ;;
         *) echo "UNKOWN OS: ${unameOut}" && exit -1
     esac
-}
-
-function link_config {
-    config_path="$(set_config_path)"
-    currDir=$PWD
-    (
-        cd "${config_path}"
-        for conf_file in settings.json snippets; do
-            rm -rf "${config_path}/${conf_file}"
-            ln -s "${currDir}/${conf_file}" "${conf_file}"
-        done
-    )
 }
 
 function install_extensions {
@@ -91,5 +65,9 @@ function install_extensions {
     done
 }
 
-link_config
-install_extensions
+function main {
+    link_config --target-directory "$(set_config_path)" settings.json snippets
+    install_extensions
+}
+
+main

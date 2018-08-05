@@ -1,17 +1,9 @@
 #!/bin/bash
 set -e
-function setup {
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-}
-
-function link_config {
-    currDir=$PWD
-    (
-        cd ~
-        ln -s $currDir/.tmux.conf .tmux.conf
-    )
+source "../.lib/link_config.sh"
+function main {
+    git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    link_config .tmux.conf
     tmux source ~/.tmux.conf
 }
-
-setup
-link_config
+main

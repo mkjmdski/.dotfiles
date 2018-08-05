@@ -3,7 +3,7 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-export SHELL_CONFIG="$(dirname $ZSH)/shell-config"
+export MULTI_RC="$(dirname $ZSH)/shell-config"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -79,6 +79,10 @@ for binary in docker docker-compose docker-machine helm kubectl minikube lpass t
 done
 plugins=(${plugins_to_load[@]})
 source $ZSH/oh-my-zsh.sh
+
+if [ $commands[aws] ]; then
+  source "$(dirname $(which aws))/aws_zsh_completer.sh"
+fi
 
 # User configuration
 

@@ -10,6 +10,7 @@
     "files.trimTrailingWhitespace": true,
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
+    "shellcheck.customArgs": [ "-x" ],
     "shellcheck.disableVersionCheck": true,
 
 }
