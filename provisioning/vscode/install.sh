@@ -1,5 +1,22 @@
 #!/bin/bash
 set -e
+
+# rogalmic.bash-debug
+# apt package manager {r, engine='bash'} sudo apt-get install bashdb
+# sudo gdebi Downloads/bashdb_4.3.0.91+ds-4build1_amd64.deb
+# yum package manager {r, engine='bash'} sudo yum install bashdb
+# installation from sources (advanced): {r, engine='bash'} tar -xvf bashdb-*.tar.gz cd bashdb-* ./configure make sudo make install
+# verification {r, engine='bash'} bashdb --version
+
+# timonwong.shellcheck
+# apt-get install shellcheck
+# yum -y install epel-release
+# yum install ShellCheck
+# brew install shellcheck
+
+# ms-python.python
+# pip3 install pylint
+
 function set_config_path {
     unameOut="$(uname -s)"
     case "${unameOut}" in
@@ -27,25 +44,42 @@ function link_config {
 
 function install_extensions {
     extensions=(
-        bungcip.better-toml
         marcostazi.VS-code-vagrantfile
         PeterJausovec.vscode-docker
-        redhat.vscode-yaml
-        robertohuertasm.vscode-icons
-        rogalmic.bash-debug
+        ipedrazas.kubernetes-snippets
+
+        ms-python.python
+        timonwong.shellcheck
+        formulahendry.code-runner
         secanis.jenkinsfile-support
+        atishay-jain.all-autocomplete
+        ionutvmi.path-autocomplete
+        ryu1kn.partial-diff
+
         shanoor.vscode-nginx
-        shd101wyy.markdown-preview-enhanced
-        tinkertrain.theme-panda
+        mrmlnc.vscode-apache
+
+        davidanson.vscode-markdownlint
+        alanwalk.markdown-toc
         wholroyd.jinja
+
+        bungcip.better-toml
+        redhat.vscode-yaml
         dunstontc.viml
+        sidneys1.gitconfig
+        mohsen1.prettify-json
+
         loganarnett.tf-snippets
         erd0s.terraform-autocomplete
         mauve.terraform
         mindginative.terraform-snippets
-        mrmlnc.vscode-apache
+
         vangware.dark-plus-material
         file-icons.file-icons
+
+        donjayamanne.githistory
+        waderyan.gitblame
+        eamodio.gitlens
     )
     installed_extensions="$(code --list-extensions)"
     for extension in "${extensions[@]}"; do

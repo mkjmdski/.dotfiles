@@ -5,10 +5,11 @@
     "workbench.iconTheme": "file-icons",
     "workbench.colorTheme": "Dark+ Material",
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 3000,
+    "files.autoSaveDelay": 1000,
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
+    "shellcheck.disableVersionCheck": true,
 
 }
