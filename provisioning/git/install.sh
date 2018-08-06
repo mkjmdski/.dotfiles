@@ -1,5 +1,6 @@
 #!/bin/bash
 function main {
-    git config --global include.path $PWD/.gitconfig
+    sudo pip install git+https://github.com/jeffkaufman/icdiff.git
+    git config --global include.path "$PWD/.gitconfig"
 }
 main
