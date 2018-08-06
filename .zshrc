@@ -115,3 +115,8 @@ bindkey "^[^[[C" forward-word
 bindkey "^[^[[D" backward-word
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
+
+
+# Source goto
+[[ -s "/usr/local/share/goto.sh" ]] && source /usr/local/share/goto.sh
+
