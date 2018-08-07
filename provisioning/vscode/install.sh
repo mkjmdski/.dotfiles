@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-source "../.lib/link_config.sh"
-source "../.lib/install_packs.sh"
+source "../../.lib/link_config.sh"
+source "../../.lib/install_packs.sh"
 
 function set_config_path {
     unameOut="$(uname -s)"

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-source "../.lib/get_os.sh"
-source "../.lib/install_packs.sh"
-source "../.lib/link_config.sh"
+source "../../.lib/get_os.sh"
+source "../../.lib/install_packs.sh"
+source "../../.lib/link_config.sh"
 
 function install_oh_my_zsh {
     case "$(get_os)" in

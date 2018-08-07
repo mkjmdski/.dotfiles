@@ -83,7 +83,7 @@ set expandtab
 retab
 
 " See your crazy vim ninja cmds
-set showcmd 
+set showcmd
 
 " Needed for Syntax Highlighting and stuff
 filetype on
