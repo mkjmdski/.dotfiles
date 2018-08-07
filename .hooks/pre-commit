@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+#works when inside .git directory
+function get_git_url {
+    cat config | grep 'remote "origin"' -A 1 | tail -n 1 | cut -d"=" -f 2
+}
+
+
+function get_git_urls_in_dir {
+    for git_repo in $(find $1 -type d -name .git); do (
+        cd $git_repo
+        get_git_url
+    ) done
+}
+
+function main {
+    get_git_urls_in_dir
+    get_git_urls_in_dir "$HOME/.tmux/plugins" > .commit-cache-tmux
+}
+
+main > /dev/null
+exit

@@ -17,3 +17,11 @@ function link_config {
         ln -s "$currDir/$config_file" "$config_file"
     ) done
 }
+
+function clone_repos_from_file {
+    file="$1"
+    [ -n "$2" ] && directory="$2" || directory=""
+    for repo in $(cat $file); do
+        git clone --depth=1 $repo $directory
+    done
+}
