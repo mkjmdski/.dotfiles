@@ -14,9 +14,10 @@ function get_git_urls_in_dir {
     ) done
 }
 
+
 function main {
-    get_git_urls_in_dir
     get_git_urls_in_dir "$HOME/.tmux/plugins" > .commit-cache-tmux
+    code --list-extensions > .commit-cache-vscode
 }
 
 main > /dev/null

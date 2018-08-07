@@ -17,46 +17,8 @@ function set_config_path {
 }
 
 function install_extensions {
-    extensions=(
-        marcostazi.VS-code-vagrantfile
-        PeterJausovec.vscode-docker
-        ipedrazas.kubernetes-snippets
-
-        ms-python.python
-        timonwong.shellcheck
-        formulahendry.code-runner
-        secanis.jenkinsfile-support
-        atishay-jain.all-autocomplete
-        ionutvmi.path-autocomplete
-        ryu1kn.partial-diff
-
-        shanoor.vscode-nginx
-        mrmlnc.vscode-apache
-
-        davidanson.vscode-markdownlint
-        alanwalk.markdown-toc
-        wholroyd.jinja
-
-        bungcip.better-toml
-        redhat.vscode-yaml
-        dunstontc.viml
-        sidneys1.gitconfig
-        mohsen1.prettify-json
-
-        loganarnett.tf-snippets
-        erd0s.terraform-autocomplete
-        mauve.terraform
-        mindginative.terraform-snippets
-
-        vangware.dark-plus-material
-        file-icons.file-icons
-
-        donjayamanne.githistory
-        waderyan.gitblame
-        eamodio.gitlens
-    )
     installed_extensions="$(code --list-extensions)"
-    for extension in "${extensions[@]}"; do
+    for extension in $(cat installed_vs_extensions); do
         if [[ ! $installed_extensions = *"$extension"* ]]; then
             code --install-extension $extension
         else
