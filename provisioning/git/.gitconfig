@@ -59,7 +59,6 @@
 	a = add --all
 	s = status --branch --show-stash
 	m = commit --message
-	am = commit --all --message
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	tags = tag --list -n10

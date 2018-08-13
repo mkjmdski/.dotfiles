@@ -21,14 +21,16 @@ function install_oh_my_zsh {
 }
 
 function install_plugins {
-    declare -a plugins=(
-        https://github.com/zsh-users/zsh-autosuggestions.git
-        https://github.com/zsh-users/zsh-syntax-highlighting.git
+    declare -A plugins=(
+        [zsh-autosuggestions]=https://github.com/zsh-users/zsh-autosuggestions.git
+        [zsh-syntax-highlighting]=https://github.com/zsh-users/zsh-syntax-highlighting.git
     )
     (
         cd "$ZSH/custom/plugins"
-        for custom_plugin in "${plugins[@]}"; do
-            git clone --depth=1 $custom_plugin
+        for plugin in "${!plugins[@]}"; do
+            if [ ! -d "${plugin}" ]; then
+                git clone --depth=1 "${plugins[$plugin]}" "${plugin}"
+            fi
         done
     )
     declare -A raw_plugins=(
@@ -36,8 +38,8 @@ function install_plugins {
     )
     for raw_plugin in "${!raw_plugins[@]}"; do
         local plugin_location="$ZSH/custom/plugins/${raw_plugin}"
-        mkdir -p $plugin_location
-        curl -L ${raw_plugins[$raw_plugin]} > "${plugin_location}/_${raw_plugin}"
+        mkdir -p "${plugin_location}"
+        curl -L "${raw_plugins[$raw_plugin]}" > "${plugin_location}/_${raw_plugin}"
     done
 }
 

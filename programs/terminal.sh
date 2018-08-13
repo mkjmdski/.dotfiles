@@ -1,4 +1,5 @@
 #!/bin/bash
+source "../.lib/include.sh"
 
 function main {
     os="$(get_os)"
