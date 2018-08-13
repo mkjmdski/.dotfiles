@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
-source "../../.lib/link_config.sh"
-source "../../.lib/install_packs.sh"
+source "../../.lib/include.sh"
 
 function set_config_path {
     unameOut="$(uname -s)"
@@ -20,7 +19,7 @@ function install_extensions {
     installed_extensions="$(code --list-extensions)"
     for extension in $(cat installed_vs_extensions); do
         if [[ ! $installed_extensions = *"$extension"* ]]; then
-            code --install-extension $extension
+            code --install-extension "${extension}"
         else
             echo "$extension is installed"
         fi
