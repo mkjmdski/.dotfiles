@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+
+  os:
+    image: ${SYSTEM}:${VERSION}
+    volumes:
+      - "./:/app"
+    working_dir: /app
