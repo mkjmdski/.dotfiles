@@ -1,0 +1,51 @@
+# Add custom bin files
+for bin_path in "$HOME/bin" "$HOME/.local/bin/"; do
+    if [ -d "$bin_path" ]; then
+        export PATH="$bin_path:$PATH"
+    fi
+done
+
+# Add yarn global binaries
+if yarn -v &> /dev/null; then
+    export PATH="$(yarn global bin):$PATH"
+fi
+
+# Add go binaries
+if [ -d "$GOPATH" ]; then
+    export PATH="$GOPATH/bin:$PATH"
+elif go help &> /dev/null; then
+    export PATH="$(go env GOPATH)/bin:$PATH"
+fi
+
+if aws --version &> /dev/null; then
+    if [ "$0" = "zsh" ]; then
+        source "$(dirname $(which aws))/aws_zsh_completer.sh"
+    elif [ "$0" = "bash" ]; then
+        source "$(dirname $(which aws))/aws_bash_completer"
+    fi
+fi
+
+
+# Source goto
+[[ -s "/usr/local/share/goto.sh" ]] && source /usr/local/share/goto.sh
+
+# Node Virtual Machine Config
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# The next line updates PATH and enables shell command completion for the Google Cloud SDK.
+if [ -d "$HOME/google-cloud-sdk" ]; then
+    if [ "$0" = "zsh" ] || [ "$0" = "bash" ] || [ "$0" = "fish" ]; then
+        source "$HOME/google-cloud-sdk/path.$0.inc"
+        source "$HOME/google-cloud-sdk/completion.$0.inc"
+    fi
+fi
+
+# Additional keys binding for MacOS
+if [ "$(uname -s)" = "Darwin" ]; then
+    bindkey "^[^[[C" forward-word
+    bindkey "^[^[[D" backward-word
+    bindkey "^[[H" beginning-of-line
+    bindkey "^[[F" end-of-line
+fi

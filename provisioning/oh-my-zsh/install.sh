@@ -1,21 +1,18 @@
 #!/bin/bash
 set -e
-source "../../.lib/get_os.sh"
-source "../../.lib/install_packs.sh"
-source "../../.lib/link_config.sh"
+source "../../.lib/include.sh"
+
 
 function install_oh_my_zsh {
+    install_package_universal tmux zsh
     case "$(get_os)" in
         Ubuntu*)
-            install_ubuntu git fonts-powerline ttf-ancient-fonts tmux vim zsh
+            install_package_ubuntu fonts-powerline ttf-ancient-fonts
         ;;
         CentOS*)
-            install_centos git tmux vim zsh
             install_powerline_font
         ;;
         Darwin*)
-            install_darwin git tmux zsh
-            brew cask install iterm2
             install_powerline_font
         ;;
     esac
@@ -27,7 +24,6 @@ function install_plugins {
     declare -a plugins=(
         https://github.com/zsh-users/zsh-autosuggestions.git
         https://github.com/zsh-users/zsh-syntax-highlighting.git
-        https://github.com/leonhartX/docker-machine-zsh-completion.git
     )
     (
         cd "$ZSH/custom/plugins"
@@ -48,7 +44,7 @@ function install_plugins {
 function main {
     export ZSH="$HOME/.oh-my-zsh" #default root of ZSH
     install_oh_my_zsh
-    link_config ".zshrc" ".zshenv"
+    link_config ".zshrc"
     link_config --target-directory "$ZSH" "custom"
     install_plugins
 }
