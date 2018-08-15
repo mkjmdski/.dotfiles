@@ -5,13 +5,13 @@ function main {
     os="$(get_os)"
     case "${os}" in
         CentOS*)
-            install_package_centos terminator
+            install_package_centos task
         ;;
         Ubuntu*)
-            install_package_ubuntu terminator
+            install_package_ubuntu taskwarrior
         ;;
         Darwin*)
-            brew cask install iterm2
+            install_package_darwin task
         ;;
         *)
             echo "Operating system > ${os} < is not supported" && exit 1
