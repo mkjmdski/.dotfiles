@@ -25,7 +25,7 @@
 
 #icdiff
 [difftool "icdiff"]
-	cmd = /usr/local/bin/icdiff --line-numbers $LOCAL $REMOTE
+	cmd = icdiff --line-numbers $LOCAL $REMOTE
 
 [log]
 	# Use abbrev SHAs whenever possible/relevant instead of full 40 chars
