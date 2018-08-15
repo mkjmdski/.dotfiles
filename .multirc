@@ -17,6 +17,7 @@ elif go help &> /dev/null; then
     export PATH="$(go env GOPATH)/bin:$PATH"
 fi
 
+# Add AWS autocomplete
 if aws --version &> /dev/null; then
     if [ "$0" = "zsh" ]; then
         source "$(dirname $(which aws))/aws_zsh_completer.sh"
@@ -25,6 +26,22 @@ if aws --version &> /dev/null; then
     fi
 fi
 
+# Add gopass autocomplete
+
+if gopass --version &> /dev/null; then
+    case "$0" in
+    "zsh")
+        source <(gopass completion zsh | tail -n +2 | sed \$d)
+        compdef _gopass gopass
+    ;;
+    "bash")
+        source <(gopass completion bash)
+    ;;
+    "fish")
+        source <(gopass completion fish)
+    ;;
+    esac
+fi
 
 # Source goto
 [[ -s "/usr/local/share/goto.sh" ]] && source /usr/local/share/goto.sh
@@ -48,4 +65,8 @@ if [ "$(uname -s)" = "Darwin" ]; then
     bindkey "^[^[[D" backward-word
     bindkey "^[[H" beginning-of-line
     bindkey "^[[F" end-of-line
+    export GPG_TTY=$(tty)
 fi
+
+# Default language
+export LANG=en_US.UTF-8
