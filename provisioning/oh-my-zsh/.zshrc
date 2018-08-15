@@ -2,9 +2,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 export MULTI_RC="$(dirname $ZSH)/shell-config"
 
-# Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
-
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -30,7 +27,7 @@ plugins_to_load=(
 plugins_to_check=(
   docker
   docker-compose
-  docker-machine-zsh-completion
+  docker-machine
   helm
   kubectl
   lpass
@@ -45,6 +42,17 @@ for binary in "${plugins_to_check[@]}"; do
     plugins_to_load+=($binary)
   fi
 done
+
+typeset -A binary_per_plugin
+binary_per_plugin=(
+  task taskwarrior
+)
+for binary in "${(@k)binary_per_plugin}"; do
+  if [ $commands[$binary] ]; then
+    plugins_to_load+=$binary_per_plugin[$binary]
+  fi
+done
+
 plugins=(${plugins_to_load[@]})
 
 source "${ZSH}/oh-my-zsh.sh"
