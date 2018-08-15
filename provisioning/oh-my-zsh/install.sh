@@ -24,6 +24,7 @@ function install_plugins {
     declare -A plugins=(
         [zsh-autosuggestions]=https://github.com/zsh-users/zsh-autosuggestions.git
         [zsh-syntax-highlighting]=https://github.com/zsh-users/zsh-syntax-highlighting.git
+        [docker-machine]=https://github.com/leonhartX/docker-machine-zsh-completion.git
     )
     (
         cd "$ZSH/custom/plugins"
