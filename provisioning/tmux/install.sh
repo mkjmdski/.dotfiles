@@ -2,7 +2,7 @@
 set -e
 source "../../.lib/include.sh"
 
-function tmux {
+function install_tmux {
     os="$(get_os)"
     case "${os}" in
         CentOS*)
