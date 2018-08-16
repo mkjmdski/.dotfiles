@@ -1,62 +1,7 @@
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-export MULTI_RC="$(dirname $ZSH)/shell-config"
-
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="bullet-train-fork"
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='vim'
-fi
-
-# Loading plugins
-plugins_to_load=(
-  history
-  extract
-  copyfile
-  copydir
-  encode64
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-)
-plugins_to_check=(
-  docker
-  docker-compose
-  docker-machine
-  helm
-  kubectl
-  lpass
-  minikube
-  terraform
-  tmux
-  vault
-  yarn
-)
-for binary in "${plugins_to_check[@]}"; do
-  if [ $commands[$binary] ];then
-    plugins_to_load+=($binary)
-  fi
-done
-
-typeset -A binary_per_plugin
-binary_per_plugin=(
-  task taskwarrior
-)
-for binary in "${(@k)binary_per_plugin}"; do
-  if [ $commands[$binary] ]; then
-    plugins_to_load+=$binary_per_plugin[$binary]
-  fi
-done
-
-plugins=(${plugins_to_load[@]})
-
-source "${ZSH}/oh-my-zsh.sh"
-source "${MULTI_RC}/.multirc"
+# OH-MY-ZSH
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# Line uncommented because antigen makes autoupdates for us
+# DISABLE_AUTO_UPDATE=true
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
@@ -71,9 +16,6 @@ source "${MULTI_RC}/.multirc"
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
@@ -126,3 +68,59 @@ source "${MULTI_RC}/.multirc"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Path to your oh-my-zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load. Optionally, if you set this to "random"
+# it'll load a random theme each time that oh-my-zsh is loaded.
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+ZSH_THEME="bullet-train-fork"
+
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='vim'
+fi
+source "${ZSH}/oh-my-zsh.sh"
+
+
+# MULTI RC
+export DOTFILES="$HOME/.dotfiles"
+source "${DOTFILES}/.multirc"
+
+
+# ZSH PLUGINS
+source ~/.zplug/init.zsh
+declare -a plugins_to_load=(
+  extract
+)
+declare -a plugins_to_check=(
+  docker
+  docker-compose
+  docker-machine
+  helm
+  kubectl
+  minikube
+  terraform
+  tmux
+  vault
+  yarn
+)
+for binary in "${plugins_to_check[@]}"; do
+  if [ $commands[$binary] ];then
+    plugins_to_load+=($binary)
+  fi
+done
+for plugin in "${plugins_to_load[@]}"; do
+  zplug "plugins/$plugin",   from:oh-my-zsh
+done
+declare -a custom_plugins=(
+  zsh-users/zsh-autosuggestions
+  zsh-users/zsh-syntax-highlighting
+)
+for plugin in "${custom_plugins[@]}"; do
+  zplug $plugin
+done
+zplug load
