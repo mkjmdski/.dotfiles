@@ -1,0 +1,13 @@
+plugins/extract, from:oh-my-zsh
+plugins/docker, from:oh-my-zsh
+plugins/docker-compose, from:oh-my-zsh
+plugins/docker-machine, from:oh-my-zsh
+plugins/helm, from:oh-my-zsh
+plugins/kubectl, from:oh-my-zsh
+plugins/minikube, from:oh-my-zsh
+plugins/terraform, from:oh-my-zsh
+plugins/tmux, from:oh-my-zsh
+plugins/vault, from:oh-my-zsh
+plugins/yarn, from:oh-my-zsh
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting

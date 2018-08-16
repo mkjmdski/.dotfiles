@@ -93,34 +93,4 @@ source "${DOTFILES}/.multirc"
 
 # ZSH PLUGINS
 source ~/.zplug/init.zsh
-declare -a plugins_to_load=(
-  extract
-)
-declare -a plugins_to_check=(
-  docker
-  docker-compose
-  docker-machine
-  helm
-  kubectl
-  minikube
-  terraform
-  tmux
-  vault
-  yarn
-)
-for binary in "${plugins_to_check[@]}"; do
-  if [ $commands[$binary] ];then
-    plugins_to_load+=($binary)
-  fi
-done
-for plugin in "${plugins_to_load[@]}"; do
-  zplug "plugins/$plugin",   from:oh-my-zsh
-done
-declare -a custom_plugins=(
-  zsh-users/zsh-autosuggestions
-  zsh-users/zsh-syntax-highlighting
-)
-for plugin in "${custom_plugins[@]}"; do
-  zplug $plugin
-done
 zplug load

@@ -5,6 +5,11 @@ source "../../.lib/include.sh"
 
 function install_zplug {
     curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+    source ~/.zplug/init.zsh
+    while read -r plugin; do
+        zplug $plugin
+    done < plugins.txt
+    zplug install
 }
 
 function install_oh_my_zsh {
@@ -38,3 +43,4 @@ function main {
 }
 
  main
+ zsh
