@@ -1,14 +1,5 @@
 #!/bin/bash
 
-function install_powerline_font { (
-    cd /tmp || return
-    git clone https://github.com/powerline/fonts.git --depth=1
-    cd fonts
-    ./install.sh
-    cd ..
-    rm -rf fonts
-) }
-
 function install_package_ubuntu {
     local prefix
     [ "$(whoami)" = root ] && prefix="" || prefix="sudo"

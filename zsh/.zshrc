@@ -2,12 +2,14 @@
 # Check if zplug is installed
 [[ ! -d ~/.zplug ]] && git clone https://github.com/zplug/zplug ~/.zplug
 export DOTFILES="$HOME/.dotfiles"
-export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
+export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
+ZSH_CUSTOM_THEME="denysdovhan/spaceship-prompt"
+# ZSH_THEME="dracula/zsh"
 source ~/.zplug/init.zsh
 zplug check || zplug install
 zplug load
 
-#### NO PLUGIN INSTALLS
+#### CUSTOM INSTALLS OUTSIDE OF PLUGINS
 [[ ! $commands[glances] ]] && pip3 install netifaces py-cpuinfo glances
 
 # [[ $commands[aws] ]] && {

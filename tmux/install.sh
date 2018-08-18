@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-source "../../.lib/include.sh"
+source "$DOTFILES/.lib/include.sh"
 
 function install_tmux {
     os="$(get_os)"
@@ -28,10 +28,18 @@ function install_tmux {
     esac
 }
 
-function main {
-    install_tmux
-    clone_repos_from_file "./tmux_plugins_repositories"
-    link_config .tmux.conf
+function source_tmux_config {
+    tmux new-session -d -s installation-session
     tmux source ~/.tmux.conf
+    tmux kill-session -t installation-session
 }
+
+function main {
+    if ! tmux -V &> /dev/null; then
+        install_tmux
+    fi
+    link_config .tmux.conf
+    source_tmux_config
+}
+
 main

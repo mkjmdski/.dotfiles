@@ -15,8 +15,8 @@ function move_cache_to_config {
 }
 
 function main {
-    move_cache_to_config "vscode" "provisioning/vscode/installed_vs_extensions"
-    move_cache_to_config "gitconfig" "provisioning/git/.gitconfig"
+    move_cache_to_config "vscode" "vscode/installed_vs_extensions"
+    move_cache_to_config "gitconfig" "git/global.gitconfig"
     if [ "$git_action" -eq 1 ]; then
         git commit --amend -C HEAD --no-verify
     fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-source "../../.lib/include.sh"
+source "$DOTFILES/.lib/include.sh"
 
 function set_config_path {
     unameOut="$(uname -s)"
@@ -13,17 +13,6 @@ function set_config_path {
         ;;
         *) echo "UNKOWN OS: ${unameOut}" && exit -1
     esac
-}
-
-function install_extensions {
-    installed_extensions="$(code --list-extensions)"
-    for extension in $(cat installed_vs_extensions); do
-        if [[ ! $installed_extensions = *"$extension"* ]]; then
-            code --install-extension "${extension}"
-        else
-            echo "$extension is installed"
-        fi
-    done
 }
 
 function main {

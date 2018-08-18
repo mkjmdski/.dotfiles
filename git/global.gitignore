@@ -1,0 +1,22 @@
+# Compiled source #
+###################
+*.pyc
+*.log
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+
+# IDE files #
+#############
+.vscode
+.idea
+.iml
+
+
+# NPM #
+node_modules
+
+# Composer #
+vendor

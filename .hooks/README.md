@@ -10,4 +10,4 @@ Just enter this directory with cd and run `install.sh`
 
 ## What do they do
 
-After each commit your vscode plugins are updated, so this repository contains your actuall set of plugins.
+After each commit your vscode plugins are updated, so this repository contains your actuall set of plugins. Also snippets for git configuration are compiled to one file included in the global config.

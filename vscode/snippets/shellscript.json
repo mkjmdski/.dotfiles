@@ -1,0 +1,11 @@
+{
+    "Line_by_line": {
+        "prefix": "while",
+        "body": [
+          "while read -r ${1:element}; do",
+          "\t$0 $${1:element}",
+          "done ${2|<,<<<|} ${3:file}"
+        ],
+        "description": "Iterate over file lines"
+	}
+}

@@ -13,7 +13,8 @@ Plugin 'bash-support.vim'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-
+Plugin 'tpope/vim-sensible'
+Plugin 'flazz/vim-colorschemes'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -30,7 +31,8 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 " Visual
-let g:airline_theme='wombat'
+colorscheme molokai
+let g:airline_theme='molokai'
 
 " Preconfig
 
@@ -63,14 +65,8 @@ augroup JumpCursorOnEdit
             \ endif
 augroup END
 
-" Necesary  for lots of cool vim things
-set nocompatible
-
 " Show line numbers
 set number
-
-" Who doesn't like autoindent?
-set autoindent
 
 " Who wants an 8 character tab?  Not me!
 set shiftwidth=4
@@ -85,14 +81,5 @@ retab
 " See your crazy vim ninja cmds
 set showcmd
 
-" Needed for Syntax Highlighting and stuff
-filetype on
-filetype plugin on
-syntax enable
-set grepprg=grep\ -nH\ $*
-
 " Enable mouse support in console
 set mouse=a
-
-filetype plugin indent on
-syntax on
