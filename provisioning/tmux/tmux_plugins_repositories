@@ -1,12 +1,12 @@
  https://git::@github.com/tmux-plugins/tmux-continuum
- https://git::@github.com/tmux-plugins/tmux-cpu
- https://git::@github.com/tmux-plugins/tmux-prefix-highlight
- https://git::@github.com/tmux-plugins/tmux-pain-control
- https://git::@github.com/tmux-plugins/tmux-yank
  https://git::@github.com/tmux-plugins/tmux-resurrect
- https://github.com/tmux-plugins/tpm
+ https://git::@github.com/tmux-plugins/tmux-prefix-highlight
+ https://git::@github.com/tmux-plugins/tmux-yank
+ https://git::@github.com/tmux-plugins/tmux-pain-control
  https://git::@github.com/tmux-plugins/tmux-copycat
- https://git::@github.com/tmux-plugins/tmux-battery
- https://git::@github.com/tmux-plugins/tmux-sensible
  https://git::@github.com/tmux-plugins/tmux-open
+ https://git::@github.com/tmux-plugins/tmux-sensible
+ https://github.com/tmux-plugins/tpm
+ https://git::@github.com/tmux-plugins/tmux-cpu
  https://git::@github.com/caiogondim/maglev
+ https://git::@github.com/tmux-plugins/tmux-battery

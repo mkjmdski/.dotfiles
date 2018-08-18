@@ -1,0 +1,13 @@
+# Force ssh git protocol over https
+[url "git@github.com:"]
+insteadOf = https://github.com/
+
+[url "git@bitbucket.org:"]
+insteadOf = https://bitbucket.org/
+
+# Shortcuts for popular repos
+[url "git@github.com:"]
+    insteadOf = gh:
+
+[url "git@bitbucket.org:"]
+    insteadOf = bb:
