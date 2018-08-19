@@ -23,7 +23,7 @@ zplug "lib/*", from:oh-my-zsh
 
 #### BINARIES
 function _task_install {
-    echo "$fg[green]Installing task warrior, please wait, it can take some time ...$reset_color"
+    echo "$fg[green]Compiling task warrior from the source, please wait, it can take some time ...$reset_color"
     cmake -DCMAKE_BUILD_TYPE=release .
     make
     make install
@@ -37,7 +37,7 @@ zplug "peco/peco", as:command, from:gh-r
 zplug "mollifier/cd-gitroot", as:command
 zplug "plugins/extract", from:oh-my-zsh
 zplug "plugins/jump", from:oh-my-zsh
-zplug "GothenburgBitFactory/taskwarrior", at:2.6.0, hook-build:"_task_install"
+zplug "GothenburgBitFactory/taskwarrior", at:2.6.0, hook-build:"_task_install &> /dev/tty"
 zplug "ogham/exa", from:gh-r, as:command, use:"*$(_exa_release)*", hook-load:"_exa_aliases_load"
 zplug "gopasspw/gopass", from:gh-r, as:command, hook-load:"_gopass_autocomplete_load"
 
