@@ -1,11 +1,28 @@
 {
-    "Line_by_line": {
-        "prefix": "while",
-        "body": [
-          "while read -r ${1:element}; do",
-          "\t$0 $${1:element}",
-          "done ${2|<,<<<|} ${3:file}"
-        ],
-        "description": "Iterate over file lines"
-	}
+  "Line_by_line": {
+    "prefix": "while",
+    "body": [
+      "while read -r ${1:element}; do",
+      "\t$0 $${1:element}",
+      "done ${2|<,<<<|} ${3:file}"
+    ],
+    "description": "Iterate over file lines"
+  },
+  "Word_by_word": {
+    "prefix": "for",
+    "body": [
+      "for ${1:element} in $(cat ${2:file}); do",
+      "\t$0 $${1:element}",
+      "done"
+    ]
+  },
+  "String_equals": {
+    "prefix": "if",
+    "body": [
+      "if [\"${1:element_one}\" = \"${2:element_two}\"]; then",
+      "\t$0",
+      "${3|else, ,elif|}",
+      "fi"
+    ]
+  }
 }
