@@ -1,15 +1,25 @@
+#### EXPORTS
+export DOTFILES="$HOME/.dotfiles" # <- me
+export GPG_TTY=$(tty) # Use actual tty when prompting for GPG stuff
+export LANG=en_US.UTF-8 # Default language
+
 #### ZPLUG LOAD
 # Check if zplug is installed
-[[ ! -d ~/.zplug ]] && git clone https://github.com/zplug/zplug ~/.zplug
-export DOTFILES="$HOME/.dotfiles"
-export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
-
-# Change this variable to change theme from denysdovhan/spaceship-prompt
-# ZSH_THEME="dracula/zsh"
-
+[[ ! -d ~/.zplug ]] && git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
+ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
-zplug check || zplug install
-zplug load
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+zplug load --verbose
+clear
+
+#### LOADING PLUGINS FROM ZPLUG WHICH DON'T WORK ON HOOKS
+_autojump_load
+_ssh_connect_load
 
 #### CUSTOM INSTALLS OUTSIDE OF PLUGINS
 [[ ! $commands[glances] ]] && pip3 install netifaces py-cpuinfo glances
@@ -41,12 +51,6 @@ zplug load
     bindkey "^[OH" backward-kill-word # fn + left arrow
     bindkey "^[OF" kill-word # fn + right arrow
 }
-
-#### Use actual tty when prompting for GPG stuff
-export GPG_TTY=$(tty)
-
-#### Default language
-export LANG=en_US.UTF-8
 
 #### Node Virtual Machine Config
 # export NVM_DIR="$HOME/.nvm"
