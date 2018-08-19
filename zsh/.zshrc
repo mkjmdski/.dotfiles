@@ -3,8 +3,10 @@
 [[ ! -d ~/.zplug ]] && git clone https://github.com/zplug/zplug ~/.zplug
 export DOTFILES="$HOME/.dotfiles"
 export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
+
 # Change this variable to change theme from denysdovhan/spaceship-prompt
 # ZSH_THEME="dracula/zsh"
+
 source ~/.zplug/init.zsh
 zplug check || zplug install
 zplug load
@@ -32,10 +34,12 @@ zplug load
 
 #### ADDITIONAL KEY BINDINGS
 [ "$(uname)" = "Darwin" ] && {
-    bindkey "^[^[[C" forward-word
-    bindkey "^[^[[D" backward-word
-    bindkey "^[[H" beginning-of-line
-    bindkey "^[[F" end-of-line
+    bindkey "^[^[[C" forward-word # alt + right arrow
+    bindkey "^[^[[D" backward-word # alt + left arrow
+    bindkey "^[[5~" end-of-line # fn + up arrow
+    bindkey "^[[6~" beginning-of-line # fn + down arrow
+    bindkey "^[OH" backward-kill-word # fn + left arrow
+    bindkey "^[OF" kill-word # fn + right arrow
 }
 
 #### Use actual tty when prompting for GPG stuff
