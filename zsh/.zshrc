@@ -3,7 +3,7 @@
 [[ ! -d ~/.zplug ]] && git clone https://github.com/zplug/zplug ~/.zplug
 export DOTFILES="$HOME/.dotfiles"
 export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
-ZSH_CUSTOM_THEME="denysdovhan/spaceship-prompt"
+# Change this variable to change theme from denysdovhan/spaceship-prompt
 # ZSH_THEME="dracula/zsh"
 source ~/.zplug/init.zsh
 zplug check || zplug install
@@ -12,6 +12,7 @@ zplug load
 #### CUSTOM INSTALLS OUTSIDE OF PLUGINS
 [[ ! $commands[glances] ]] && pip3 install netifaces py-cpuinfo glances
 
+#### AUTOCOMPLETIONS
 # [[ $commands[aws] ]] && {
 #     aws_location="$(which aws)"
 #     [[ -h $aws_location ]] && aws_location=$(readlink $aws_location)
@@ -20,19 +21,14 @@ zplug load
 
 #### $PATH
 # Add go binaries
-if [ -d "$GOPATH" ]; then
-    export PATH="$GOPATH/bin:$PATH"
-elif [[ $commands[go] ]]; then
-    export PATH="$(go env GOPATH)/bin:$PATH"
-fi
+[ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH" || [[ $commands[go] ]] && export PATH="$(go env GOPATH)/bin:$PATH"
 
 # Add yarn global binaries
 [[ $commands[yarn] ]] && export PATH="$(yarn global bin):$PATH"
 
 # Add custom bin files
-for bin_path in "$HOME/bin" "$HOME/.local/bin/"; do
-  [ -d "$bin_path" ] && export PATH="$bin_path:$PATH"
-done
+[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
 #### ADDITIONAL KEY BINDINGS
 [ "$(uname)" = "Darwin" ] && {

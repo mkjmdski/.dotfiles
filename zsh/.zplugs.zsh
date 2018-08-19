@@ -60,17 +60,8 @@ zplug "plugins/docker-compose", from:oh-my-zsh, if:'[[ $commands[docker-compose]
 zplug "plugins/terraform", from:oh-my-zsh, if:'[[ $commands[terraform] ]]'
 
 #### THEMES
-# use custom theme if loading is custom, otherwise use ZSH_THEME
-if [ ! -z "$ZSH_CUSTOM_THEME" ]; then
-  # https://github.com/denysdovhan/spaceship-prompt/blob/master/docs/Options.md
-  # https://github.com/denysdovhan/spaceship-prompt/blob/master/docs/API.md
-  zplug "denysdovhan/spaceship-prompt", \
-    use:spaceship.zsh, from:github, \
-    as:theme, if:'[ "$ZSH_CUSTOM_THEME" = "denysdovhan/spaceship-prompt" ]'
-
-  # https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt
-  zplug "bhilburn/powerlevel9k", \
-    use:powerlevel9k.zsh-theme, if:'[ "$ZSH_CUSTOM_THEME" = "bhilburn/powerlevel9k" ]'
-elif [ ! -z "$ZSH_THEME" ]; then
-  zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
+if [ ! -z "$ZSH_THEME" ]; then
+    zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
+else
+    zplug "denysdovhan/spaceship-prompt", as:theme, if:'[ -z "$ZSH_THEME" ]'
 fi
