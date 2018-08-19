@@ -1,6 +1,4 @@
 #!/bin/bash
 set -e
 source "$DOTFILES/.lib/include.sh"
-install_extensions
 actualize_crontabs
-exit
