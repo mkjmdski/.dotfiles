@@ -2,8 +2,8 @@
 
 ## Requirements
 
-* `glances` - `pip3` binary in $PATH
-* `taskwarrior` - `gcc`, `make`, `cmake`
+* `gawk` - for ubuntu
+* `Python v2.6+ except v3.2` - for autojump
 
 ## Configuration
 
@@ -16,13 +16,11 @@ All of the plugins and external tools are collected in `.zplugs.zsh`:
 * [jq](https://github.com/stedolan/jq) - parsing json tool
 * [cloc](https://github.com/AlDanial/cloc) - counts code lines inside the project, usefull during refactors
 * [peco](https://github.com/peco/peco) - interactive grep for user, usefull when reading large outputs
-* [cd-gitroot](https://github.com/mollifier/cd-gitroot) - navigates to root of the git repository
 * [extract](https://github.com/robbyrussell/oh-my-zsh/plugins/extract) - allows using `x` to extract any archive
-* [jump](https://github.com/robbyrussell/oh-my-zsh/plugins/jump) - allows marking directories and jumping to them around filesystem
-* [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior) - task manager with timetracking functions. Awesome tool when working for various projects at the same time. It's compiled from source thus the first setup with this plugin activated can take some time!
+* [autojump](https://github.com/wting/autojump) - allows marking directories and jumping to them around filesystem
 * [exa](https://github.com/ogham/exa) - improved `ls` with extra colours for readability
 * [gopass](https://github.com/gopasspw/gopass) - [pass](https://github.com/peff/pass) implementation in go. Supports storing passwords on git backend with encryption. Access to secrets is based on GPG keyrings. Perfect tools for teams or configuration shared accross computers.
-* [glances](https://nicolargo.github.io/glances/) - is a modern `top` tool with many features based on python. Due to that it's **the** only plugin which is installed from pip instead of zplug. It's installation line is kept inside `.zshrc`
+* [ssh-connect](https://github.com/gko/ssh-connect) - manages and remembers your ssh connections.
 
 ## Themes
 

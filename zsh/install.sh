@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+if [[ -z "${DOTFILES}" ]]; then
+    export DOTFILES="$(git rev-parse --show-toplevel)"
+else
 source "$DOTFILES/.lib/include.sh"
 
 function _install_powerline_font { (
@@ -11,31 +14,14 @@ function _install_powerline_font { (
     rm -rf fonts
 ) }
 
-function install_powerline_fonts {
-    case "$(get_os)" in
-        Ubuntu*)
-            install_package_ubuntu fonts-powerline ttf-ancient-fonts
-        ;;
-        CentOS*)
-            _install_powerline_fonts
-        ;;
-        Darwin*)
-            _install_powerline_fonts
-        ;;
-    esac
-}
-
 function main {
     if ! zsh --version &> /dev/null; then
         install_package_universal zsh
         chsh -s /bin/zsh $USER #set zsh as current default shell
     fi
+    _install_powerline_fonts
     link_config ".zshrc"
 }
 
-if [ $1 = "--install-powerline-fonts" ]; then
-    install_powerline_fonts
-else
-    main
-    zsh
-fi
+main
+zsh

@@ -3,6 +3,7 @@ set -e
 source "$DOTFILES/.lib/include.sh"
 
 function main {
+    cat config/*.gitconfig > global.gitconfig
     git config --global include.path "$PWD/global.gitconfig"
     git config --global core.excludesfile "$PWD/global.gitignore"
     if ! icdiff --version &> /dev/null; then

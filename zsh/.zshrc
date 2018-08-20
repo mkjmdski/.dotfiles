@@ -14,15 +14,11 @@ if ! zplug check --verbose; then
         echo; zplug install
     fi
 fi
-zplug load --verbose
-clear
+zplug load
 
 #### LOADING PLUGINS FROM ZPLUG WHICH DON'T WORK ON HOOKS
 _autojump_load
 _ssh_connect_load
-
-#### CUSTOM INSTALLS OUTSIDE OF PLUGINS
-[[ ! $commands[glances] ]] && pip3 install netifaces py-cpuinfo glances
 
 #### AUTOCOMPLETIONS
 # [[ $commands[aws] ]] && {
@@ -33,24 +29,15 @@ _ssh_connect_load
 
 #### $PATH
 # Add go binaries
-[ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH" || [[ $commands[go] ]] && export PATH="$(go env GOPATH)/bin:$PATH"
-
+if [ -d "$GOPATH" ]; then export PATH="$GOPATH/bin:$PATH"
+elif [[ $commands[go] ]]; then export PATH="$(go env GOPATH)/bin:$PATH"
+fi
 # Add yarn global binaries
-[[ $commands[yarn] ]] && export PATH="$(yarn global bin):$PATH"
-
+if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
 # Add custom bin files
-[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
-[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
+if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
 
-#### ADDITIONAL KEY BINDINGS
-[ "$(uname)" = "Darwin" ] && {
-    bindkey "^[^[[C" forward-word # alt + right arrow
-    bindkey "^[^[[D" backward-word # alt + left arrow
-    bindkey "^[[5~" end-of-line # fn + up arrow
-    bindkey "^[[6~" beginning-of-line # fn + down arrow
-    bindkey "^[OH" backward-kill-word # fn + left arrow
-    bindkey "^[OF" kill-word # fn + right arrow
-}
 
 #### Node Virtual Machine Config
 # export NVM_DIR="$HOME/.nvm"
@@ -64,3 +51,17 @@ _ssh_connect_load
 #     source "$HOME/google-cloud-sdk/path.zsh.inc"
 #     source "$HOME/google-cloud-sdk/completion.zsh.inc"
 # }
+
+#### FUNCTIONS
+
+function cd-gitroot {
+    local root
+    root=$(git rev-parse --show-toplevel)
+    root
+}
+
+function gopass-clipboard {
+    local secret
+    secret=$(gopass show $1 | head -n 1)
+    clc $secret
+}
