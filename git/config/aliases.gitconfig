@@ -10,8 +10,8 @@
 	undo = reset --soft HEAD^
 	stash-all = stash save --include-untracked
 	pop = stash pop
-    unstage = reset HEAD --
-    this = !git init && git add -A && git commmit -m \"Initial commit.\"
+        unstage = reset HEAD --
+        this = !git init && git add -A && git commit -m \"Initial commit.\"
 	mark = !bash -c \"git tag -a $1 -m $1 --force \"
 	branch-delete = !bash -c \" \
 		git branch -D $1 && \
