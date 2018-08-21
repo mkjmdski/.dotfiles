@@ -71,5 +71,6 @@ function gopass-clipboard {
 
 #### ALIASES
 
-alias s="git status"
+## GIT
+alias s="git s"
 alias cdg="cd-gitroot"

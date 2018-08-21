@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+if [[ -z "${DOTFILES}" ]]; then
+    export DOTFILES="$(git rev-parse --show-toplevel)"
+fi
 source "$DOTFILES/.lib/include.sh"
 
 function install_tmux {

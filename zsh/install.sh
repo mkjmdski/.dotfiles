@@ -2,7 +2,7 @@
 set -e
 if [[ -z "${DOTFILES}" ]]; then
     export DOTFILES="$(git rev-parse --show-toplevel)"
-else
+fi
 source "$DOTFILES/.lib/include.sh"
 
 function _install_powerline_font { (

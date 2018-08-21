@@ -1,4 +1,7 @@
 #!/bin/bash
+if [[ -z "${DOTFILES}" ]]; then
+    export DOTFILES="$(git rev-parse --show-toplevel)"
+fi
 source "$DOTFILES/.lib/include.sh"
 
 function main {
