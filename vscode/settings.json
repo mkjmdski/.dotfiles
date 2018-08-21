@@ -9,5 +9,11 @@
     "files.trimTrailingWhitespace": true,
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
-    "editor.tabCompletion": true
+    "editor.tabCompletion": true,
+    "editor.cursorStyle": "block",
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.statusBar.feedback.visible": false,
+    "window.closeWhenEmpty": true,
+    "window.restoreFullscreen": true,
+    "window.restoreWindows": "all"
 }
