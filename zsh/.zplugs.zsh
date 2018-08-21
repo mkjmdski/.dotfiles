@@ -44,9 +44,16 @@ function _oh_my_zsh_aliases {
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 HIST_STAMPS="mm/dd/yyyy"
 zplug "robbyrussell/oh-my-zsh", use:"lib/*.zsh", hook-load:"_oh_my_zsh_aliases 2> /dev/tty"
-zplug "plugins/colored-man-pages", from:oh-my-zsh
-zplug "plugins/vi-mode", from:oh-my-zsh
 zplug "plugins/extract", from:oh-my-zsh
+zplug "plugins/colored-man-pages", from:oh-my-zsh
+
+#### ZSH Syntax
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+
+#### Using vim in terminal
+zplug "plugins/vi-mode", from:oh-my-zsh
+zplug "b4b4r07/zsh-vimode-visual", defer:3
 
 #### BINARIES
 zplug "stedolan/jq", from:gh-r, as:command
@@ -58,8 +65,6 @@ zplug "gopasspw/gopass", from:gh-r, as:command, use:"$(_gopass_release)", hook-l
 zplug "wting/autojump", as:command, hook-build:"_autojump_install 2> /dev/tty"
 
 #### AUTOCOMPLETIONS
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "plugins/docker", from:oh-my-zsh, if:'[[ $commands[docker] ]]'
 zplug "plugins/docker-compose", from:oh-my-zsh, if:'[[ $commands[docker-compose] ]]'
 zplug "plugins/terraform", from:oh-my-zsh, if:'[[ $commands[terraform] ]]'

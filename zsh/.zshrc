@@ -66,5 +66,10 @@ function cd-gitroot {
 function gopass-clipboard {
     local secret
     secret=$(gopass show $1 | head -n 1)
-    clc $secret
+    clc <<< $secret
 }
+
+#### ALIASES
+
+alias s="git status"
+alias cdg="cd-gitroot"
