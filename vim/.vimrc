@@ -16,6 +16,7 @@ Plugin 'tpope/vim-sensible'
 Plugin 'flazz/vim-colorschemes'
 Plugin 'bling/vim-bufferline'
 Plugin 'vim-syntastic/syntastic'
+Plugin 'jiangmiao/auto-pairs'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -30,7 +31,8 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
-
+" Automatic brackets closing
+let g:AutoPairsFlyMode = 1
 " Syntastic
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
