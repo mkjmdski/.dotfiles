@@ -11,15 +11,14 @@ function move_cache_to_config {
         git add "${config_localization}"
         git_action=1
     fi
-
 }
 
 function main {
     move_cache_to_config "vscode" "vscode/installed_vs_extensions"
-    move_cache_to_config "gitconfig" "git/global.gitconfig"
     if [ "$git_action" -eq 1 ]; then
-        git commit --amend -C HEAD --no-verify
+        git commit --amend --no-edit -C HEAD --no-verify
     fi
 }
+
 main > /dev/null
 exit
