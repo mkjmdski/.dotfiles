@@ -5,5 +5,4 @@ if [[ -z "${DOTFILES}" ]]; then
 fi
 source "$DOTFILES/.lib/include.sh"
 install_extensions
-actualize_crontabs
 exit

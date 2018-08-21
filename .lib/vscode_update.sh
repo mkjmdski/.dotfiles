@@ -5,7 +5,10 @@ function install_extensions {
     installed_extensions="$(code --list-extensions)"
     for extension in $(cat $extensions_file); do
         if [[ ! $installed_extensions = *"$extension"* ]]; then
-            code --install-extension "${extension}"
+            printf "Install ${extension}? [y/N]: "
+            if read -q; then
+                echo; code --install-extension "${extension}"
+            fi
         else
             echo "$extension is installed"
         fi
