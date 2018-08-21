@@ -1,8 +1,11 @@
 #### EXPORTS
+function _get_editor {
+    echo $(which vim) || echo $(which vi)
+}
 export DOTFILES="$HOME/.dotfiles" # <- me
 export GPG_TTY=$(tty) # Use actual tty when prompting for GPG stuff
 export LANG=en_US.UTF-8 # Default language
-
+export EDITOR="$(_get_editor)"
 #### ZPLUG LOAD
 # Check if zplug is installed
 [[ ! -d ~/.zplug ]] && git clone --depth=1 https://github.com/zplug/zplug ~/.zplug

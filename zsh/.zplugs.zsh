@@ -84,5 +84,4 @@ fi
 #### OSX PLUGINS
 if [ "$(uname)" = "Darwin" ]; then
     zplug "tysonwolker/iterm-tab-colors"
-    zplug "zsh-users/zsh-apple-touchbar"
 fi
