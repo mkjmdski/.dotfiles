@@ -19,6 +19,14 @@ function _autojump_load {
 function _ssh_connect_load {
     source $ZPLUG_HOME/repos/gko/ssh-connect/ssh-connect.sh
 }
+function _history_substring_search_bindings {
+    if [ "$(uname)" = "Darwin" ]; then
+        bindkey '^[OA' history-substring-search-up
+        bindkey '^[OB' history-substring-search-down
+    fi
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+}
 
 #### AUTOCOMPLETIONS
 function _gopass_autocomplete_load {
@@ -50,6 +58,7 @@ zplug "plugins/colored-man-pages", from:oh-my-zsh
 #### ZSH Syntax
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "zsh-users/zsh-history-substring-search", defer:3, hook-load:"_history_substring_search_bindings"
 
 #### Using vim in terminal
 zplug "plugins/vi-mode", from:oh-my-zsh
