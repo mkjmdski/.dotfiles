@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-#### ZPLUG AUTOUPDATE
+# this allows zplug to update itself on `zplug update`
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 #### HELPERS
@@ -16,14 +16,13 @@ function _autojump_load {
     [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
     autoload -U compinit && compinit -u
 }
-function _ssh_connect_load {
-    source $ZPLUG_HOME/repos/gko/ssh-connect/ssh-connect.sh
-}
 function _history_substring_search_bindings {
+    # History substring search for OSX
     if [ "$(uname)" = "Darwin" ]; then
         bindkey '^[OA' history-substring-search-up
         bindkey '^[OB' history-substring-search-down
     fi
+    # History substring search for vim normal mode
     bindkey -M vicmd 'k' history-substring-search-up
     bindkey -M vicmd 'j' history-substring-search-down
 }
@@ -53,25 +52,30 @@ function _oh_my_zsh_aliases {
 HIST_STAMPS="mm/dd/yyyy"
 zplug "robbyrussell/oh-my-zsh", use:"lib/*.zsh", hook-load:"_oh_my_zsh_aliases 2> /dev/tty"
 zplug "plugins/extract", from:oh-my-zsh
-zplug "plugins/colored-man-pages", from:oh-my-zsh
 
-#### ZSH Syntax
+#### ZSH magic
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "zsh-users/zsh-history-substring-search", defer:3, hook-load:"_history_substring_search_bindings"
+zplug "plugins/colored-man-pages", from:oh-my-zsh
 
-#### Using vim in terminal
+#### Vimode for zsh
 zplug "plugins/vi-mode", from:oh-my-zsh
 zplug "b4b4r07/zsh-vimode-visual", defer:3
 
-#### BINARIES
+#### Parsing outputs
 zplug "stedolan/jq", from:gh-r, as:command
-zplug "AlDanial/cloc", as:command
 zplug "peco/peco", as:command, from:gh-r
-zplug "gko/ssh-connect", as:command
+
+#### Better system navigation
 zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)", hook-load:"_exa_aliases_load 2> /dev/tty"
-zplug "gopasspw/gopass", from:gh-r, as:command, use:"$(_gopass_release)", hook-load:"_gopass_autocomplete_load 2> /dev/tty"
 zplug "wting/autojump", as:command, hook-build:"_autojump_install 2> /dev/tty"
+
+#### Count lines of code
+zplug "AlDanial/cloc", as:command
+
+#### gopass
+zplug "gopasspw/gopass", from:gh-r, as:command, use:"$(_gopass_release)", hook-load:"_gopass_autocomplete_load 2> /dev/tty"
 
 #### AUTOCOMPLETIONS
 zplug "plugins/docker", from:oh-my-zsh, if:'[[ $commands[docker] ]]'
@@ -86,8 +90,6 @@ zplug "plugins/terraform", from:oh-my-zsh, if:'[[ $commands[terraform] ]]'
 # zplug "plugins/vault", from:oh-my-zsh, if:'[[ $commands[vault] ]]'
 
 #### THEMES
-# Uncomment this variable to change theme from denysdovhan/spaceship-prompt
-# ZSH_THEME="dracula/zsh"
 if [ ! -z "$ZSH_THEME" ]; then
     zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
 else

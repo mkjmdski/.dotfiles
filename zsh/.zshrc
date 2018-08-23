@@ -1,18 +1,21 @@
 #### EXPORTS
-function _get_editor {
-    echo $(which vim) || echo $(which vi)
-}
-export DOTFILES="$HOME/.dotfiles" # <- me
-export GPG_TTY=$(tty) # Use actual tty when prompting for GPG stuff
-export LANG=en_US.UTF-8 # Default language
+function _get_editor { echo $(which vim) || echo $(which vi) }
 export EDITOR="$(_get_editor)"
+export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
+export LANG=en_US.UTF-8 # Default language
+
+# Uncomment this export line to change theme from denysdovhan/spaceship-prompt
+# export ZSH_THEME="dracula/zsh"
+
 #### ZPLUG LOAD
-# Check if zplug is installed
+export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
+# Install zplug if not installed
 [[ ! -d ~/.zplug ]] && git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
+# Show where are located plugins definitions
 ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
 if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
+    printf "Install? [y/N]: " # Prompt about installing plugins
     if read -q; then
         echo; zplug install
     fi
@@ -21,7 +24,6 @@ zplug load
 
 #### LOADING PLUGINS FROM ZPLUG WHICH DON'T WORK ON HOOKS
 _autojump_load
-_ssh_connect_load
 
 #### AUTOCOMPLETIONS
 # [[ $commands[aws] ]] && {

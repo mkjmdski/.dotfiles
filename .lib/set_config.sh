@@ -1,20 +1,23 @@
 #!/bin/bash
 
 function link_config {
-    local currDir targetDir
-    currDir=$PWD
+    local curr_dir target_dir
+    curr_dir=$PWD
     if [ "$1" = "--target-directory" ]; then
-        targetDir="$2"
+        target_dir="$2"
         shift
         shift
     else
-        targetDir="$HOME"
+        target_dir="$HOME"
     fi
     for config_file in "$@"; do (
-        [[ -h "$targetDir/$config_file" ]] && unlink "$targetDir/$config_file" #is already a symlink
-        [[ -e "$targetDir/$config_file" ]] && rm -rf "$targetDir/$config_file" #is file or directory
-        cd "$targetDir" || exit 1
-        ln -s "$currDir/$config_file" "$config_file"
+        [[ -h "${target_dir}/${config_file}" ]] && unlink "${target_dir}/${config_file}" #is already a symlink
+        [[ -e "${target_dir}/${config_file}" ]] && {
+            echo "${target_dir}/${config_file} exists, creating backup at ${target_dir}/${config_file}.bkp "
+            mv "${target_dir}/${config_file}" "${target_dir}/${config_file}.bkp"
+        }
+        cd "${target_dir}" || exit 1 && echo "No such directory ${target_dir}"
+        ln -s "${curr_dir}/${config_file}" "${config_file}"
     ) done
 }
 
