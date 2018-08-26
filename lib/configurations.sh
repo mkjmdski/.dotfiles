@@ -11,13 +11,17 @@ function link_config {
         target_dir="$HOME"
     fi
     for config_file in "$@"; do (
-        [[ -h "${target_dir}/${config_file}" ]] && unlink "${target_dir}/${config_file}" #is already a symlink
-        [[ -e "${target_dir}/${config_file}" ]] && {
-            echo "${target_dir}/${config_file} exists, creating backup at ${target_dir}/${config_file}.bkp "
+        if [ -h "${target_dir}/${config_file}" ]; then
+            _log_info "unlinking ${target_dir}/${config_file}"
+            unlink "${target_dir}/${config_file}"
+        fi
+        if [ -e "${target_dir}/${config_file}" ]; then
+            _log_info "${target_dir}/${config_file} exists, creating backup at ${target_dir}/${config_file}.bkp"
             mv "${target_dir}/${config_file}" "${target_dir}/${config_file}.bkp"
-        }
-        cd "${target_dir}" || exit 1 && echo "No such directory ${target_dir}"
+        fi
+        cd "${target_dir}"
         ln -s "${curr_dir}/${config_file}" "${config_file}"
+        _log_info "link created succesfully: ${curr_dir}/${config_file}" "${config_file}"
     ) done
 }
 

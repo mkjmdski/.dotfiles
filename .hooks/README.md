@@ -10,4 +10,8 @@ Just enter this directory with cd and run `install.sh`
 
 ## What do they do
 
-After each commit your vscode plugins are updated, so this repository contains your actuall set of plugins. Also snippets for git configuration are compiled to one file included in the global config.
+If commit message contains tag `[ext]` your current vscode extensions are taken as update list. This can break your tagging!
+
+After each pull you are asked about installing new set of extensions.
+
+You can also run this command manually if your `.zshrc` sources `lib` (by defualt yes)

@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-
-function main {
-    code --list-extensions > .commit-cache-vscode
-}
-
-main > /dev/null
-exit

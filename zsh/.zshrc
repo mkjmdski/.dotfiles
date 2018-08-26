@@ -1,36 +1,61 @@
 #### EXPORTS
+export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
+
 function _get_editor { echo $(which vim) || echo $(which vi) }
 export EDITOR="$(_get_editor)"
+
 export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
 export LANG=en_US.UTF-8 # Default language
 
-# Uncomment this export line to change theme from denysdovhan/spaceship-prompt
-# export ZSH_THEME="dracula/zsh"
+#### LIBRARY
+source "${DOTFILES}/lib/log.sh"
+source "${DOTFILES}/lib/plugins.sh"
 
-#### ZPLUG LOAD
-export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
+#### LINUXBREW LOAD
+if [ "$(uname)" = "Linux" ]; then
+    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+        export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+        export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
+        export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
+    fi
+fi
+
+#### ZPLUG
+
 # Install zplug if not installed
-[[ ! -d ~/.zplug ]] && git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
-# Show where are located plugins definitions
+if [ ! -d ~/.zplug ]; then git clone --depth=1 https://github.com/zplug/zplug ~/.zplug; fi
+
+# Load oh my zsh and plugins from repository file
+# Variables for .zplugs.zsh file
+# export ZSH_THEME="eendroroy/alien"
 ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
+
 source ~/.zplug/init.zsh
 if ! zplug check --verbose; then
-    printf "Install? [y/N]: " # Prompt about installing plugins
+    _log_info "Install zplugs? [y/N]: " # Prompt about installing plugins
     if read -q; then
         echo; zplug install
     fi
 fi
 zplug load
 
-#### LOADING PLUGINS FROM ZPLUG WHICH DON'T WORK ON HOOKS
-_autojump_load
+#### OTHER PLUGS LOAD
+if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
+    source $HOME/.autojump/etc/profile.d/autojump.sh
+fi
+#### Node Virtual Machine Config
+# export NVM_DIR="$HOME/.nvm"
+# if [ -d "$NVM_DIR" ]; then
+#   \. "$NVM_DIR/nvm.sh"  # This loads nvm
+#   \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# fi
 
-#### AUTOCOMPLETIONS
-# [[ $commands[aws] ]] && {
-#     aws_location="$(which aws)"
-#     [[ -h $aws_location ]] && aws_location=$(readlink $aws_location)
-#     source "$(dirname $aws_location)/aws_zsh_completer.sh"
-# }
+#### Google SDK
+# if [ -d "$HOME/google-cloud-sdk" ]; then
+#     source "$HOME/google-cloud-sdk/path.zsh.inc"
+#     source "$HOME/google-cloud-sdk/completion.zsh.inc"
+# fi
+
 
 #### $PATH
 # Add go binaries
@@ -43,26 +68,11 @@ if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
 if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
 if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
 
-
-#### Node Virtual Machine Config
-# export NVM_DIR="$HOME/.nvm"
-# [ -d "$NVM_DIR" ] && {
-#   \. "$NVM_DIR/nvm.sh"  # This loads nvm
-#   \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-# }
-
-#### Google SDK
-# [ -d "$HOME/google-cloud-sdk" ] && {
-#     source "$HOME/google-cloud-sdk/path.zsh.inc"
-#     source "$HOME/google-cloud-sdk/completion.zsh.inc"
-# }
-
 #### FUNCTIONS
-
 function cd-gitroot {
     local root
     root=$(git rev-parse --show-toplevel)
-    root
+    eval $root
 }
 
 function gopass-clipboard {
@@ -72,7 +82,11 @@ function gopass-clipboard {
 }
 
 #### ALIASES
-
 ## GIT
 alias s="git s"
 alias cdg="cd-gitroot"
+## Color ls
+alias ls="colorls"
+alias t="ls -A --tree"
+alias l="ls -lA"
+unalias la ll lsa

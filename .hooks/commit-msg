@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+commit_message="$1"
+if echo "*${commit_message}*" | grep --quiet "[ext]"; then
+    code --list-extensions > .commit-cache-vscode
+fi
+exit

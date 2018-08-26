@@ -13,4 +13,4 @@ Dotfiles repositories are great practice among developers, because we can share 
 ## Additional files
 
 * .hooks - git hooks used to generate configuration files of this repository
-* .lib - shared shell code which helps in autoinstallation of configurations
+* lib - shared shell code which helps in autoinstallation of configurations

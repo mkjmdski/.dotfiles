@@ -1,17 +1,14 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
-if [[ -z "${DOTFILES}" ]]; then
-    export DOTFILES="$(git rev-parse --show-toplevel)"
-fi
-source "$DOTFILES/.lib/include.sh"
+for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
+    source "${file}"
+done
 
 function main {
-    cat "$DOTFILES/config/*.gitconfig" > "$DOTFILES/git/global.gitconfig"
-    git config --global include.path "$DOTFILES/global.gitconfig"
-    git config --global core.excludesfile "$DOTFILES/global.gitignore"
-    if ! icdiff --version &> /dev/null; then
-        sudo pip install git+https://github.com/jeffkaufman/icdiff.git
-    fi
+    git config --global include.path "$DOTFILES/git/global.gitconfig"
+    git config --global core.excludesfile "$DOTFILES/git/global.gitignore"
 }
 
+_log_info "Linking files to global git configuration"
 main
+_log_info "Success"

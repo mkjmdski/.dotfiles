@@ -3,13 +3,16 @@ set -e
 git_action=0
 
 function move_cache_to_config {
-    local config_name config_directory
+    local config_name config_localization
     config_name="$1"
     config_localization="$2"
     if [ -a ".commit-cache-${config_name}" ]; then
         mv ".commit-cache-${config_name}" "${config_localization}"
-        git add "${config_localization}"
-        git_action=1
+        CHANGED=`git diff HEAD@{1} --stat -- "${config_localization}" | wc -l`
+        if [ $CHANGED -gt 0 ]; then
+            git add "${config_localization}"
+            git_action=1
+        fi
     fi
 }
 
@@ -19,6 +22,5 @@ function main {
         git commit --amend --no-edit -C HEAD --no-verify
     fi
 }
-
-main > /dev/null
+main
 exit

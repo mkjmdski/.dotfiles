@@ -1,9 +1,5 @@
 # Git
 
-## Developing this repository
-
-All files inside `conifg` are during commit merged into `.gitconfig` which is sourced by your global git configuration. While testing edit `.gitconfig` file and when commiting add new file or edit existing ones inside config directory. This way configuration is more readeable.
-
 ## Editor
 
 During `git rebase -i` or `git commit --amend` you have to enter the editor. Some of us are picky about this and don't like the default one (for e.g. nano in Ubuntu). You can change that for any of your choice. I chose `vim`. But nothing stands against picking `code` or `atom` or `sublime`. See commented lines in `config/core` to check out this feature!

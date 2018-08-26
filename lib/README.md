@@ -12,8 +12,6 @@ Even if each file is separated, access to them is shared. It means once you sour
 
 `get_os` returns `Darwin` (osx) or name of Linux distribution
 
-`install_package_<centos,darwin,ubuntu,universal>` installs packages given as arguments on the certain system
-
 `clone_repos_from_file` clones repositories included in text file (each one new line) to `$PWD` or directory passed as a second argument
 
 `link_config` if you pass --target-directory as a first argument it will link configuration files to this directory. Otherwise all other arguments are linked with same name in `$HOME`

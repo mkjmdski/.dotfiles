@@ -1,11 +1,9 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
-if [[ -z "${DOTFILES}" ]]; then
-     export DOTFILES="$(git rev-parse --show-toplevel)"
-fi
-source "$DOTFILES/.lib/include.sh"
-
-function set_config_path {
+for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
+    source "${file}"
+done
+function vscode_config_path {
     unameOut="$(uname -s)"
     case "${unameOut}" in
         Linux*)
@@ -19,8 +17,8 @@ function set_config_path {
 }
 
 function main {
-    link_config --target-directory "$(set_config_path)" settings.json snippets
-    install_extensions
+    link_config --target-directory "$(vscode_config_path)" settings.json snippets
+    install_vscode_extensions
 }
 
 main

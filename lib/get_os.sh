@@ -1,7 +1,6 @@
 #!/bin/bash
-set -e
 
-function _get_distro { (
+function get_distro { (
     if [ -f /etc/os-release ]; then
         source /etc/os-release
         echo "${NAME}" | cut -d" " -f 1
@@ -25,7 +24,7 @@ function get_os {
     unameOut="$(uname -s)"
     case "${unameOut}" in
         Linux*)
-            distro="$(_get_distro)"
+            distro="$(get_distro)"
             case "${distro}" in
                 Ubuntu|CentOS) echo "${distro}"
                 ;;

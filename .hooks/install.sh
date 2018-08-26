@@ -1,11 +1,11 @@
-#!/bin/bash
-if [[ -z "${DOTFILES}" ]]; then
-    export DOTFILES="$(git rev-parse --show-toplevel)"
-fi
-source "$DOTFILES/.lib/include.sh"
-
+#!/bin/zsh
+set -e
+for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
+    source "${file}"
+done
 function main {
-    link_config --target-directory ../.git/hooks post-commit pre-commit post-merge
+    link_config --target-directory "$(git rev-parse --show-toplevel)/.git/hooks" post-commit commit-msg post-merge
 }
-
+_log_info "Installing git hooks"
 main
+_log_info "Success"
