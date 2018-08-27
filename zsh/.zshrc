@@ -100,5 +100,9 @@ unalias la ll lsa
 setopt auto_cd
 
 #### SET COLORS FOR MAN PAGES
-export LESS="--RAW-CONTROL-CHARS"
-. $DOTFILES/.less_colors
+export PAGER="most"
+
+#### COMPLETION COLORS
+# ls with color
+eval $(gdircolors $DOTFILES/.dir_colors)
+zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"

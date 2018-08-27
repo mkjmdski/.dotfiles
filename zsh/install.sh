@@ -43,7 +43,6 @@ function _install_brew {
         elif [ "$(uname)" = "Darwin" ]; then
             ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
-    else
     fi
 }
 

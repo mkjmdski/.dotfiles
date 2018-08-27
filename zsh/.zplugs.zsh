@@ -32,13 +32,13 @@ function _gopass_autocomplete_load {
 
 #### OH-MY-ZSH
 HIST_STAMPS="dd.mm.yyyy"
-zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,history,termsupport}.zsh"
+zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,history,termsupport,key-bindings}.zsh"
 zplug "plugins/extract", from:oh-my-zsh
 
 #### ZSH MAGIC
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
-zplug "zsh-users/zsh-history-substring-search", defer:3, hook-load:"_history_substring_search_bindings"
+zplug "zsh-users/zsh-history-substring-search", defer:3, hook-load:"_history_substring_search_bindings 2> /dev/tty"
 
 #### PARSING OUTPUTS
 zplug "stedolan/jq", from:gh-r, as:command
@@ -79,13 +79,10 @@ function _configure_spaceship {
     spaceship_vi_mode_enable
 }
 
-#### OSX PLUGINS
-if [ "$(uname)" = "Darwin" ]; then
-    zplug "tysonwolker/iterm-tab-colors"
-fi
-
 #### CUSTOM PLUGINS
 #### lib/plugins.sh
 _install_custom_plugin "ag" "brew install the_silver_searcher"
 _install_custom_plugin "glances" "curl -L https://bit.ly/glances | /bin/bash"
 _install_custom_plugin "colorls" "sudo gem install colorls"
+_install_custom_plugin "most" "brew install most"
+_install_custom_plugin "gls" "brew install coreutils"

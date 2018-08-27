@@ -4,7 +4,7 @@
 
 This vim configuration is basic due to fact that I'm not an expert in vim. It's got minimal set of features which can help in exploring vim world instead of getting lost by drowning in ocean of plugins.
 
-#Plugins
+## Plugins
 
 Plugins managed by [Vundle](https://github.com/VundleVim/Vundle.vim):
 
