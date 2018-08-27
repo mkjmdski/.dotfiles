@@ -43,18 +43,15 @@ zplug load
 if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
     source $HOME/.autojump/etc/profile.d/autojump.sh
 fi
-#### Node Virtual Machine Config
-# export NVM_DIR="$HOME/.nvm"
-# if [ -d "$NVM_DIR" ]; then
-#   \. "$NVM_DIR/nvm.sh"  # This loads nvm
-#   \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-# fi
 
-#### Google SDK
-# if [ -d "$HOME/google-cloud-sdk" ]; then
-#     source "$HOME/google-cloud-sdk/path.zsh.inc"
-#     source "$HOME/google-cloud-sdk/completion.zsh.inc"
-# fi
+#### Node Virtual Machine Config
+function load_nvm {
+    export NVM_DIR="$HOME/.nvm"
+    if [ -d "$NVM_DIR" ]; then
+    \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    fi
+}
 
 
 #### $PATH
@@ -81,6 +78,14 @@ function gopass-clipboard {
     clc <<< $secret
 }
 
+function take {
+  mkdir -p $@ && cd ${@:$#}
+}
+
+function zsh_stats {
+  fc -l 1 | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20
+}
+
 #### ALIASES
 ## GIT
 alias s="git s"
@@ -90,3 +95,10 @@ alias ls="colorls"
 alias t="ls -A --tree"
 alias l="ls -lA"
 unalias la ll lsa
+
+#### CUSTOM ZSH CONFIGURATIONS
+setopt auto_cd
+
+#### SET COLORS FOR MAN PAGES
+export LESS="--RAW-CONTROL-CHARS"
+. $DOTFILES/.less_colors
