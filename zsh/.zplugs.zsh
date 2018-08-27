@@ -9,13 +9,18 @@ function _exa_release {
 function _gopass_release {
     [ "$(uname)" = "Linux" ] && echo '*linux*amd64*tar.gz' || echo '*darwin*'
 }
+function _ccat_release {
+    [ "$(uname)" = "Darwin" ] && echo '*darwin*tar.gz' || [ "$(uname)" = "Linux" ] && echo '*linux*amd64*tar.gz'
+}
 function _autojump_install {
     ./install.py
 }
 function _install_ranger_deps {
     brew install highlight
 }
-
+function _ccat_load {
+    alias cat="ccat --bg='dark'"
+}
 function _history_substring_search_bindings {
     bindkey '^[OA' history-substring-search-up
     bindkey '^[OB' history-substring-search-down
@@ -56,8 +61,11 @@ zplug "ranger/ranger", use:ranger.py, rename-to:ranger, as:command, hook-build:"
 #### DIFF TOOL FOR GIT
 zplug "jeffkaufman/icdiff", use:icdiff.py, rename-to:icdiff, as:command
 
+#### CAT WITH SYNTAX HIGHLIGHTING
+zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command, hook-load:"_ccat_load 2> /dev/tty"
+
 #### AUTOCOMPLETIONS FROM ZSH
-for plugin in docker-compose; do
+for plugin in docker docker-compose; do
     zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
 done
 
