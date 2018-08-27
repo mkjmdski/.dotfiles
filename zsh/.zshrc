@@ -75,7 +75,7 @@ function cd-gitroot {
 function gopass-clipboard {
     local secret
     secret=$(gopass show $1 | head -n 1)
-    clc <<< $secret
+    clipcopy <<< $secret
 }
 
 function take {
