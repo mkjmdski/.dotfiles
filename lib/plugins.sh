@@ -6,7 +6,6 @@ function _install_custom_plugin {
     if ! which $program &> /dev/null; then
         _log_info "Install $program? [y/N]: " # Prompt about installing plugins
         if read -q; then
-            echo
             eval $installation_script
         fi
     fi

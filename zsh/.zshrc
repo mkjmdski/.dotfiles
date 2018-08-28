@@ -21,15 +21,12 @@ if [ "$(uname)" = "Linux" ]; then
 fi
 
 #### ZPLUG
-
 # Install zplug if not installed
 if [ ! -d ~/.zplug ]; then git clone --depth=1 https://github.com/zplug/zplug ~/.zplug; fi
 
-# Load oh my zsh and plugins from repository file
 # Variables for .zplugs.zsh file
 # export ZSH_THEME="eendroroy/alien"
 ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
-
 source ~/.zplug/init.zsh
 if ! zplug check --verbose; then
     _log_info "Install zplugs? [y/N]: " # Prompt about installing plugins
@@ -44,7 +41,22 @@ if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
     source $HOME/.autojump/etc/profile.d/autojump.sh
 fi
 
-#### Node Virtual Machine Config
+#### $PATH
+# Add go binaries
+if [ -d "$GOPATH" ]; then
+    export PATH="$GOPATH/bin:$PATH"
+elif [[ $commands[go] ]]; then
+    export PATH="$(go env GOPATH)/bin:$PATH"
+fi
+
+# Add yarn global binaries
+if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
+
+# Add custom bin files
+if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
+if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
+
+#### FUNCTIONS
 function load_nvm {
     export NVM_DIR="$HOME/.nvm"
     if [ -d "$NVM_DIR" ]; then
@@ -53,19 +65,6 @@ function load_nvm {
     fi
 }
 
-
-#### $PATH
-# Add go binaries
-if [ -d "$GOPATH" ]; then export PATH="$GOPATH/bin:$PATH"
-elif [[ $commands[go] ]]; then export PATH="$(go env GOPATH)/bin:$PATH"
-fi
-# Add yarn global binaries
-if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
-# Add custom bin files
-if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
-if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
-
-#### FUNCTIONS
 function cd-gitroot {
     local root
     root=$(git rev-parse --show-toplevel)
@@ -95,6 +94,8 @@ alias ls="colorls"
 alias t="ls -A --tree"
 alias l="ls -lA"
 unalias la ll lsa
+## rm
+alias rmf="rm -rf"
 
 #### CUSTOM ZSH CONFIGURATIONS
 setopt auto_cd

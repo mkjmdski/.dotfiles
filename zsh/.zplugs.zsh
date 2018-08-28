@@ -64,6 +64,9 @@ zplug "jeffkaufman/icdiff", use:icdiff.py, rename-to:icdiff, as:command
 #### CAT WITH SYNTAX HIGHLIGHTING
 zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command, hook-load:"_ccat_load 2> /dev/tty"
 
+#### CHEAT SHEAT
+zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
+
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose; do
     zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
