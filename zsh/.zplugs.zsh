@@ -12,6 +12,9 @@ function _gopass_release {
 function _ccat_release {
     [ "$(uname)" = "Darwin" ] && echo '*darwin*tar.gz' || [ "$(uname)" = "Linux" ] && echo '*linux*amd64*tar.gz'
 }
+function _fd_release {
+    [ "$(uname)" = "Linux" ] && echo "*x86_64*linux*gnu*tar.gz*" || [ "$(uname)" = "Darwin" ] && echo "*darwin*"
+}
 function _autojump_install {
     ./install.py
 }
@@ -68,8 +71,13 @@ zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command, hook-load:
 zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
 
 #### LS TOOLS
-zplug "ogham/exa", from:gh-r, as:command, use:"*$(_exa_release)*"
+zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
 _install_custom_plugin "colorls" "sudo gem install colorls"
+_install_custom_plugin "gls" "brew install coreutils"
+
+#### FIND TOOLS
+zplug "sharkdp/fd", from:gh-r, as:command, use:"$(_fd_release)"
+_install_custom_plugin "ag" "brew install the_silver_searcher"
 
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose; do
@@ -94,7 +102,5 @@ function _configure_spaceship {
 
 #### CUSTOM PLUGINS
 #### lib/plugins.sh
-_install_custom_plugin "ag" "brew install the_silver_searcher"
 _install_custom_plugin "glances" "curl -L https://bit.ly/glances | /bin/bash"
 _install_custom_plugin "most" "brew install most"
-_install_custom_plugin "gls" "brew install coreutils"
