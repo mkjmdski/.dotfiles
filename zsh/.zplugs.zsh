@@ -67,6 +67,10 @@ zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command, hook-load:
 #### CHEAT SHEAT
 zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
 
+#### LS TOOLS
+zplug "ogham/exa", from:gh-r, as:command, use:"*$(_exa_release)*"
+_install_custom_plugin "colorls" "sudo gem install colorls"
+
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose; do
     zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
@@ -75,11 +79,9 @@ done
 #### THEMES
 if [ ! -z "$ZSH_THEME" ]; then
     zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
-
     #### VIMODE FOR TYPING COMMANDS IN ZSH
     zplug "plugins/vi-mode", from:oh-my-zsh
     zplug "b4b4r07/zsh-vimode-visual", defer:3
-
 else
     zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme, hook-load:"_configure_spaceship 2> /dev/tty", if:'[ -z "$ZSH_THEME" ]'
 fi
@@ -94,6 +96,5 @@ function _configure_spaceship {
 #### lib/plugins.sh
 _install_custom_plugin "ag" "brew install the_silver_searcher"
 _install_custom_plugin "glances" "curl -L https://bit.ly/glances | /bin/bash"
-_install_custom_plugin "colorls" "sudo gem install colorls"
 _install_custom_plugin "most" "brew install most"
 _install_custom_plugin "gls" "brew install coreutils"
