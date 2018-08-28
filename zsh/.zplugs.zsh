@@ -72,12 +72,9 @@ zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
 
 #### LS TOOLS
 zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
-_install_custom_plugin "colorls" "sudo gem install colorls"
-_install_custom_plugin "gls" "brew install coreutils"
 
 #### FIND TOOLS
 zplug "sharkdp/fd", from:gh-r, as:command, use:"$(_fd_release)"
-_install_custom_plugin "ag" "brew install the_silver_searcher"
 
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose; do
@@ -99,8 +96,3 @@ function _configure_spaceship {
     SPACESHIP_BATTERY_THRESHOLD="95"
     spaceship_vi_mode_enable
 }
-
-#### CUSTOM PLUGINS
-#### lib/plugins.sh
-_install_custom_plugin "glances" "curl -L https://bit.ly/glances | /bin/bash"
-_install_custom_plugin "most" "brew install most"

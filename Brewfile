@@ -1,0 +1,5 @@
+brew "thefuck"
+brew "most"
+brew "coreutils"
+brew "the_silver_searcher"
+brew "glances"
