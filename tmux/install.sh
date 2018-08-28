@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 set -e
 for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
     source "${file}"
@@ -9,6 +9,6 @@ function main {
     link_config .tmux.conf
 }
 
-_log_info "Installing tmux"
+echo " >> Installing tmux"
 main
-_log_info "Success"
+echo " >> Success"

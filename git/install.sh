@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 set -e
 for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
     source "${file}"
@@ -9,6 +9,6 @@ function main {
     git config --global core.excludesfile "$DOTFILES/git/global.gitignore"
 }
 
-_log_info "Linking files to global git configuration"
+echo " >> Linking files to global git configuration"
 main
-_log_info "Success"
+echo " >> Success"

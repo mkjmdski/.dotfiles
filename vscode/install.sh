@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 set -e
 for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
     source "${file}"

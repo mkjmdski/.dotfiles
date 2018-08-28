@@ -23,50 +23,13 @@ function _expand_path {
     # Add custom bin files
     if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
     if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
-}
 
-function _load_brew {
     #### LOAD BREW PATH ON LINUX
     if [ "$(uname)" = "Linux" ]; then
         if [ -d "/home/linuxbrew/.linuxbrew" ]; then
             export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
             export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
             export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
-        fi
-    fi
-
-    #### INSTALL DEPS FROM BREWFILE
-    (
-        cd $DOTFILES
-        local brew_info="$(brew bundle check --verbose 2> /dev/null)"
-        if [ "$?" -ne 0 ] ; then
-            echo "${brew_info}" | grep "→"
-            _log_info "Install missing brew formulas? [y/N]: " # Prompt about installing plugins
-            if read -q; then
-                echo; brew bundle
-            fi
-        fi
-    )
-}
-
-function _load_gems {
-    local -a gems=(
-        colorls
-    )
-    local -a uninstalled_gems
-    for gem in "${gems[@]}"; do
-        if ! gem list -i "${gem}" &> /dev/null; then
-            uninstalled_gems+=("${gem}")
-        fi
-    done
-    if [ ${#uninstalled_gems[@]} -ne 0 ]; then
-        echo "${uninstalled_gems[@]}"
-        _log_info "Install missing gems? [y/N]: "
-        if read -q; then
-            echo;
-            for gem in "${uninstalled_gems[@]}"; do
-                gem install --user-install "${gem}"
-            done
         fi
     fi
 }
@@ -90,19 +53,16 @@ function _load_zplug {
 
 function _load_others {
     #### LOAD AUTOJUMP
-    if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then source $HOME/.autojump/etc/profile.d/autojump.sh fi
+    if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then source $HOME/.autojump/etc/profile.d/autojump.sh; fi
 }
 
 function _init_zsh {
     export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
-    source "${DOTFILES}/lib/log.sh"
+    source "${DOTFILES}/zsh/functions.zsh"
     _system_exports
     _expand_path
     _load_zplug
-    _load_brew
-    _load_gems
     _load_others
-    source "${DOTFILES}/zsh/functions.zsh"
     source "${DOTFILES}/zsh/aliases.zsh"
     source "${DOTFILES}/zsh/configuration.zsh"
 }
