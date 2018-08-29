@@ -35,6 +35,7 @@ function _autojump_install {
 #### UPDATERS
 function update_brew {
     #### INSTALL DEPS FROM BREWFILE
+    _log_info "Checking Brewfile dependencies..."
     if ! brew bundle check --verbose --file=${DOTFILES}/Brewfile; then
         _log_info "Install missing brew formulas? [y/N]: " # Prompt about installing plugins
         if read -q; then
@@ -44,6 +45,7 @@ function update_brew {
 }
 
 function update_gems {
+    _log_info "Checking installed gems..."
     #### DECLARE GEMS TO CHECK
     local -a gems=(
         colorls
@@ -82,6 +84,7 @@ function update_gems {
 }
 
 function update_zplugs {
+    _log_info "Checking zplugs..."
     ZPLUG_UPDATE=true zsh
 }
 
