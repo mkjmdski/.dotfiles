@@ -51,7 +51,7 @@ function main {
     fi
     link_config ".zshrc"
     echo " >> setting zsh as a default shell"
-    chsh -s /bin/zsh $USER
+    chsh -s /bin/zsh
     _install_powerline_fonts
     _install_nerd_fonts
 }
