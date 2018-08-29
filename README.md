@@ -13,6 +13,7 @@ Dotfiles repositories are great practice among developers, because we can share 
 * vim - minimal vim configuration to create this tool more friendly for beginners
 * vscode - snippets, configuration and auto-generated extension list kept in repository
 * zsh - zsh integrated with zplug and oh-my-zsh with many external binaries to speed up daily work of DevOps
+* brew - brewfile with a few programs used by me
 
 ## Additional files
 

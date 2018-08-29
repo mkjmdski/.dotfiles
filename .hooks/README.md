@@ -14,4 +14,4 @@ If commit message contains tag `[ext]` your current vscode extensions are taken 
 
 After each pull you are asked about installing new set of extensions.
 
-You can also run this command manually if your `.zshrc` sources `lib` (by defualt yes)
+You can also run this command manually form lib/vscode.sh file `source lib/vscode.sh; install_vscode_extensions`
