@@ -4,6 +4,7 @@ function _system_exports {
     export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
     export LANG=en_US.UTF-8 # Default language
     export PAGER="most"
+    # export ZSH_THEME="eendroroy/alien"
 }
 
 function _expand_path {
@@ -37,32 +38,25 @@ function _expand_path {
 function _load_zplug {
     # Install zplug if not installed
     if [ ! -d ~/.zplug ]; then git clone --depth=1 https://github.com/zplug/zplug ~/.zplug; fi
-
-    # Variables for .zplugs.zsh file
-    # export ZSH_THEME="eendroroy/alien"
     ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
     source ~/.zplug/init.zsh
     if ! zplug check --verbose; then
-        _log_info "Install zplugs? [y/N]: " # Prompt about installing plugins
+        _log_info "Install zplugs? [y/N]: "
         if read -q; then
             echo; zplug install
         fi
     fi
     zplug load
-}
-
-function _load_others {
-    #### LOAD AUTOJUMP
-    if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then source $HOME/.autojump/etc/profile.d/autojump.sh; fi
+    if [ ! -z "$ZPLUG_UPDATE" ]; then zplug update; fi
 }
 
 function _init_zsh {
     export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
     source "${DOTFILES}/zsh/functions.zsh"
+    source "${DOTFILES}/zsh/updates.zsh"
     _system_exports
     _expand_path
     _load_zplug
-    _load_others
     source "${DOTFILES}/zsh/aliases.zsh"
     source "${DOTFILES}/zsh/configuration.zsh"
 }

@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-## GIT
+## git
 alias s="git s"
 alias cdg="cd-gitroot"
 
@@ -14,3 +14,6 @@ alias t="exa --tree"
 
 ## thefuck
 eval $(thefuck --alias)
+
+## cat
+alias cat="ccat --bg='dark'"
