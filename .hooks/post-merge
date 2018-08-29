@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
-source "$(git rev-parse --show-toplevel)/lib/include.sh"
+source "$(git rev-parse --show-toplevel)/lib/vscode.sh"
 install_vscode_extensions
 exit

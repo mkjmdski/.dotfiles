@@ -1,19 +1,14 @@
 #!/bin/bash
 set -e
-for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
-    source "${file}"
-done
+source "$(git rev-parse --show-toplevel)/lib/vscode.sh"
+source "$(git rev-parse --show-toplevel)/lib/configurations.sh"
+
 function vscode_config_path {
-    unameOut="$(uname -s)"
-    case "${unameOut}" in
-        Linux*)
-            echo "$HOME/.config/Code/User"
-        ;;
-        Darwin*)
-            echo "$HOME/Library/Application Support/Code/User"
-        ;;
-        *) echo "UNKOWN OS: ${unameOut}" && exit -1
-    esac
+    if [ "$(uname)" = "Linux" ]; then
+        echo "$HOME/.config/Code/User"
+    else
+        echo "$HOME/Library/Application Support/Code/User"
+    fi
 }
 
 function main {

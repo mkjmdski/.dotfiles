@@ -4,6 +4,7 @@ function _system_exports {
     export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
     export LANG=en_US.UTF-8 # Default language
     export PAGER="most"
+    # export ZSH_UPDATE="true"
     # export ZSH_THEME="eendroroy/alien"
 }
 
@@ -26,12 +27,10 @@ function _expand_path {
     if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
 
     #### LOAD BREW PATH ON LINUX
-    if [ "$(uname)" = "Linux" ]; then
-        if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-            export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-            export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
-            export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
-        fi
+    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+        export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+        export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
+        export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
     fi
 }
 

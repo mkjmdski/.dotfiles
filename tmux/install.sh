@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
-for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
-    source "${file}"
-done
+source "$(git rev-parse --show-toplevel)/lib/configurations.sh"
+
 
 function main {
     _install_custom_plugin "tmux" "brew install tmux"

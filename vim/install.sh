@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
-for file in $(git rev-parse --show-toplevel)/lib/*.sh; do
-    source "${file}"
-done
-
+source "$(git rev-parse --show-toplevel)/lib/configurations.sh"
 
 function main {
     vundle_dir="$HOME/.vim/bundle/Vundle.vim"

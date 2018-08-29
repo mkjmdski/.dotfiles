@@ -1,5 +1,9 @@
 # Dotfiles
 
+## Short install
+
+`bash -c "$(curl -fsSL https://raw.githubusercontent.com/mkjmdski/.dotfiles/master/install.sh)"`
+
 ## About
 
 Dotfiles repositories are great practice among developers, because we can share the way how we maintain creating stable cross-platform setups. This dotfile repository contains few modules where each one has got it's own README explaining what is kept inside VCS and why. Here is the short summary of them:

@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
-for file in $(git rev-parse --show-toplevel)/lib/{log,configurations}.sh; do
-    source "${file}"
-done
+source "$(git rev-parse --show-toplevel)/lib/configurations.sh"
 
 function _get_font_dir {
     if [ ! "$(uname)" = "Darwin" ]; then
