@@ -28,6 +28,3 @@ function zsh_stats {
   fc -l 1 | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20
 }
 
-function _log_info {
-    echo "$fg[green][INFO]$reset_color $(date '+%H:%M:%S') > $@"
-}

@@ -24,7 +24,7 @@ All of the binaries are collected in `.zplugs.zsh`, `Brewfile` and gems array in
 
 ### ZPlugs
 
-Run `update_zplugs` to update those binaries (or add them to the path if you lost them by accident from `$ZPLUG_HOME`)
+Run `zplugs` to update those binaries (or add them to the path if you lost them by accident from `$ZPLUG_HOME`). All of the programs presented below should be installed once.
 
 * [`jq`](https://github.com/stedolan/jq) - parsing json tool
 * [`cloc`](https://github.com/AlDanial/cloc) - counts code lines inside the project, usefull during refactors
@@ -40,7 +40,7 @@ Run `update_zplugs` to update those binaries (or add them to the path if you los
 
 ### Brew binaries
 
-[Brew](https://brew.sh) is installed together with zsh and for linux computers [linuxbrew](https://linuxbrew.sh/) port is used. Run `update_brew` to install programs from dotfiles Brewfile repo.
+[Brew](https://brew.sh) is installed together with zsh and for linux computers [linuxbrew](https://linuxbrew.sh/) port is used. Run `brews_install` to install programs from dotfiles Brewfile repo manually. Use `BREW_UPDATE` variable to do it automatically.
 
 * [`fuck`](https://github.com/nvbn/thefuck) - corrects your last typo
 * `most` - colors your manpages
@@ -50,7 +50,7 @@ Run `update_zplugs` to update those binaries (or add them to the path if you los
 
 ### Ruby gems
 
-Run `update_gems` to install/update gems specified below. Gems are installed to user directory (not global).
+Run `gems_install` to install gems manually. Gems are installed to user directory (not global). Use `GEMS_UPDATE` variable to do it automatically.
 
 * [`colorls`](https://github.com/athityakumar/colorls) - colors your ls, adds tree and nerdfonts
 
