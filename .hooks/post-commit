@@ -8,8 +8,9 @@ function move_cache_to_config {
     config_localization="$2"
     if [ -a ".commit-cache-${config_name}" ]; then
         mv ".commit-cache-${config_name}" "${config_localization}"
-        CHANGED=`git diff HEAD@{1} --stat -- "${config_localization}" | wc -l`
+        CHANGED="$(git diff HEAD@{1} --stat -- "${config_localization}" | wc -l)"
         if [ $CHANGED -gt 0 ]; then
+            echo "[post-commit hook] actualizing vs code extensions"
             git add "${config_localization}"
             git_action=1
         fi

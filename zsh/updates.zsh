@@ -61,7 +61,7 @@ function update_gems {
         fi
     done
     #### PROMPT ABOUT INSTALLING ALL GEMS
-    if [ ${#not_installed_gems[@]} -ne 0 ]; then
+    if [ ${#not_installed_gems[@]} -gt 0 ]; then
         echo "${not_installed_gems[@]}"
         _log_info "Install missing gems? [y/N]: "
         if read -q; then
@@ -71,7 +71,8 @@ function update_gems {
             done
         fi
     fi
-    if [ ${#installed_gems[@]} -ne 0 ]; then
+    #### PROMPT ABOUT UPDATING EXISTING GEMS
+    if [ ${#installed_gems[@]} -gt 0 ]; then
         echo "${installed_gems[@]}"
         _log_info "Update already installed gems? [y/N]: "
         if read -q; then
