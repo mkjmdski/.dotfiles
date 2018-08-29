@@ -85,7 +85,7 @@ function update_zplugs {
     ZPLUG_UPDATE=true zsh
 }
 
-function update {
+function update_dotfiles {
     update_brew
     update_gems
     update_zplugs

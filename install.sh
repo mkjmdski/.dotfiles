@@ -10,3 +10,4 @@
         )
     done
 )
+zsh -i -c update_dotfiles

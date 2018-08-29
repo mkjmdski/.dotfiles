@@ -50,11 +50,13 @@ function main {
         brew install zsh
     fi
     link_config ".zshrc"
-    echo " >> setting zsh as a default shell"
-    chsh -s /bin/zsh
     _install_powerline_fonts
     _install_nerd_fonts
+    read -p " >> Do you want to set zsh as your default shell? [y/N]" -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        chsh -s /bin/zsh
+    fi
 }
 
 main
-zsh
