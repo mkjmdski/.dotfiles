@@ -1,5 +1,10 @@
 #!/bin/zsh
 
+export EDITOR="$( echo $(which vim) || echo $(which vi) )"
+export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
+export LANG=en_US.UTF-8 # Default language
+export PAGER="most"
+
 #### GO TO DIRECTORY BY TYPING IT'S NAME
 setopt auto_cd
 

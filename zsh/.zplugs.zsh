@@ -17,7 +17,8 @@ for plugin in docker docker-compose; do
     zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
 done
 
-#### THEMES
+#### THEME
+## ZSH_THEME="eendroroy/alien"
 if [ ! -z "$ZSH_THEME" ]; then
     zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
 
@@ -35,34 +36,6 @@ function _configure_spaceship {
 }
 
 
-#### THOSE BINARIES REQUIRE SETUP ONLY ONCE
-#### YOU CAN FIND RELEASE FUNCTION AND INSTALLERS IN zsh/installers.zsh
-if [ ! -z "$ZPLUG_UPDATE" ]; then
-    #### PARSING OUTPUTS
-    zplug "stedolan/jq", from:gh-r, as:command
-    zplug "peco/peco", from:gh-r, as:command
-
-    #### INTELIGENT PATH CHANGING
-    zplug "wting/autojump", as:command, hook-build:"_autojump_install 2> /dev/tty"
-
-    #### PASSWORD MANAGING IN GOPASS
-    zplug "gopasspw/gopass", from:gh-r, use:"$(_gopass_release)", as:command
-
-    #### VIM LIKE FILE MANAGER
-    zplug "ranger/ranger", use:ranger.py, rename-to:ranger, as:command
-
-    #### DIFF TOOL FOR GIT
-    zplug "jeffkaufman/icdiff", use:icdiff.py, rename-to:icdiff, as:command
-
-    #### CAT WITH SYNTAX HIGHLIGHTING
-    zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command
-
-    #### CHEAT SHEAT
-    zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
-
-    #### LS TOOLS
-    zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
-
-    #### FIND TOOLS
-    zplug "sharkdp/fd", from:gh-r, as:command, use:"$(_fd_release)"
+if [ "$ZPLUG_UPDATE" = true ] ; then
+    source "$DOTFILES/zsh/.zplugs_to_install_once.zsh"
 fi

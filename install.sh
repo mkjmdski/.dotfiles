@@ -10,4 +10,4 @@
         )
     done
 )
-zsh -i -c update_dotfiles
+ZPLUG_UPDATE=true BREW_UPDATE=true GEMS_UPDATE=true zsh

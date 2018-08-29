@@ -1,63 +1,42 @@
-#### EXPORTS
-function _system_exports {
-    export EDITOR="$( echo $(which vim) || echo $(which vi) )"
-    export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
-    export LANG=en_US.UTF-8 # Default language
-    export PAGER="most"
-    # export ZSH_UPDATE="true"
-    # export ZSH_THEME="eendroroy/alien"
+function _log_info {
+    echo "$fg[green][INFO]$reset_color $(date '+%H:%M:%S') > $@"
 }
 
-function _expand_path {
-    # Add go binaries
-    if [ -d "$GOPATH" ]; then
-        export PATH="$GOPATH/bin:$PATH"
-    elif [[ $commands[go] ]]; then
-        export PATH="$(go env GOPATH)/bin:$PATH"
-    fi
+## INIT
+export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
+for file in $DOTFILES/zsh/.init/*.zsh; do
+    source "${file}"
+done
 
-    # Add yarn global binaries
-    if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
+## CONFIGURE LOADS
+# ZPLUG_UPDATE=true
+# BREW_UPDATE=true
+GEMS_UPDATE=true
 
-    # Add ruby gems
-    if [[ $commands[ruby] ]]; then export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"; fi
+## LOAD ZPLUG
+if [ ! -d ~/.zplug ]; then
+    git clone --depth=1 https://github.com/zplug/zplug ~/.zplug;
+fi
+export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
+source ~/.zplug/init.zsh
+zplug load
+if [ "$ZPLUG_UPDATE" = true ] ; then
+    zplugs_install
+#     zplug update
+fi
 
-    # Add custom bin files
-    if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
-    if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
+## LOAD BREW
+if [ "$BREW_UPDATE" = true ] ; then
+    brews_install
+    # brew update
+fi
 
-    #### LOAD BREW PATH ON LINUX
-    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-        export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-        export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
-        export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
-    fi
-}
+## LOAD GEMS
+if [ "$GEMS_UPDATE" = true ] ; then
+    gems_install
+    # gem update --user-install
+fi
 
-function _load_zplug {
-    # Install zplug if not installed
-    if [ ! -d ~/.zplug ]; then git clone --depth=1 https://github.com/zplug/zplug ~/.zplug; fi
-    ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
-    source ~/.zplug/init.zsh
-    if ! zplug check --verbose; then
-        _log_info "Install zplugs? [y/N]: "
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
-    zplug load
-    if [ ! -z "$ZPLUG_UPDATE" ]; then zplug update; fi
-}
-
-function _init_zsh {
-    export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
-    source "${DOTFILES}/zsh/functions.zsh"
-    source "${DOTFILES}/zsh/updates.zsh"
-    _system_exports
-    _expand_path
-    _load_zplug
-    source "${DOTFILES}/zsh/aliases.zsh"
-    source "${DOTFILES}/zsh/configuration.zsh"
-}
-
-_init_zsh
+for file in $DOTFILES/zsh/.postload/*.zsh; do
+    source "${file}"
+done
