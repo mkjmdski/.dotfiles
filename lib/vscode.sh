@@ -9,8 +9,9 @@ function install_vscode_extensions {
             printf "\t\t${extension}\n"
         fi
     done
-    echo " >> Install vscode extensions? [y/N]"
-    if read -q; then
+    read -p " >> Install vscode extensions? [y/N]" -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         for extension in $(cat $extensions_file); do
             if ! echo "${installed_extensions}" | grep --quiet "${extension}"; then
                 code --install-extension "${extension}"

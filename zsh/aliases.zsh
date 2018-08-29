@@ -5,15 +5,25 @@ alias s="git s"
 alias cdg="cd-gitroot"
 
 ## Color ls
-alias ls="colorls"
+if [[ $commands[colorls] ]]; then
+    alias ls="colorls"
+fi
 alias l="ls -lA"
 unalias la ll lsa
 
 ## tree
-alias t="exa --tree"
+if [[ $commands[exa] ]]; then
+    alias tree="exa --tree"
+fi
+alias t="tree"
 
-## thefuck
-eval $(thefuck --alias)
 
 ## cat
-alias cat="ccat --bg='dark'"
+if [[ $commands[thefuck] ]]; then
+    eval $(thefuck --alias)
+fi
+
+## thefuck
+if [[ $commands[ccat] ]]; then
+    alias cat="ccat --bg='dark'"
+fi
