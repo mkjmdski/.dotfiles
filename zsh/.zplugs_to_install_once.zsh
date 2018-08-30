@@ -62,4 +62,4 @@ zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
 zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
 
 #### FIND TOOLS
-zplug "sharkdp/fd", from:gh-r, as:command, use:"$(_fd_release)"
+zplug "sharkdp/fd", from:gh-r, as:command
