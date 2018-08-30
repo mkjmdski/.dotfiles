@@ -28,6 +28,10 @@
     echo "ERROR: z.sh's datafile (${_Z_DATA:-$HOME/.z}) is a directory."
 }
 
+function man_z {
+    groff -man -Tascii $HOME/.sshrc.d/z.1 | col -bx
+}
+
 _z() {
 
     local datafile="${_Z_DATA:-$HOME/.z}"
