@@ -12,6 +12,10 @@ clone the repository:
 
 and run `install.sh` from modules directories you wish to install
 
+## Article
+
+I have also published article about this configuration in version 1.6 [check it out](https://blog.apptension.com/2018/08/30/shell-configuration-hack-your-zsh/)!
+
 ## About
 
 Dotfiles repositories are great practice among developers, because we can share the way how we maintain creating stable cross-platform setups. This dotfile repository contains few modules where each one has got it's own README explaining what is kept inside VCS and why. Here is the short summary of them:
