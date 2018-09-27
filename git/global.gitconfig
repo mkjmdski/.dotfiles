@@ -55,12 +55,13 @@ insteadOf = https://bitbucket.org/
 
 #### ALIASES
 [alias]
+	cam = commit --all --message
 	a = add --all
 	s = status --branch --show-stash
 	m = commit --message
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
-	log-line = log --oneline --graph --decorate
+	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
 	tags = tag --list -n10
 	undo = reset --soft HEAD^
 	stash-all = stash save --include-untracked
@@ -103,3 +104,7 @@ insteadOf = https://bitbucket.org/
 	cmd = icdiff --line-numbers $LOCAL $REMOTE
 # [difftool "pycharm"]
 # 	cmd = /usr/local/bin/charm diff "$LOCAL" "$REMOTE" && echo "Press enter to continue..." && read
+
+
+[rebase]
+    instructionFormat = %s [%an]

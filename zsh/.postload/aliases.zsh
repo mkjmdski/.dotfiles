@@ -18,12 +18,21 @@ fi
 alias t="tree"
 
 
-## cat
+## thefuck
 if [[ $commands[thefuck] ]]; then
     eval $(thefuck --alias)
+    alias f="fuck --yes"
 fi
 
-## thefuck
+## cat
 if [[ $commands[ccat] ]]; then
     alias cat="ccat --bg='dark'"
 fi
+
+## git
+alias pull="git pull"
+alias checkout="git checkout"
+alias push="git push"
+alias merge="git merge"
+alias describe="git describe"
+alias mark="git mark"
