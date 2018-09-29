@@ -127,3 +127,32 @@ set showcmd
 
 " Enable mouse support in console
 set mouse=a
+
+" Read file when modified outside Vim
+set autoread
+
+" Allow backspacing over everything in INSERT mode
+set backspace=indent,eol,start
+
+" Show ruler and command visual aid
+set ruler
+
+" Set partial search and result highlighting
+set incsearch
+set hlsearch
+
+" Ignore case when searching
+set ignorecase
+set smartcase
+
+" Show matching bracets
+set showmatch
+
+" Highlight the cursor line
+set cursorline
+
+" Set the colorscheme and window transparency
+colorscheme molokai
+
+" Make use of the "status line" to show possible completions of command line commands, file names, and more. Allows to cycle forward and backward throught the list. This is called the "wild menu".
+ set wmnu

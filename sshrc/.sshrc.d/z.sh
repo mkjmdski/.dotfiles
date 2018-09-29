@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright (c) 2009 rupa deadwyler. Licensed under the WTFPL license, Version 2
 
 # maintains a jump-list of the directories you actually use
@@ -29,7 +30,7 @@
 }
 
 function man_z {
-    groff -man -Tascii $HOME/.sshrc.d/z.1 | col -bx
+    groff -man -Tascii $SSHHOME/.sshrc.d/z.1 | col -bx
 }
 
 _z() {
