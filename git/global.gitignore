@@ -20,3 +20,9 @@ node_modules
 
 # Composer #
 vendor
+
+# Terraform #
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
+.terraform

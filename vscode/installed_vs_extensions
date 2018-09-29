@@ -5,6 +5,7 @@ bungcip.better-toml
 DavidAnson.vscode-markdownlint
 donjayamanne.githistory
 dunstontc.viml
+dunstontc.vscode-docker-syntax
 eamodio.gitlens
 erd0s.terraform-autocomplete
 eriklynd.json-tools
@@ -14,12 +15,14 @@ hangxingliu.vscode-nginx-conf-hint
 ionutvmi.path-autocomplete
 ipedrazas.kubernetes-snippets
 k--kato.intellij-idea-keybindings
+kumar-harsh.graphql-for-vscode
 loganarnett.tf-snippets
 mauve.terraform
 mikestead.dotenv
 mindginative.terraform-snippets
 mohsen1.prettify-json
 ms-python.python
+ms-vscode.Go
 PeterJausovec.vscode-docker
 samuelcolvin.jinjahtml
 secanis.jenkinsfile-support

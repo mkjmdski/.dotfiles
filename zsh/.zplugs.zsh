@@ -35,7 +35,4 @@ function _configure_spaceship {
     spaceship_vi_mode_enable
 }
 
-
-if [ "$ZPLUG_UPDATE" = true ] ; then
-    source "$DOTFILES/zsh/.zplugs_to_install_once.zsh"
-fi
+return 0 # in case zplug adds plugs ignore them

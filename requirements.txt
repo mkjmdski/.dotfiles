@@ -1,0 +1,6 @@
+thefuck
+pycodestyle
+flake8
+setuptools
+httpie
+shell-functools

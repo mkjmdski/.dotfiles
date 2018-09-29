@@ -15,5 +15,9 @@
     "workbench.statusBar.feedback.visible": false,
     "window.closeWhenEmpty": true,
     "window.restoreFullscreen": true,
-    "window.restoreWindows": "all"
+    "window.restoreWindows": "all",
+    "python.linting.pep8Enabled": true,
+    "python.linting.pep8Path": "~/.local/bin/pycodestyle",
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Path": "~/.local/bin/flake8"
 }

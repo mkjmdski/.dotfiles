@@ -1,6 +1,6 @@
-brew "thefuck"
 brew "most"
 brew "coreutils"
 brew "the_silver_searcher"
 brew "highlight"
 brew "sshrc"
+brew "bat"

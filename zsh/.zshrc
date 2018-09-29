@@ -8,33 +8,40 @@ for file in $DOTFILES/zsh/.init/*.zsh; do
     source "${file}"
 done
 
-## CONFIGURE LOADS
-# ZPLUG_UPDATE=true
-# BREW_UPDATE=true
-# GEMS_UPDATE=true
+## CONFIGURE INSTALLS
+# INSTALL=true
+# ZPLUG_INSTALL=true
+# BREW_INSTALL=true
+# GEMS_INSTALL=true
+# PYTHON_INSTALL=true
+
 
 ## LOAD ZPLUG
 if [ ! -d ~/.zplug ]; then
     git clone --depth=1 https://github.com/zplug/zplug ~/.zplug;
 fi
+
 export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
-if [ "$ZPLUG_UPDATE" = true ] ; then
+
+if [ "$ZPLUG_INSTALL" = true ] || [ "$INSTALL" = true ]; then
+    source "$DOTFILES/zsh/.zplugs_to_install_once.zsh"
     zplugs_install
-#     zplug update
 fi
 
 ## LOAD BREW
-if [ "$BREW_UPDATE" = true ] ; then
-    brews_install
-    # brew update
+if [ "$BREW_INSTALL" = true ] || [ "$INSTALL" = true ]; then
+    brew_install
 fi
 
 ## LOAD GEMS
-if [ "$GEMS_UPDATE" = true ] ; then
+if [ "$GEMS_INSTALL" = true ] || [ "$INSTALL" = true ]; then
     gems_install
-    # gem update --user-install
+fi
+
+if [ "$PYTHON_INSTALL" = true ] || [ "$INSTALL" = true ]; then
+    pip_install
 fi
 
 for file in $DOTFILES/zsh/.postload/*.zsh; do

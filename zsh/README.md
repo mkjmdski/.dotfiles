@@ -40,7 +40,7 @@ Run `zplugs` to update those binaries (or add them to the path if you lost them 
 
 ### Brew binaries
 
-[Brew](https://brew.sh) is installed together with zsh and for linux computers [linuxbrew](https://linuxbrew.sh/) port is used. Run `brews_install` to install programs from dotfiles Brewfile repo manually. Use `BREW_UPDATE` variable to do it automatically.
+[Brew](https://brew.sh) is installed together with zsh and for linux computers [linuxbrew](https://linuxbrew.sh/) port is used. Run `brew_install` to install programs from dotfiles Brewfile repo manually. Use `BREW_UPDATE` variable to do it automatically.
 
 * [`fuck`](https://github.com/nvbn/thefuck) - corrects your last typo
 * `most` - colors your manpages

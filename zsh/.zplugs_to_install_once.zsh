@@ -32,6 +32,14 @@ function _fd_release {
         echo "*darwin*"
     fi
 }
+function _noti_release {
+    if [ "$(uname)" = "Linux" ]; then
+        echo "noti*linux*"
+    else
+        echo "*noti*darwin*"
+    fi
+}
+
 function _autojump_install {
     ./install.py
 }
@@ -46,14 +54,8 @@ zplug "wting/autojump", as:command, hook-build:"_autojump_install 2> /dev/tty"
 #### PASSWORD MANAGING IN GOPASS
 zplug "gopasspw/gopass", from:gh-r, use:"$(_gopass_release)", as:command
 
-#### VIM LIKE FILE MANAGER
-zplug "ranger/ranger", use:ranger.py, rename-to:ranger, as:command
-
 #### DIFF TOOL FOR GIT
 zplug "jeffkaufman/icdiff", use:icdiff.py, rename-to:icdiff, as:command
-
-#### CAT WITH SYNTAX HIGHLIGHTING
-zplug "jingweno/ccat", from:gh-r, use:"$(_ccat_release)", as:command
 
 #### CHEAT SHEAT
 zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
@@ -63,3 +65,6 @@ zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
 
 #### FIND TOOLS
 zplug "sharkdp/fd", from:gh-r, as:command
+
+#### NOTIFY AFTER EVENT IS DONE
+zplug "variadico/noti", from:gh-r, as:command, use:"$(_noti_release)"

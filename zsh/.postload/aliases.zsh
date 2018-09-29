@@ -1,15 +1,11 @@
 #!/bin/zsh
 
-## git
-alias s="git s"
-alias cdg="cd-gitroot"
-
 ## Color ls
 if [[ $commands[colorls] ]]; then
     alias ls="colorls"
+    alias l="ls -lA"
+    unalias la ll lsa
 fi
-alias l="ls -lA"
-unalias la ll lsa
 
 ## tree
 if [[ $commands[exa] ]]; then
@@ -24,15 +20,9 @@ if [[ $commands[thefuck] ]]; then
     alias f="fuck --yes"
 fi
 
-## cat
-if [[ $commands[ccat] ]]; then
-    alias cat="ccat --bg='dark'"
-fi
-
 ## git
-alias pull="git pull"
-alias checkout="git checkout"
-alias push="git push"
-alias merge="git merge"
-alias describe="git describe"
-alias mark="git mark"
+alias gcd="cd-gitroot"
+alias g="git"
+
+## use man with most
+alias man="PAGER=most man"
