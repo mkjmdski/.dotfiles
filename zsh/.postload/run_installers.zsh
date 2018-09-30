@@ -25,7 +25,7 @@ function _gopass_completion {
     gopass completion zsh > "${DOTFILES}/zsh/fpath/_gopass"
 }
 function _googler_completion {
-    ln -s 
+    ln -s $ZPLUG_REPOS/jarun/googler/auto-completion/zsh/_googler $DOTFILES/zsh/fpath
 }
 function _autojump_install {
     ./install.py

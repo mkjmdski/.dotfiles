@@ -19,6 +19,10 @@ if [[ $commands[thefuck] ]]; then
     alias f="fuck --yes"
 fi
 
+if [[ $commands[jq] ]]; then
+    alias jq="jq -C"
+fi
+
 ## git
 alias gcd="cd-gitroot"
 alias g="git"
