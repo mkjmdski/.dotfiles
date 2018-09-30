@@ -8,14 +8,6 @@ for file in $DOTFILES/zsh/.init/*.zsh; do
     source "${file}"
 done
 
-## CONFIGURE INSTALLS
-# INSTALL=true
-# ZPLUG_INSTALL=true
-# BREW_INSTALL=true
-# GEMS_INSTALL=true
-# PYTHON_INSTALL=true
-
-
 ## LOAD ZPLUG
 if [ ! -d ~/.zplug ]; then
     git clone --depth=1 https://github.com/zplug/zplug ~/.zplug;
