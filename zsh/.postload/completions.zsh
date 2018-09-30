@@ -60,12 +60,11 @@ export LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;
 
 
 ZSHCAHCEDIR=/tmp/$USER-zsh-cache
-zstyle ':completion::complete:*' use-cache 1
+zstyle ':completion:*' use-cache on
 zstyle ':completion::complete:*' cache-path $ZSHCAHCEDIR/$HOST # Expand partial paths
+zstyle ':completion:predict:*' completer _complete # Completion caching
 
-
-
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # ignore case
+zstyle ':completion:*' matcher-list '' '+m:{a-z}={A-Z}' 'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select=2                        # menu if nb items > 2
 zstyle ':completion:*::::' completer _expand _complete _ignored _approximate # list of completers to use
 
@@ -83,21 +82,11 @@ zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=29=34"
 zstyle ':completion:*:*:killall:*' menu yes select
 zstyle ':completion:*:killall:*' force-list always
 
-zstyle ':completion:*' completer _expand _complete _correct _approximate
 zstyle ':completion:*' expand prefix suffix
 zstyle ':completion:*' file-sort access
 zstyle ':completion:*' list-suffixes true
-zstyle ':completion:*' matcher-list '' '+m:{a-z}={A-Z}' 'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
-zstyle ':completion:*' preserve-prefix '//[^/]##/'
-zstyle ':completion:*' use-cache on
 
 
-zstyle ':completion:::::' completer _complete _approximate
-zstyle ':completion:*:approximate:*' max-errors 2
-zstyle ':completion:*' completer _complete _prefix
-zstyle ':completion::prefix-1:*' completer _complete
-zstyle ':completion:incremental:*' completer _complete _correct
-zstyle ':completion:predict:*' completer _complete # Completion caching
 zstyle ':completion:*:functions' ignored-patterns '_*'
 zstyle ':completion:*' squeeze-slashes 'yes' # Include non-hidden directories in globbed file completions
 zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~' # Separate matches into groups
