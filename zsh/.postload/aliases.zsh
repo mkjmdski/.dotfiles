@@ -1,6 +1,5 @@
 #!/bin/zsh
 
-## Color ls
 if [[ $commands[colorls] ]]; then
     alias ls="colorls"
     alias l="ls -lA"

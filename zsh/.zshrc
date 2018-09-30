@@ -25,29 +25,6 @@ export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
 
-if [ "$ZPLUG_INSTALL" = true ] || [ "$INSTALL" = true ]; then
-    source "$DOTFILES/zsh/.zplugs_to_install_once.zsh"
-    zplugs_install
-fi
-
-## LOAD BREW
-if [ "$BREW_INSTALL" = true ] || [ "$INSTALL" = true ]; then
-    brew_install
-fi
-
-## LOAD GEMS
-if [ "$GEMS_INSTALL" = true ] || [ "$INSTALL" = true ]; then
-    gems_install
-fi
-
-if [ "$PYTHON_INSTALL" = true ] || [ "$INSTALL" = true ]; then
-    pip_install
-fi
-
-if [ "$YARN_INSTALL" = true ] || [ "$INSTALL" = true ]; then
-    yarn_install
-fi
-
 for file in $DOTFILES/zsh/.postload/*.zsh; do
     source "${file}"
 done

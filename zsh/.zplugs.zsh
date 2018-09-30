@@ -2,8 +2,6 @@
 # this allows zplug to update itself on `zplug update`
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
-#### OH-MY-ZSH
-HIST_STAMPS="dd.mm.yyyy"
 zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,history,termsupport,key-bindings}.zsh"
 zplug "plugins/extract", from:oh-my-zsh
 
@@ -34,5 +32,10 @@ function _configure_spaceship {
     SPACESHIP_BATTERY_THRESHOLD="95"
     spaceship_vi_mode_enable
 }
+
+#### LOAD AUTOJUMP
+if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
+    source $HOME/.autojump/etc/profile.d/autojump.sh;
+fi
 
 return 0 # in case zplug adds plugs ignore them
