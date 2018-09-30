@@ -30,6 +30,8 @@ fi
 function _configure_spaceship {
     SPACESHIP_TIME_SHOW="true"
     SPACESHIP_BATTERY_THRESHOLD="95"
+    SPACESHIP_EXIT_CODE_SHOW="true"
+    SPACESHIP_EXIT_CODE_SYMBOL="✘ "
     spaceship_vi_mode_enable
 }
 
