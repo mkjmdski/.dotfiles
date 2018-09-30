@@ -9,7 +9,7 @@ function _get_font_dir {
     else
             dir="$HOME/Library/Fonts"
     fi
-    echo $dir
+    echo "${dir}"
 }
 
 function _install_powerline_fonts { (
