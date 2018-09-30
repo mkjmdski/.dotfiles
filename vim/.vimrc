@@ -156,3 +156,6 @@ colorscheme molokai
 
 " Make use of the "status line" to show possible completions of command line commands, file names, and more. Allows to cycle forward and backward throught the list. This is called the "wild menu".
  set wmnu
+
+ " Turn off beeping
+set vb
