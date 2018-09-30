@@ -33,3 +33,7 @@ function gems_install {
     _log_info "Installing ruby dependencies..."
     bundle install --system --gemfile $DOTFILES/Gemfile
 }
+
+function yarn_install {
+    yarn global add @aweary/alder to-double-quotes-cli to-single-quotes-cli yaml-cli rename-cli
+}

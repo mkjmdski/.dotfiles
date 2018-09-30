@@ -44,6 +44,10 @@ if [ "$PYTHON_INSTALL" = true ] || [ "$INSTALL" = true ]; then
     pip_install
 fi
 
+if [ "$YARN_INSTALL" = true ] || [ "$INSTALL" = true ]; then
+    yarn_install
+fi
+
 for file in $DOTFILES/zsh/.postload/*.zsh; do
     source "${file}"
 done

@@ -8,8 +8,8 @@ if [[ $commands[colorls] ]]; then
 fi
 
 ## tree
-if [[ $commands[exa] ]]; then
-    alias tree="exa --tree"
+if [[ $commands[alder] ]]; then
+    alias tree="alder"
 fi
 alias t="tree"
 

@@ -4,25 +4,11 @@
 ## !! DON'T USE `hook-loads` IN HERE !! ##
 ####
 #### HELPERS FOR ZPLUG
-function _exa_release {
-    if [ "$(uname)" = "Darwin" ]; then
-        echo '*macos*'
-    else
-        echo '*linux*'
-    fi
-}
 function _gopass_release {
     if [ "$(uname)" = "Linux" ]; then
         echo '*linux*amd64*tar.gz'
     else
         echo '*darwin*'
-    fi
-}
-function _ccat_release {
-    if [ "$(uname)" = "Darwin" ]; then
-        echo '*darwin*tar.gz'
-    else
-        echo '*linux*amd64*tar.gz'
     fi
 }
 function _fd_release {
@@ -60,11 +46,10 @@ zplug "jeffkaufman/icdiff", use:icdiff.py, rename-to:icdiff, as:command
 #### CHEAT SHEAT
 zplug "chubin/cheat.sh", use:"share/cht.sh.txt", as:command, rename-to:cht.sh
 
-#### LS TOOLS
-zplug "ogham/exa", from:gh-r, as:command, use:"$(_exa_release)"
-
 #### FIND TOOLS
 zplug "sharkdp/fd", from:gh-r, as:command
 
 #### NOTIFY AFTER EVENT IS DONE
 zplug "variadico/noti", from:gh-r, as:command, use:"$(_noti_release)"
+
+zplug "jarun/googler", use:"googler", as:command

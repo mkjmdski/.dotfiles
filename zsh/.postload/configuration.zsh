@@ -27,5 +27,10 @@ fi
 #### LOAD AUTOJUMP
 if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
     source $HOME/.autojump/etc/profile.d/autojump.sh;
-    autoload -U compinit && compinit -u
 fi
+
+if [ -f  $ZPLUG_REPOS/jarun/googler/auto-completion/zsh/_googler ]; then
+    source $ZPLUG_REPOS/jarun/googler/auto-completion/zsh/_googler
+fi
+
+autoload -U compinit && compinit -u
