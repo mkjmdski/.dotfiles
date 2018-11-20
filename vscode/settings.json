@@ -16,8 +16,7 @@
     "window.closeWhenEmpty": true,
     "window.restoreFullscreen": true,
     "window.restoreWindows": "all",
-    "python.linting.pep8Enabled": true,
-    "python.linting.pep8Path": "~/.local/bin/pycodestyle",
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": "~/.local/bin/flake8"
+    "window.zoomLevel": 1,
+    "python.linting.pylamaEnabled": true,
+    "python.linting.pylamaPath": "pylama",
 }

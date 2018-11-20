@@ -1,7 +1,0 @@
-thefuck
-flake8
-pycodestyle
-setuptools
-httpie
-shell-functools
-stormssh

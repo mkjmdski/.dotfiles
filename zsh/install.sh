@@ -33,21 +33,9 @@ function _install_nerd_fonts { (
     fi
 ) }
 
-function _install_brew {
-    if ! which brew &> /dev/null; then
-        echo " >> Installing brew"
-        if [ "$(uname)" = "Linux" ]; then
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)" # Install brew if not installed
-        elif [ "$(uname)" = "Darwin" ]; then
-            ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        fi
-    fi
-}
-
 function main {
-    _install_brew
     if ! which zsh &> /dev/null; then
-        brew install zsh
+        return 1 && echo "You need to install zsh"
     fi
     link_config ".zshrc"
     _install_powerline_fonts

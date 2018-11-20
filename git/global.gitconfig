@@ -21,14 +21,6 @@
 	#always rebase
 	rebase = true
 
-
-#### FORCE SSH OVER HTTPS
-[url "git@github.com:"]
-insteadOf = https://github.com/
-
-[url "git@bitbucket.org:"]
-insteadOf = https://bitbucket.org/
-
 #### SHORTCUTS FOR GITHUB AND BITBUCKET
 [url "git@github.com:"]
     insteadOf = gh:
@@ -66,6 +58,7 @@ insteadOf = https://bitbucket.org/
 	tags = tag --list -n10
  	uncommit = reset --soft HEAD^
  	stash-all = stash save --include-untracked
+	drop = stash drop
 	pop = stash pop
 	unstage = reset HEAD --
 	this = !git init && git add -A && git commit -m \"Initial commit.\"

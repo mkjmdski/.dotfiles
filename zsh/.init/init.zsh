@@ -1,17 +1,12 @@
 # We want to extend path once
-export EDITOR="$( echo $(which vim) || echo $(which vi) )"
+if which vim &> /dev/null; then
+    export EDITOR="$(which vim)"
+fi
 export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
 export LANG=en_US.UTF-8 # Default language
 export LC_ALL=en_US.UTF-8
 
 if [ ! "$PATH_LOADED" = "true" ]; then
-
-    #### LOAD BREW PATH ON LINUX
-    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-        export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-        export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
-        export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
-    fi
 
     # Add go binaries
     if [ -d "$GOPATH" ]; then

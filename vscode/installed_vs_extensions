@@ -1,5 +1,4 @@
 aaron-bond.better-comments
-AlanWalk.markdown-toc
 Atishay-Jain.All-Autocomplete
 bungcip.better-toml
 DavidAnson.vscode-markdownlint
@@ -10,11 +9,10 @@ eamodio.gitlens
 erd0s.terraform-autocomplete
 eriklynd.json-tools
 file-icons.file-icons
+formulahendry.auto-close-tag
 formulahendry.code-runner
 hangxingliu.vscode-nginx-conf-hint
 ionutvmi.path-autocomplete
-ipedrazas.kubernetes-snippets
-k--kato.intellij-idea-keybindings
 kumar-harsh.graphql-for-vscode
 loganarnett.tf-snippets
 mauve.terraform
@@ -27,8 +25,7 @@ PeterJausovec.vscode-docker
 samuelcolvin.jinjahtml
 secanis.jenkinsfile-support
 shanoor.vscode-nginx
-shd101wyy.markdown-preview-enhanced
 sidneys1.gitconfig
-tomoki1207.pdf
 vangware.dark-plus-material
+vscoss.vscode-ansible
 waderyan.gitblame

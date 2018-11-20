@@ -3,7 +3,6 @@ set -e
 source "$(git rev-parse --show-toplevel)/lib/configurations.sh"
 
 function main {
-    _install_custom_plugin "vim" "brew install vim"
     vundle_dir="$HOME/.vim/bundle/Vundle.vim"
     if [ ! -d "${vundle_dir}" ]; then
         echo " >> Cloning vundle"

@@ -12,7 +12,6 @@ done
 if [ ! -d ~/.zplug ]; then
     git clone --depth=1 https://github.com/zplug/zplug ~/.zplug;
 fi
-
 export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
