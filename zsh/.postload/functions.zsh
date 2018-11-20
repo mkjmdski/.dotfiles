@@ -1,12 +1,4 @@
 #!/bin/zsh
-#### FUNCTIONS
-function load_nvm {
-    export NVM_DIR="$HOME/.nvm"
-    if [ -d "$NVM_DIR" ]; then
-    \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    fi
-}
 
 function cd-gitroot {
     local root
@@ -30,4 +22,8 @@ function zsh_stats {
 
 function vim_update {
     vim +PluginInstall +qall
+}
+
+function log_info {
+    echo "$fg[green][INFO]$reset_color $(date '+%H:%M:%S') > $@"
 }

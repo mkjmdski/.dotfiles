@@ -3,7 +3,6 @@
 if [[ $commands[colorls] ]]; then
     alias ls="colorls"
     alias l="ls -lA"
-    unalias la ll lsa
 fi
 
 ## tree
@@ -23,9 +22,9 @@ if [[ $commands[jq] ]]; then
     alias jq="jq -C"
 fi
 
+if [[ $commands[bat] ]]; then
+    alias cat="PAGER=less bat -p"
+fi
+
 ## git
 alias gcd="cd-gitroot"
-alias g="git"
-
-## use man with most
-alias man="PAGER=most man"

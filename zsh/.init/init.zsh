@@ -1,13 +1,10 @@
 # We want to extend path once
-if which vim &> /dev/null; then
-    export EDITOR="$(which vim)"
-fi
+export EDITOR="$(which vim)"
 export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
 export LANG=en_US.UTF-8 # Default language
 export LC_ALL=en_US.UTF-8
 
 if [ ! "$PATH_LOADED" = "true" ]; then
-
     # Add go binaries
     if [ -d "$GOPATH" ]; then
         export PATH="$GOPATH/bin:$PATH"

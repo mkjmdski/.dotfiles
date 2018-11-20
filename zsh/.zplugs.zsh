@@ -39,5 +39,8 @@ function _configure_spaceship {
 if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
     source $HOME/.autojump/etc/profile.d/autojump.sh;
 fi
+if [[ -f /usr/share/autojump/autojump.sh ]]; then
+    . /usr/share/autojump/autojump.sh
+fi
 
 return 0 # in case zplug adds plugs ignore them

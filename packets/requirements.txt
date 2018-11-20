@@ -1,4 +1,0 @@
-thefuck
-pylama
-git+https://github.com/jeffkaufman/icdiff.git
-jq
