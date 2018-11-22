@@ -22,6 +22,11 @@ if [[ $commands[jq] ]]; then
     alias jq="jq -C"
 fi
 
+if [[ $commands[nvim] ]]; then
+    alias vim="nvim"
+    alias vi="nvim"
+fi
+
 if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
 fi

@@ -1,14 +1,15 @@
 - defaults:
     link:
+      create: true
       relink: true
       force: true
     shell:
       stdout: true
 
 - link:
-    ~/.vim/colors/molokai.vim:
+    ~/.config/nvim/colors/molokai.vim:
       path: vim/molokai.vim
-    ~/.vimrc:
+    ~/.config/nvim/init.vim:
       path: vim/.vimrc
     ~/.zshrc:
       path: zsh/.zshrc
@@ -41,6 +42,6 @@
     - command: zsh -i -c "zplug install && zplug load"
       description: install zplugs
 
-    - command: vim +PluginInstall +qall
+    - command: nvim +PlugInstall +q! +q! > /dev/tty
       description: install vim plugins
       stdin: false

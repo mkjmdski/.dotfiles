@@ -1,31 +1,19 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
-
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-" call vundle#begin('~/some/path/here')
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'bash-support.vim'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'tpope/vim-sensible'
-Plugin 'bling/vim-bufferline'
-Plugin 'vim-syntastic/syntastic'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'tmhedberg/SimpylFold'
-Plugin 'vim-scripts/indentpython.vim'
-Plugin 'nvie/vim-flake8'
-Plugin 'scrooloose/nerdtree'
-Plugin 'jistr/vim-nerdtree-tabs'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'sheerun/vim-polyglot'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'tpope/vim-sensible'
+Plug 'bling/vim-bufferline'
+Plug 'vim-syntastic/syntastic'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tmhedberg/SimpylFold'
+Plug 'vim-scripts/indentpython.vim'
+Plug 'nvie/vim-flake8'
+Plug 'scrooloose/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+call plug#end()
 " To ignore plugin indent changes, instead use:
 " filetype plugin on
 "
@@ -63,7 +51,6 @@ cnoremap !py !python3<Space>
 let g:AutoPairsFlyMode = 1
 " Syntastic
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1

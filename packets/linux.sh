@@ -29,11 +29,13 @@ function install_debian {
         python3-dev \
         python3-setuptools \
         ruby \
+        ruby-dev \
         rng-tools \
         gnupg \
         gopass \
         peco \
         yarn \
+        neovim \
         zsh
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
