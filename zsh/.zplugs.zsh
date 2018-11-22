@@ -15,25 +15,12 @@ for plugin in docker docker-compose docker-machine; do
     zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
 done
 
-#### THEME
-## ZSH_THEME="eendroroy/alien"
-if [ ! -z "$ZSH_THEME" ]; then
-    zplug "$ZSH_THEME", as:theme, if:'[ ! -z "$ZSH_THEME" ]'
-
-    #### VIMODE FOR TYPING COMMANDS IN ZSH
-    zplug "plugins/vi-mode", from:oh-my-zsh
-    zplug "b4b4r07/zsh-vimode-visual", defer:3
-else
-    zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme, hook-load:"_configure_spaceship 2> /dev/tty", if:'[ -z "$ZSH_THEME" ]'
-fi
-
-function _configure_spaceship {
-    SPACESHIP_TIME_SHOW="true"
-    SPACESHIP_BATTERY_THRESHOLD="95"
-    SPACESHIP_EXIT_CODE_SHOW="true"
-    SPACESHIP_EXIT_CODE_SYMBOL="✘ "
-    spaceship_vi_mode_enable
-}
+zplug "plugins/vi-mode", from:oh-my-zsh
+zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
+SPACESHIP_TIME_SHOW="true"
+SPACESHIP_BATTERY_THRESHOLD="80"
+SPACESHIP_EXIT_CODE_SHOW="true"
+SPACESHIP_EXIT_CODE_SYMBOL="✘ "
 
 #### LOAD AUTOJUMP
 if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then

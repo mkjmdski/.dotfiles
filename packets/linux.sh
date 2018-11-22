@@ -3,13 +3,16 @@
 function install_python {
     pip3 install \
         thefuck \
-        pylama \
         git+https://github.com/jeffkaufman/icdiff.git
 }
 
 function install_gem {
     gem install \
         colorls
+}
+
+function install_yarn {
+    yarn global add @aweary/alder
 }
 
 function install_debian {
@@ -30,6 +33,7 @@ function install_debian {
         gnupg \
         gopass \
         peco \
+        yarn \
         zsh
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
@@ -38,16 +42,10 @@ function install_debian {
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
 }
 
-if [ ! -d "$HOME/bin" ]; then
-    mkdir ~/bin
-fi
-if [ ! -f "$HOME/bin/cht.sh" ]; then
-    curl https://cht.sh/:cht.sh > ~/bin/cht.sh
-fi
 if apt --version &> /dev/null; then
     install_debian
 fi
-
 install_python
 install_gem
+install_yarn
 chsh -s /bin/zsh

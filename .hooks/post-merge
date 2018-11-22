@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-echo "[post-merge hook]"
-exec < /dev/tty
-source "$(git rev-parse --show-toplevel)/lib/vscode.sh"
-install_vscode_extensions
-exit

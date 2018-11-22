@@ -3,7 +3,6 @@
       relink: true
       force: true
     shell:
-      stdin: true
       stdout: true
 
 - link:
@@ -13,14 +12,10 @@
       path: zsh/.zshrc
     ~/.config/Code/User/settings.json:
       path: vscode/settings.json
+      if: which code
     ~/.config/Code/User/snippets:
       path: vscode/snippets
-    .git/hooks/commit-msg:
-      path: .hooks/commit-msg
-    .git/hooks/post-commit:
-      path: .hooks/post-commit
-    .git/hooks/post-merge:
-      path: .hooks/post-merge
+      if: which code
 
 - shell:
     - command: sudo bash packets/linux.sh
@@ -32,9 +27,6 @@
     - command: bash packets/clone.sh
       description: install programs from git
 
-    - command: bash vscode/install.sh
-      description: install vscode plugins
-
     - command: git config --global include.path "$PWD/git/global.gitconfig"
       description: set global gitconfig
 
@@ -44,7 +36,11 @@
     - command: gopass completion zsh > "$PWD/zsh/fpath/_gopass"
       description: install gopass completion
 
-    - command: vim +PluginInstall +qall > /dev/null < /dev/tty
-      description: install vim plugins
+    - command: zsh -i -c "zplug load && zplug install"
+      description: install zplugs
 
-    
+    - command: vim +PluginInstall +qall
+      description: install vim plugins
+      stdin: false
+      stdout: false
+      quiet: true
