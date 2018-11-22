@@ -6,6 +6,8 @@
       stdout: true
 
 - link:
+    ~/.vim/colors/molokai.vim:
+      path: vim/molokai.vim
     ~/.vimrc:
       path: vim/.vimrc
     ~/.zshrc:
@@ -36,11 +38,9 @@
     - command: gopass completion zsh > "$PWD/zsh/fpath/_gopass"
       description: install gopass completion
 
-    - command: zsh -i -c "zplug load && zplug install"
+    - command: zsh -i -c "zplug install && zplug load"
       description: install zplugs
 
     - command: vim +PluginInstall +qall
       description: install vim plugins
       stdin: false
-      stdout: false
-      quiet: true
