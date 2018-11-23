@@ -23,6 +23,7 @@
 - shell:
     - command: sudo bash packets/linux.sh
       description: install standard linux packets
+      stdin: true
 
     - command: bash packets/fonts.sh
       description: install nerd and power fonts
@@ -39,9 +40,8 @@
     - command: gopass completion zsh > "$PWD/zsh/fpath/_gopass"
       description: install gopass completion
 
-    - command: zsh -i -c "zplug install && zplug load"
+    - command: zsh -i -c "zplug check || (zplug install && zplug load)"
       description: install zplugs
 
-    - command: nvim +PlugInstall +q! +q! > /dev/tty
+    - command: nvim +PlugInstall +qall > /dev/tty
       description: install vim plugins
-      stdin: false

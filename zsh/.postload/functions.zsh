@@ -24,6 +24,10 @@ function vim_update {
     vim +PluginInstall +qall
 }
 
+function nvim_update {
+    nvim +PlugInstall +qall
+}
+
 function log_info {
     echo "$fg[green][INFO]$reset_color $(date '+%H:%M:%S') > $@"
 }
