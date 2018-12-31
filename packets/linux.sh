@@ -21,6 +21,7 @@ function install_debian {
     apt update
     apt install -y \
         mc \
+        meld \
         silversearcher-ag \
         most \
         jq \
@@ -36,18 +37,47 @@ function install_debian {
         peco \
         yarn \
         neovim \
-        zsh
+        zsh \
+        byobu
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
     dpkg -i fd_7.2.0_amd64.deb
     dpkg -i bat_0.9.0_amd64.deb
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
+    post_setup
+}
+
+function install_arch {
+    pacman -S --noconfirm \
+        gnupg2 \
+        git \
+        rng-tools \
+        gopass \
+        mc meld \
+        the_silver_searcher \
+        python python-pip \
+        most \
+        ruby \
+        ruby-rdoc \
+        yarn \
+        neovim \
+        zsh \
+        jq \
+        fd \
+        bat 
+    post_setup
+}
+
+function post_setup {
+    install_python
+    install_gem
+    install_yarn
+    chsh -s /bin/zsh
 }
 
 if apt --version &> /dev/null; then
     install_debian
+elif pacman --version &> /dev/null; then
+    install_arch
 fi
-install_python
-install_gem
-install_yarn
-chsh -s /bin/zsh
+

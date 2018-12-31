@@ -21,7 +21,7 @@
       if: which code
 
 - shell:
-    - command: sudo bash packets/linux.sh
+    - command: sudo packets/linux.sh
       description: install standard linux packets
       stdin: true
 
@@ -43,5 +43,6 @@
     - command: zsh -i -c "zplug check || (zplug install && zplug load)"
       description: install zplugs
 
-    - command: nvim +PlugInstall +qall > /dev/tty
+    - command: nvim +PlugInstall +qall
       description: install vim plugins
+      stdout: true
