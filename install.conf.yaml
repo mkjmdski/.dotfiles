@@ -43,15 +43,9 @@
       path: vim/.vimrc
     ~/.zshrc:
       path: zsh/.zshrc
-    ~/.config/Code - OSS/User/settings.json:
-      path: vscode/settings.json
-      if: uname -a | grep -iq arch
-    ~/.config/Code - OSS/User/snippets:
-      path: vscode/snippets
-      if: uname -a | grep -iq arch
     ~/.config/Code/User/settings.json:
       path: vscode/settings.json
-      if: uname -a | grep -iq ubuntu
+      if: uname -a | grep -iq linux
     ~/.config/Code/User/snippets:
       path: vscode/snippets
-      if: uname -a | grep -iq arch
+      if: uname -a | grep -iq linux

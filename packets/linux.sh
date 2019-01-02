@@ -38,7 +38,8 @@ function install_debian {
         yarn \
         neovim \
         zsh \
-        byobu
+        terminator \
+        autojump
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
     dpkg -i fd_7.2.0_amd64.deb
@@ -65,8 +66,9 @@ function install_arch {
         jq \
         fd \
         bat \
-        byobu \
-        code
+        terminator \
+        code \
+        autojump
     post_setup
 }
 

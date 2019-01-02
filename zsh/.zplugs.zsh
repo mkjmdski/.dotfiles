@@ -29,5 +29,8 @@ fi
 if [[ -f /usr/share/autojump/autojump.sh ]]; then
     . /usr/share/autojump/autojump.sh
 fi
+if [[ -f  /etc/profile.d/autojump.zsh ]]; then
+    source /etc/profile.d/autojump.zsh
+fi
 
 return 0 # in case zplug adds plugs ignore them
