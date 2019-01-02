@@ -67,7 +67,6 @@ function install_arch {
         fd \
         bat \
         terminator \
-        code \
         autojump
     post_setup
 }
