@@ -19,6 +19,4 @@
     "window.zoomLevel": 1,
     "python.linting.pylamaEnabled": true,
     "python.linting.pylamaPath": "pylama",
-    "vim.enableNeovim": true,
-    "vim.useCtrlKeys": false,
 }

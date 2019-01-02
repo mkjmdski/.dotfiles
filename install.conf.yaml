@@ -6,20 +6,6 @@
     shell:
       stdout: true
 
-- link:
-    ~/.config/nvim/colors/molokai.vim:
-      path: vim/molokai.vim
-    ~/.config/nvim/init.vim:
-      path: vim/.vimrc
-    ~/.zshrc:
-      path: zsh/.zshrc
-    ~/.config/Code/User/settings.json:
-      path: vscode/settings.json
-      if: which code
-    ~/.config/Code/User/snippets:
-      path: vscode/snippets
-      if: which code
-
 - shell:
     - command: sudo packets/linux.sh
       description: install standard linux packets
@@ -49,3 +35,23 @@
 
     - command: for extension in $(cat vscode/installed_vs_extensions); do code --install-extension $extension; done
       description: setup VS Code
+
+- link:
+    ~/.config/nvim/colors/molokai.vim:
+      path: vim/molokai.vim
+    ~/.config/nvim/init.vim:
+      path: vim/.vimrc
+    ~/.zshrc:
+      path: zsh/.zshrc
+    ~/.config/Code - OSS/User/settings.json:
+      path: vscode/settings.json
+      if: uname -a | grep -iq arch
+    ~/.config/Code - OSS/User/snippets:
+      path: vscode/snippets
+      if: uname -a | grep -iq arch
+    ~/.config/Code/User/settings.json:
+      path: vscode/settings.json
+      if: uname -a | grep -iq ubuntu
+    ~/.config/Code/User/snippets:
+      path: vscode/snippets
+      if: uname -a | grep -iq arch

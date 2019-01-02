@@ -64,7 +64,9 @@ function install_arch {
         zsh \
         jq \
         fd \
-        bat 
+        bat \
+        byobu \
+        code
     post_setup
 }
 
