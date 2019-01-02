@@ -46,3 +46,6 @@
     - command: nvim +PlugInstall +qall
       description: install vim plugins
       stdout: true
+
+    - command: for extension in $(cat vscode/installed_vs_extensions); do code --install-extension $extension; done
+      description: setup VS Code
