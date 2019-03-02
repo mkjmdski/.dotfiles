@@ -12,7 +12,7 @@ zplug "zsh-users/zsh-history-substring-search", defer:3
 
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose docker-machine; do
-    zplug "plugins/$plugin", from:oh-my-zsh, if:"(( $+commands[$plugin]))"
+    zplug "plugins/$plugin", from:oh-my-zsh
 done
 
 zplug "plugins/vi-mode", from:oh-my-zsh
