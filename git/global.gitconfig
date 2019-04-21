@@ -102,3 +102,4 @@
 
 [rebase]
     instructionFormat = %s [%an]
+	amend = commit --amend --no-edit

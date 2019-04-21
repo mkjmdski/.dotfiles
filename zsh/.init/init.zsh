@@ -10,6 +10,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
         export PATH="$GOPATH/bin:$PATH"
     elif [[ $commands[go] ]]; then
         export PATH="$(go env GOPATH)/bin:$PATH"
+        export GOPATH="$(go env GOPATH)"
     fi
 
     # Add yarn global binaries
