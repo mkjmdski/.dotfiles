@@ -1,4 +1,7 @@
 export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
+
+fpath=($fpath $DOTFILES/zsh/fpath)
+
 for file in $DOTFILES/zsh/.init/*.zsh; do
     source "${file}"
 done
