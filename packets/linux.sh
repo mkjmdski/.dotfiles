@@ -21,6 +21,7 @@ function install_debian {
         peco \
         neovim \
         zsh \
+        tree \
         terminator \
         autojump
     # dpkg
@@ -54,7 +55,8 @@ function install_arch {
         fd \
         bat \
         terminator \
-        autojump
+        autojump \
+        tree
 }
 
 if apt --version &> /dev/null; then

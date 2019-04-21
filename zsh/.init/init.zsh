@@ -13,9 +13,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
         export GOPATH="$(go env GOPATH)"
     fi
 
-    # Add yarn global binaries
-    if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
-
     # Add ruby gems
     if [[ $commands[ruby] ]]; then export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"; fi
 
