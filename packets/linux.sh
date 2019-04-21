@@ -1,20 +1,5 @@
 #!/bin/bash
 
-function install_python {
-    pip3 install \
-        thefuck \
-        git+https://github.com/jeffkaufman/icdiff.git
-}
-
-function install_gem {
-    gem install \
-        colorls
-}
-
-function install_yarn {
-    yarn global add @aweary/alder
-}
-
 function install_debian {
     # apt
     wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
@@ -34,7 +19,6 @@ function install_debian {
         gnupg \
         gopass \
         peco \
-        yarn \
         neovim \
         zsh \
         terminator \
@@ -46,7 +30,9 @@ function install_debian {
     dpkg -i bat_0.9.0_amd64.deb
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
     # snap
-    snap install --classic code
+    snap install --classic \
+        code \
+        slack
     snap install brave
 }
 
@@ -62,7 +48,6 @@ function install_arch {
         most \
         ruby \
         ruby-rdoc \
-        yarn \
         neovim \
         zsh \
         jq \
@@ -78,7 +63,9 @@ elif pacman --version &> /dev/null; then
     install_arch
 fi
 
-install_python
-install_gem
-install_yarn
+pip3 install \
+    thefuck \
+    git+https://github.com/jeffkaufman/icdiff.git
+gem install \
+    colorls
 
