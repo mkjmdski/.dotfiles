@@ -17,10 +17,6 @@
     "window.restoreFullscreen": true,
     "window.restoreWindows": "all",
     "window.zoomLevel": 1,
-    "python.linting.pylamaEnabled": true,
-    "python.linting.pylamaPath": "pylama",
-    "python.jediEnabled": false,
     "editor.largeFileOptimizations": false,
     "editor.suggestSelection": "first",
-    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 }

@@ -28,6 +28,12 @@
 [url "git@bitbucket.org:"]
     insteadOf = bb:
 
+[url "git@gitlab.com:"]
+    insteadOf = gl:
+
+[url "git@git.egnyte-internal.com:"]
+    insteadOf = eg:
+
 #### COLORS DEFINITIONS
 [color]
 	ui = auto

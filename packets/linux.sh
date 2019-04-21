@@ -16,12 +16,11 @@ function install_yarn {
 }
 
 function install_debian {
+    # apt
     wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
     echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | sudo tee /etc/apt/sources.list.d/gopass.list
     apt update
     apt install -y \
-        mc \
-        meld \
         silversearcher-ag \
         most \
         jq \
@@ -40,12 +39,15 @@ function install_debian {
         zsh \
         terminator \
         autojump
+    # dpkg
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
     dpkg -i fd_7.2.0_amd64.deb
     dpkg -i bat_0.9.0_amd64.deb
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
-    post_setup
+    # snap
+    snap install --classic code
+    snap install brave
 }
 
 function install_arch {
@@ -68,14 +70,6 @@ function install_arch {
         bat \
         terminator \
         autojump
-    post_setup
-}
-
-function post_setup {
-    install_python
-    install_gem
-    install_yarn
-    chsh -s /bin/zsh
 }
 
 if apt --version &> /dev/null; then
@@ -83,4 +77,9 @@ if apt --version &> /dev/null; then
 elif pacman --version &> /dev/null; then
     install_arch
 fi
+
+install_python
+install_gem
+install_yarn
+chsh -s /bin/zsh
 
