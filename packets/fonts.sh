@@ -12,11 +12,6 @@ function _get_font_dir {
 
 function install_fonts {
     font_dir="$(_get_font_dir)"
-    if [ ! -f "$font_dir/Droid Sans Mono for Powerline Nerd Font Complete.otf" ]; then
-        echo " >> Installing nerd fonts"
-        cd $font_dir
-        curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf
-    fi
     if [ ! -f "$font_dir/Hack-Regular.ttf" ]; then
         echo " >> Installing powerline fonts"
         cd /tmp
@@ -29,3 +24,4 @@ function install_fonts {
 }
 
 install_fonts
+fc-cache -f -v
