@@ -81,5 +81,4 @@ fi
 install_python
 install_gem
 install_yarn
-chsh -s /bin/zsh
 
