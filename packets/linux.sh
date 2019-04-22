@@ -32,9 +32,10 @@ function install_debian {
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
 
     # snap
-    for app in code slack spotify; do
+    for app in code slack; do
         snap install --classic "${app}"
     done
+    snap install spotify
 }
 
 function install_arch {

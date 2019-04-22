@@ -15,5 +15,3 @@ fi
 if [[ -f  /etc/profile.d/autojump.zsh ]]; then
     source /etc/profile.d/autojump.zsh
 fi
-
-source $(dirname $(gem which colorls))/tab_complete.sh

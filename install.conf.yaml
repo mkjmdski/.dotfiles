@@ -19,6 +19,7 @@
     description: install gopass completion
   - command: for extension in $(cat vscode/installed_vs_extensions); do code --install-extension $extension; done
     description: setup VS Code
+  - command: curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
 - link:
     ~/.config/nvim/colors/molokai.vim:
       path: vim/molokai.vim
