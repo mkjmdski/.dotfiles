@@ -21,20 +21,20 @@ function install_debian {
         peco \
         neovim \
         zsh \
-        tree \
         terminator \
         autojump
+
     # dpkg
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
     dpkg -i fd_7.2.0_amd64.deb
     dpkg -i bat_0.9.0_amd64.deb
     rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
+
     # snap
-    snap install --classic \
-        code \
-        slack
-    snap install brave
+    for app in code slack spotify; do
+        snap install --classic "${app}"
+    done
 }
 
 function install_arch {
