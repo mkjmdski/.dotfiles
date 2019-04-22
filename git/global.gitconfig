@@ -21,19 +21,6 @@
 	#always rebase
 	rebase = true
 
-#### SHORTCUTS FOR GITHUB AND BITBUCKET
-[url "git@github.com:"]
-    insteadOf = gh:
-
-[url "git@bitbucket.org:"]
-    insteadOf = bb:
-
-[url "git@gitlab.com:"]
-    insteadOf = gl:
-
-[url "git@git.egnyte-internal.com:"]
-    insteadOf = eg:
-
 #### COLORS DEFINITIONS
 [color]
 	ui = auto
