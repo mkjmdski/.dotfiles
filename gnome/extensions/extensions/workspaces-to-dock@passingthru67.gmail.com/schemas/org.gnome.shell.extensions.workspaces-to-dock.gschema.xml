@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+  <enum id='org.gnome.shell.extensions.workspaces-to-dock.position'>
+    <value value='0' nick='TOP'/>
+    <value value='1' nick='RIGHT'/>
+    <value value='2' nick='BOTTOM'/>
+    <value value='3' nick='LEFT'/>
+  </enum>
+  <enum id='org.gnome.shell.extensions.workspaces-to-dock.orientation'>
+    <value value='0' nick='OUTSIDE'/>
+    <value value='1' nick='INSIDE'/>
+  </enum>
+  <enum id='org.gnome.shell.extensions.workspaces-to-dock.captionposition'>
+    <value value='0' nick='BOTTOM'/>
+    <value value='1' nick='TOP'/>
+  </enum>
+  <enum id='org.gnome.shell.extensions.workspaces-to-dock.overviewaction'>
+    <value value='0' nick='SHOW_FULL'/>
+    <value value='1' nick='HIDE'/>
+    <value value='2' nick='SHOW_PARTIAL'/>
+  </enum>
+  <enum id='org.gnome.shell.extensions.workspaces-to-dock.intellihideaction'>
+    <value value='0' nick='SHOW_FULL'/>
+    <value value='1' nick='SHOW_PARTIAL'/>
+    <value value='2' nick='SHOW_PARTIAL_FIXED'/>
+  </enum>
+  <schema path="/org/gnome/shell/extensions/workspaces-to-dock/" id="org.gnome.shell.extensions.workspaces-to-dock">
+    <key type="b" name="dock-fixed">
+      <default>false</default>
+      <summary>Dock always visible</summary>
+      <description>Dock is always visible</description>
+    </key>
+    <key type="d" name="animation-time">
+      <default>0.25</default>
+      <summary>Animation time</summary>
+      <description>Sets the time duration of the autohide effect.</description>
+    </key>
+    <key type="d" name="show-delay">
+      <default>0.25</default>
+      <summary>Show delay</summary>
+      <description>Sets the delay after the mouse reaches the screen border before showing the dock.</description>
+    </key>
+    <key type="d" name="hide-delay">
+      <default>0.1</default>
+      <summary>Show delay</summary>
+      <description>Sets the delay after the mouse left the dock before hiding it.</description>
+    </key>
+    <key type="b" name="autohide">
+      <default>true</default>
+      <summary>Dock shown on mouse over</summary>
+      <description>Enable or disable autohide mode</description>
+    </key>
+    <key type="b" name="autohide-in-fullscreen">
+      <default>false</default>
+      <summary>Enable autohide in fullscreen mode.</summary>
+      <description>Enable autohide in fullscreen mode.</description>
+    </key>
+    <key type="b" name="intellihide">
+      <default>true</default>
+      <summary>Dock dodges windows</summary>
+      <description>Enable or disable intellihide mode</description>
+    </key>
+    <key type="i" name="intellihide-option">
+      <default>0</default>
+      <summary>Intellihide mode options</summary>
+      <description>Select type of intellihide mode</description>
+    </key>
+    <key type="b" name="ignore-top-panel">
+      <default>true</default>
+      <summary>Ignore top panel menus</summary>
+      <description>Enable or disable dodging menu window belonging to the top panel</description>
+    </key>
+    <key type="b" name="ignore-context-menus">
+      <default>true</default>
+      <summary>Ignore application context menus</summary>
+      <description>Enable or disable dodging application context menus</description>
+    </key>
+    <key type="b" name="dock-edge-visible">
+      <default>false</default>
+      <summary>Leave dock edge visible when slid out</summary>
+      <description>Enable or disable leaving dock edge visible when slid out</description>
+    </key>
+    <key type="b" name="scroll-with-touchpad">
+      <default>false</default>
+      <summary>Enable to prevent multiple workspace switching when using touchpad</summary>
+      <description>Enable to prevent multiple workspace switching when using touchpad.</description>
+    </key>
+    <key type="b" name="disable-scroll">
+      <default>false</default>
+      <summary>Disable scroll to prevent workspace switching when dock is slid out</summary>
+      <description>Disable scroll to prevent workspace switching when dock is slid out.</description>
+    </key>
+    <key type="b" name="require-click-to-show">
+      <default>false</default>
+      <summary>Dock requires hover+click to show when window is maximized</summary>
+      <description>Enable or disable requiring hover+click to show dock when window is maximized</description>
+    </key>
+    <key type="b" name="require-pressure-to-show">
+      <default>true</default>
+      <summary>Require pressure to show dock (GS38+ only)</summary>
+      <description>Enable or disable requiring pressure to show dock</description>
+    </key>
+    <key type="d" name="pressure-threshold">
+      <default>120</default>
+      <summary>Pressure threshold</summary>
+      <description>Sets how much pressure is needed to show the dock.</description>
+    </key>
+    <key type="b" name="use-pressure-speed-limit">
+      <default>false</default>
+      <summary>Limit pressure sense to slow mouse speeds</summary>
+      <description>Enable or disable limiting pressure sense to slow mouse speeds</description>
+    </key>
+    <key type="d" name="pressure-speed-limit">
+      <default>50</default>
+      <summary>Pressure speed limit</summary>
+      <description>Set maximum speed for pressure sense</description>
+    </key>
+    <key type="b" name="opaque-background">
+      <default>true</default>
+      <summary>Workspaces background is opaque</summary>
+      <description>Makes the background of the workspaces opaque improving readability when in autohide mode.</description>
+    </key>
+    <key type="d" name="background-opacity">
+      <default>0.9</default>
+      <summary>Opacity of the workspaces background</summary>
+      <description>Sets the opacity of the workspaces background  when in autohide mode.</description>
+    </key>
+    <key type="b" name="straight-corners">
+      <default>false</default>
+      <summary>Force use of straight corners in theme</summary>
+      <description>Forces the theme's appearance to use straight corners.</description>
+    </key>
+    <key type="i" name="preferred-monitor">
+      <default>0</default>
+      <summary>Monitor on which to put the dock</summary>
+      <description>Choose on which monitor to put the dock, use -1 for the primary one</description>
+    </key>
+    <key name="dock-position" enum="org.gnome.shell.extensions.workspaces-to-dock.position">
+      <default>'RIGHT'</default>
+      <summary>Location of the dock on the screen</summary>
+      <description>Dock is shown on the Left, Right, Top or Bottom side of the screen.</description>
+    </key>
+    <key type="b" name="hide-dash">
+      <default>false</default>
+      <summary>Hide the Gnome Shell dash</summary>
+      <description>Hide the Gnome Shell dash.</description>
+    </key>
+    <key type="b" name="hide-workspace-switcher-popup">
+      <default>false</default>
+      <summary>Hide the Gnome Shell workspace switcher popup</summary>
+      <description>Hide the Gnome Shell workspace switcher popup.</description>
+    </key>
+    <key type="b" name="horizontal-workspace-switching">
+      <default>true</default>
+      <summary>Use horizontal workspaces switching</summary>
+      <description>Use horizontal workspace switching when dock is positioned horizontally.</description>
+    </key>
+    <key type="b" name="customize-height">
+      <default>false</default>
+      <summary>Customize height of dock</summary>
+      <description>Customize the height of the dock.</description>
+    </key>
+    <key type="i" name="customize-height-option">
+      <default>0</default>
+      <summary>Customize height options</summary>
+      <description>Select type of customization for height of dock (autosize, extend)</description>
+    </key>
+    <key type="b" name="center-thumbnails-on-dock">
+      <default>false</default>
+      <summary>Center thumbnails on dock</summary>
+      <description>Center thumbnails on dock.</description>
+    </key>
+    <key type="i" name="center-thumbnails-option">
+      <default>0</default>
+      <summary>Center thumbnails options</summary>
+      <description>Select type of centering for thumbnails and shortcuts (jointly, independently).</description>
+    </key>
+    <key type="d" name="top-margin">
+      <default>0</default>
+      <summary>Top margin of extended dock</summary>
+      <description>Sets the top margin when the dock is extended vertically.</description>
+    </key>
+    <key type="d" name="bottom-margin">
+      <default>0</default>
+      <summary>Bottom margin of dock</summary>
+      <description>Sets the bottom margin when the dock is extended vertically.</description>
+    </key>
+    <key type="d" name="screen-edge-padding">
+      <default>0</default>
+      <summary>Padding between dock and edge of screen</summary>
+      <description>Sets the padding between the dock and the edge of the screen.</description>
+    </key>
+    <key type="b" name="customize-thumbnail">
+      <default>false</default>
+      <summary>Customize workspace thumbnail size</summary>
+      <description>Customize the workspace thumbnail size.</description>
+    </key>
+    <key type="d" name="thumbnail-size">
+      <default>.125</default>
+      <summary>Set custom workspace thumbnail size</summary>
+      <description>Set the custom size for the workspace thumbnail.</description>
+    </key>
+    <key type="b" name="customize-thumbnail-visible-width">
+      <default>false</default>
+      <summary>Customize workspace thumbnail visible width</summary>
+      <description>Customize the workspace thumbnail visible width.</description>
+    </key>
+    <key type="d" name="thumbnail-visible-width">
+      <default>27</default>
+      <summary>Set custom workspace thumbnail visible width</summary>
+      <description>Set the custom visible width for the workspace thumbnail.</description>
+    </key>
+    <key type="b" name="workspace-captions">
+      <default>true</default>
+      <summary>Show workspace captions</summary>
+      <description>Enable or disable workspace captions.</description>
+    </key>
+    <key name="workspace-caption-position" enum="org.gnome.shell.extensions.workspaces-to-dock.captionposition">
+      <default>'BOTTOM'</default>
+      <summary>Set the workspace caption position</summary>
+      <description>Set the workspace caption position.</description>
+    </key>
+    <key type="d" name="workspace-caption-height">
+      <default>22</default>
+      <summary>Workspace caption height</summary>
+      <description>Set the workspace caption height.</description>
+    </key>
+    <key type="as" name="workspace-caption-items">
+      <default>['number:false', 'spacer:true', 'windowapps:false']</default>
+      <summary>List of items placed in caption</summary>
+      <description>List of items placed in the caption - allowed items are number, name, windowcount, windowapps, and spacer.</description>
+    </key>
+    <key type="b" name="workspace-caption-windowcount-image">
+      <default>false</default>
+      <summary>Show workspace window count using images</summary>
+      <description>Enable or disable using images for workspace window count.</description>
+    </key>
+    <key type="b" name="workspace-caption-taskbar-tooltips">
+      <default>true</default>
+      <summary>Show caption taskbar tooltips</summary>
+      <description>Enable or disable showing caption taskbar application tooltips.</description>
+    </key>
+    <key type="d" name="workspace-caption-taskbar-icon-size">
+      <default>24</default>
+      <summary>Workspace caption taskbar icon size</summary>
+      <description>Set the workspace caption taskbar icon size.</description>
+    </key>
+    <key type="d" name="workspace-caption-menu-icon-size">
+      <default>20</default>
+      <summary>Workspace caption popup menu icon size</summary>
+      <description>Set the workspace caption popup menu icon size.</description>
+    </key>
+    <key type="b" name="toggle-overview">
+      <default>true</default>
+      <summary>Toggle overview mode</summary>
+      <description>Toggle overview mode with right click</description>
+    </key>
+    <key type="b" name="toggle-dock-with-keyboard-shortcut">
+      <default>true</default>
+      <summary>Enable keyboard shortcut to toggle dock</summary>
+      <description>Enable keyboard shortcut to toggle the dock.</description>
+    </key>
+    <key type="as" name="dock-keyboard-shortcut">
+      <default><![CDATA[['<Super>w']]]></default>
+      <summary>Dock keyboard shortcut</summary>
+      <description>Set the keyboard shortcut to toggle the dock.</description>
+    </key>
+    <key type="d" name="keyboard-toggle-timeout">
+      <default>5</default>
+      <summary>Timeout to hide the dock</summary>
+      <description>Sets the time duration before the dock is hidden again after toggleg by the keyboard shortcut.</description>
+    </key>
+    <key type="b" name="dashtodock-hover">
+      <default>false</default>
+      <summary>Dock shown on Dash-To-Dock mouse over</summary>
+      <description>Enable or disable Dash-To-Dock hover mode</description>
+    </key>
+    <key name="overview-action" enum="org.gnome.shell.extensions.workspaces-to-dock.overviewaction">
+      <default>'SHOW_FULL'</default>
+      <summary>Show, hide, or partially hide the dock in overview mode</summary>
+      <description>Show, hide, or partially hide the dock in overview mode.</description>
+    </key>
+    <key name="intellihide-action" enum="org.gnome.shell.extensions.workspaces-to-dock.intellihideaction">
+      <default>'SHOW_FULL'</default>
+      <summary>Show full or partial dock when dock is not dodging windows</summary>
+      <description>Show full or partial dock when dock is not dodging windows.</description>
+    </key>
+    <key type="b" name="quick-show-on-workspace-change">
+      <default>false</default>
+      <summary>Show the dock temporarily when switching workspaces</summary>
+      <description>Enable or disable Showing the dock temporarily when switching workspaces</description>
+    </key>
+    <key type="d" name="quick-show-timeout">
+      <default>1000</default>
+      <summary>Length of time the dock is shown</summary>
+      <description>Set length of time the dock is shown when switching workspaces</description>
+    </key>
+    <key type="b" name="show-shortcuts-panel">
+      <default>false</default>
+      <summary>Show a favorite shortcuts panel beside the workspaces thumbnail</summary>
+      <description>Show a favorite shortcuts panel beside the workspaces thubmanail</description>
+    </key>
+    <key name="shortcuts-panel-orientation" enum="org.gnome.shell.extensions.workspaces-to-dock.orientation">
+      <default>'OUTSIDE'</default>
+      <summary>Location of the shortcuts panel in relation to the workspace thumbnails</summary>
+      <description>Location of the shortcuts panel in relation to the workspace thumbnails</description>
+    </key>
+    <key type="d" name="shortcuts-panel-icon-size">
+      <default>32</default>
+      <summary>Shortcuts panel icon size</summary>
+      <description>Set the shortcuts panel icon size.</description>
+    </key>
+    <key type="b" name="shortcuts-panel-show-running">
+      <default>false</default>
+      <summary>Show runnings apps on the shortcuts panel</summary>
+      <description>Show runnings apps on shortcuts panel</description>
+    </key>
+    <key type="b" name="shortcuts-panel-show-places">
+      <default>true</default>
+      <summary>Show places on the shortcuts panel</summary>
+      <description>Show places on the shortcuts panel</description>
+    </key>
+    <key type="b" name="shortcuts-panel-show-window-count-indicators">
+      <default>false</default>
+      <summary>Show application window count indicators</summary>
+      <description>Show application window count indicators</description>
+    </key>
+    <key type="b" name="shortcuts-panel-appsbutton-animation">
+      <default>false</default>
+      <summary>Use the apps button as the source for the swarm animation</summary>
+      <description>Use the apps button as the source for the swarm animation</description>
+    </key>
+    <key type="b" name="shortcuts-panel-appsbutton-at-bottom">
+      <default>false</default>
+      <summary>Show applications button at the bottom of the shortcuts panel</summary>
+      <description>Show applications button at the bottom of the shortcuts panel</description>
+    </key>
+    <key type="b" name="shortcuts-panel-popupmenu-arrow-at-top">
+      <default>false</default>
+      <summary>Show the shortcut button popup menu arrow at the top</summary>
+      <description>Show the shortcut button popup menu arrow at the top</description>
+    </key>
+    <key type="b" name="shortcuts-panel-popupmenu-hide-thumbnails">
+      <default>false</default>
+      <summary>Hide the thumbnails when the shortcut button popup menu is shown</summary>
+      <description>Hide the thumbnails when the shortcut button popup menu is shown</description>
+    </key>
+    <key type="b" name="thumbnails-popupmenu-hide-shortcuts">
+      <default>false</default>
+      <summary>Hide the favorite shortcuts panel when a popup menu is shown</summary>
+      <description>Hide the favorite shortcuts panel when a popup menu is shown</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+
+  <schema path="/org/gnome/shell/extensions/web-search-dialog/" id="org.gnome.shell.extensions.web-search-dialog">
+
+    <key type="as" name="open-web-search-dialog">
+      <default><![CDATA[['<Ctrl>space']]]></default>
+      <summary>Open web search.</summary>
+    </key>
+
+    <key type="s" name="search-history-data">
+      <default>"[]"</default>
+    </key>
+
+    <key type="as" name="search-engines">
+      <default>
+        [
+          '{"name": "Google", "keyword": "g", "url": "https://google.com/search?q={term}"}',
+          '{"name": "DuckDuckGo", "keyword": "d", "url": "https://duckduckgo.com/?q={term}"}',
+          '{"name": "Yandex", "keyword": "y", "url": "https://yandex.com/yandsearch?text={term}"}',
+          '{"name": "Wikipedia", "keyword": "w", "url": "https://en.wikipedia.org/wiki/Special:Search?search={term}"}',
+          '{"name": "Bing", "keyword": "b", "url": "https://www.bing.com/search?q={term}"}'
+        ]
+      </default>
+      <summary>Search engines.</summary>
+    </key>
+
+    <key type="b" name="enable-suggestions">
+        <default>true</default>
+        <summary>Enable suggetsions</summary>
+    </key>
+
+    <key type="b" name="select-first-suggestion">
+        <default>true</default>
+        <summary>Always select first suggestion</summary>
+    </key>
+
+    <key type="i" name="suggestions-delay">
+        <default>150</default>
+    </key>
+
+    <key type="b" name="enable-duckduckgo-helper">
+        <default>true</default>
+    </key>
+
+    <key type="i" name="helper-delay">
+        <default>500</default>
+    </key>
+
+    <key type="s" name="helper-position">
+      <default>"bottom"</default>
+    </key>
+
+    <key type="b" name="enable-history-suggestions">
+      <default>true</default>
+      <summary>Enable history suggestions.</summary>
+    </key>
+
+    <key type="i" name="history-limit">
+      <default>500</default>
+    </key>
+
+    <key type="i" name="default-search-engine">
+      <default>0</default>
+    </key>
+
+    <key type="s" name="open-url-label">
+      <default>"Open URL"</default>
+    </key>
+
+    <key type="s" name="open-url-keyword">
+      <default>"url"</default>
+    </key>
+
+    <key type="s" name="language-code">
+      <default>'en'</default>
+    </key>
+
+  </schema>
+</schemalist>

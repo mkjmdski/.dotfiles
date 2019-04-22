@@ -33,5 +33,14 @@
     ~/.config/Code/User/snippets:
       path: vscode/snippets
       if: uname -a | grep -iq linux
+    ~/.icons:
+      path: gnome/icons
+      if: gnome-shell --version
+    ~/.themes:
+      path: gnome/themes
+      if: gnome-shell --version
+    ~/.local/share/gnome-shell/extensions:
+      path: gnome/extensions
+      if: gnome-shell --version
 - shell:
   - command: zsh -ic "zplug load; zplug install"
