@@ -13,3 +13,24 @@ fi
 if [ ! -f "$HOME/bin/cht.sh" ]; then
     curl https://cht.sh/:cht.sh > ~/bin/cht.sh
 fi
+
+function _get_font_dir {
+    if [ ! "$(uname)" = "Darwin" ]; then
+            mkdir -p ~/.local/share/fonts
+            dir="$HOME/.local/share/fonts"
+    else
+            dir="$HOME/Library/Fonts"
+    fi
+    echo "${dir}"
+}
+
+font_dir="$(_get_font_dir)"
+cd $font_dir
+if [ ! -f "Droid Sans Mono for Powerline Nerd Font Complete.otf" ]; then
+    curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf"
+    curl -fLo "Ubuntu Mono Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/UbuntuMono/Regular/complete/Ubuntu%20Mono%20Nerd%20Font%20Complete%20Mono.ttf"
+    curl -fLo "Hack Regular Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete%20Mono.ttf"
+    fc-cache -vf
+    mkfontscale
+    mkfontdir
+fi

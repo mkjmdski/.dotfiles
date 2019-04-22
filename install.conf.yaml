@@ -9,14 +9,6 @@
   - command: sudo packets/linux.sh
     description: install standard linux packets
     stdin: true
-  - command: sudo chsh -s /bin/zsh
-    description: change shell to zsh for root
-    stdin: true
-  - command: chsh -s /bin/zsh
-    description: change shell to zsh for user
-    stdin: true
-  - command: bash packets/fonts.sh
-    description: install nerd and power fonts
   - command: bash packets/clone.sh
     description: install programs from git
   - command: git config --global include.path "$PWD/git/global.gitconfig"
@@ -40,6 +32,4 @@
     ~/.config/Code/User/snippets:
       path: vscode/snippets
       if: uname -a | grep -iq linux
-- shell:
-  - command: zsh -i -c "zplug check || (zplug install && zplug load)"
-    description: install zplugs
+- shell: zsh -ic "zplug load; zplug check; zplug install"

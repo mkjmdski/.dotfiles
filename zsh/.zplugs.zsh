@@ -15,7 +15,6 @@ for plugin in docker docker-compose docker-machine; do
     zplug "plugins/$plugin", from:oh-my-zsh
 done
 
-zplug "plugins/vi-mode", from:oh-my-zsh
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 SPACESHIP_TIME_SHOW="true"
 SPACESHIP_BATTERY_THRESHOLD="80"

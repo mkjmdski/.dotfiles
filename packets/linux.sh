@@ -71,3 +71,4 @@ pip3 install \
 gem install \
     colorls
 
+chsh -s /bin/zsh
