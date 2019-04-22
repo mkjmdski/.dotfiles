@@ -2,8 +2,8 @@
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
-    "workbench.iconTheme": "file-icons",
-    "workbench.colorTheme": "Dark+ Material",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorTheme": "Mars",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,

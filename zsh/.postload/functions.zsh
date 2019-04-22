@@ -25,5 +25,5 @@ function log_info {
 }
 
 function update_vscode_extensions {
-    code --list-extensions > "$DOTFILES/vscode/install_vscode_extensions"
+    code --list-extensions > "$DOTFILES/vscode/installed_vs_extensions"
 }

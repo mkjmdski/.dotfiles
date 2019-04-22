@@ -6,6 +6,8 @@ donjayamanne.githistory
 dunstontc.viml
 dunstontc.vscode-docker-syntax
 eamodio.gitlens
+EliverLara.andromeda
+EliverLara.mars
 erd0s.terraform-autocomplete
 eriklynd.json-tools
 file-icons.file-icons
@@ -15,6 +17,7 @@ hangxingliu.vscode-nginx-conf-hint
 ionutvmi.path-autocomplete
 kumar-harsh.graphql-for-vscode
 loganarnett.tf-snippets
+marlon407.code-groovy
 mauve.terraform
 mikestead.dotenv
 mindginative.terraform-snippets
@@ -22,6 +25,7 @@ mohsen1.prettify-json
 ms-python.python
 ms-vscode.Go
 PeterJausovec.vscode-docker
+PKief.material-icon-theme
 samuelcolvin.jinjahtml
 secanis.jenkinsfile-support
 shanoor.vscode-nginx
