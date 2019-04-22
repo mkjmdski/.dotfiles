@@ -32,4 +32,5 @@
     ~/.config/Code/User/snippets:
       path: vscode/snippets
       if: uname -a | grep -iq linux
-- shell: zsh -ic "zplug load; zplug check; zplug install"
+- shell:
+  - command: zsh -ic "zplug load; zplug install"
