@@ -35,7 +35,9 @@ function install_debian {
     for app in code slack; do
         snap install --classic "${app}"
     done
-    snap install spotify
+    for app in spotify caprine; do
+        snap install "${app}"
+    done
 }
 
 function install_arch {
