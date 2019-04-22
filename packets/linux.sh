@@ -24,6 +24,7 @@ function install_debian {
         terminator \
         git-crypt \
         git-lfs \
+        chrome-gnome-shell \
         autojump
 
     # dpkg
