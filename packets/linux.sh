@@ -22,6 +22,8 @@ function install_debian {
         neovim \
         zsh \
         terminator \
+        git-crypt \
+        git-lfs \
         autojump
 
     # dpkg
@@ -35,7 +37,7 @@ function install_debian {
     for app in code slack; do
         snap install --classic "${app}"
     done
-    for app in spotify caprine; do
+    for app in spotify caprine terraform; do
         snap install "${app}"
     done
 }
