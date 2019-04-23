@@ -33,3 +33,5 @@ fi
 
 ## git
 alias gcd="cd-gitroot"
+
+alias cls="/bin/ls"

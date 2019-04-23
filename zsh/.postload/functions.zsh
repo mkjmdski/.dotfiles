@@ -27,3 +27,14 @@ function log_info {
 function update_vscode_extensions {
     code --list-extensions > "$DOTFILES/vscode/installed_vs_extensions"
 }
+
+function setup_venv {
+    virtualenv --python=$(which python3) venv
+    if ! cat .gitignore | grep -q venv; then
+        echo "venv" >> .gitignore
+    fi
+    source venv/bin/activate
+    if [ -f requirements.txt ]; then
+        pip3 install -r requirements.txt
+    fi
+}

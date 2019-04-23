@@ -1,2 +1,3 @@
 .commit-cache*
 Gemfile.lock
+zsh/.init/custom.zsh
