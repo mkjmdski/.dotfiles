@@ -75,6 +75,7 @@ pip3 install \
     thefuck \
     git+https://github.com/jeffkaufman/icdiff.git
 gem install \
-    colorls
+    colorls \
+    terraform_landscape
 
 chsh -s /bin/zsh
