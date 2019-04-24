@@ -1,9 +1,10 @@
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -d "${HOME}/google-cloud-sdk" ]; then
+    . $HOME/google-cloud-sdk/completion.zsh.inc
+    . $HOME/google-cloud-sdk/path.zsh.inc
+elif [ -d "/opt/google-cloud-sdk" ]; then
+    . /opt/google-cloud-sdk/completion.zsh.inc
+    . /opt/google-cloud-sdk/path.zsh.inc
+fi
 
 #### LOAD AUTOJUMP
 if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then

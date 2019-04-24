@@ -73,9 +73,12 @@ fi
 
 pip3 install \
     thefuck \
-    git+https://github.com/jeffkaufman/icdiff.git
+    git+https://github.com/jeffkaufman/icdiff.git \
+    awscli
 gem install \
     colorls \
     terraform_landscape
+
+curl https://sdk.cloud.google.com | bash
 
 chsh -s /bin/zsh
