@@ -45,13 +45,13 @@ function install_debian {
 
 function install_arch {
     pacman -S --noconfirm \
-        gnupg2 \
+        gnupg \
         git \
         rng-tools \
         gopass \
-        mc meld \
         the_silver_searcher \
-        python python-pip \
+        python \
+        python-pip \
         most \
         ruby \
         ruby-rdoc \
@@ -61,8 +61,8 @@ function install_arch {
         fd \
         bat \
         terminator \
-        autojump \
-        tree
+        terraform \
+        autojump
 }
 
 if apt --version &> /dev/null; then
@@ -70,15 +70,3 @@ if apt --version &> /dev/null; then
 elif pacman --version &> /dev/null; then
     install_arch
 fi
-
-pip3 install \
-    thefuck \
-    git+https://github.com/jeffkaufman/icdiff.git \
-    awscli
-gem install \
-    colorls \
-    terraform_landscape
-
-curl https://sdk.cloud.google.com | bash
-
-chsh -s /bin/zsh

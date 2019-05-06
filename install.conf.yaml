@@ -6,8 +6,15 @@
     shell:
       stdout: true
 - shell:
-  - command: sudo packets/linux.sh
-    description: install standard linux packets
+  - command: sudo packets/packets.sh
+    description: install standard packets
+    stdin: true
+  - command: sudo packets/gems.sh
+    description: install gems
+  - command: sudo packets/pip.sh
+    description: install python packages
+  - command: curl https://sdk.cloud.google.com | bash
+    description: install google sdk
     stdin: true
   - command: bash packets/clone.sh
     description: install programs from git
@@ -19,7 +26,6 @@
     description: install gopass completion
   - command: for extension in $(cat vscode/installed_vs_extensions); do code --install-extension $extension; done
     description: setup VS Code
-  - command: curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
 - link:
     ~/.config/nvim/colors/molokai.vim:
       path: vim/molokai.vim
@@ -29,10 +35,16 @@
       path: zsh/.zshrc
     ~/.config/Code/User/settings.json:
       path: vscode/settings.json
-      if: uname -a | grep -iq linux
+      if: uname -a | grep -iq ubuntu || uname -a | grep -iq arch
     ~/.config/Code/User/snippets:
       path: vscode/snippets
-      if: uname -a | grep -iq linux
+      if: uname -a | grep -iq ubuntu || uname -a | grep -iq arch
+    ~/.config/Code - OSS/User/settings.json:
+      path: vscode/settings.json
+      if: uname -a | grep -iq manjaro
+    ~/.config/Code - OSS/User/snippets:
+      path: vscode/snippets
+      if: uname -a | grep -iq manjaro
     ~/.icons:
       path: gnome/icons
       if: gnome-shell --version
