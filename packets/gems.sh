@@ -1,4 +1,4 @@
-sudo gem install \
+gem install \
     colorls \
     terraform_landscape
 

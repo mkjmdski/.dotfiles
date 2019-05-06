@@ -62,7 +62,8 @@ function install_arch {
         bat \
         terminator \
         terraform \
-        autojump
+        autojump \
+        base-devel
 }
 
 if apt --version &> /dev/null; then
