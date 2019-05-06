@@ -5,13 +5,6 @@ if [[ $commands[colorls] ]]; then
     alias l="ls -lA"
 fi
 
-## tree
-if [[ $commands[alder] ]]; then
-    alias tree="alder"
-fi
-alias t="tree"
-
-
 ## thefuck
 if [[ $commands[thefuck] ]]; then
     eval $(thefuck --alias)
@@ -35,3 +28,12 @@ fi
 alias gcd="cd-gitroot"
 
 alias cls="/bin/ls"
+
+alias dc="docker"
+alias dcc="docker-compose"
+
+alias hp="history | peco"
+
+hpc () {
+    history | peco --query="$@"
+}

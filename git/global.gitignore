@@ -10,7 +10,6 @@
 
 # IDE files #
 #############
-.vscode
 .idea
 .iml
 
