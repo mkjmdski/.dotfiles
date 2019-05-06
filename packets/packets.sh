@@ -63,7 +63,10 @@ function install_arch {
         terminator \
         terraform \
         autojump \
-        base-devel
+        base-devel \
+        git-crypt \
+        git-lfs \
+
 }
 
 if apt --version &> /dev/null; then
