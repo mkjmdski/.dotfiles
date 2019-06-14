@@ -69,8 +69,35 @@ function install_arch {
 
 }
 
+function install_osx {
+  if ! brew --version
+  then 
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  fi
+  brew install \
+    the_silver_searcher \
+    jq \
+    gnupg2 \
+    git \
+    gopass \ 
+    pinentry-mac \
+    peco \
+    bat \
+    neovim \
+    zsh \
+    git-crypt \
+    git-lfs \
+    fd \
+    autojump
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+
+}
+
+
 if apt --version &> /dev/null; then
     install_debian
 elif pacman --version &> /dev/null; then
     install_arch
+elif uname -a | grep -iq darwin; then
+    install_osx
 fi
