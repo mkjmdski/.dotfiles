@@ -88,9 +88,12 @@ function install_osx {
     git-crypt \
     git-lfs \
     fd \
-    autojump
+    autojump \
+    python
     echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
-
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    python3 get-pip.py
+    rm get-pip.py
 }
 
 
