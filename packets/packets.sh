@@ -71,25 +71,13 @@ function install_arch {
 
 function install_osx {
   if ! brew --version
-  then 
+  then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
-  brew install \
-    the_silver_searcher \
-    jq \
-    gnupg2 \
-    git \
-    gopass \ 
-    pinentry-mac \
-    peco \
-    bat \
-    neovim \
-    zsh \
-    git-crypt \
-    git-lfs \
-    fd \
-    autojump \
-    python
+  for p in the_silver_searcher jq gnupg2 git gopass  pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python
+  do
+    brew install $p
+done
     echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python3 get-pip.py
@@ -98,9 +86,9 @@ function install_osx {
 
 
 if apt --version &> /dev/null; then
-    install_debian
+    sudo install_debian
 elif pacman --version &> /dev/null; then
-    install_arch
+    sudo install_arch
 elif uname -a | grep -iq darwin; then
     install_osx
 fi

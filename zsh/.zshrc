@@ -13,3 +13,4 @@ zplug load
 for file in $DOTFILES/zsh/.postload/*.zsh; do
     source "${file}"
 done
+fpath=($DOTFILES/zsh-completions/src $fpath)

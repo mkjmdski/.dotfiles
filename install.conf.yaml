@@ -6,7 +6,7 @@
     shell:
       stdout: true
 - shell:
-  - command: sudo packets/packets.sh
+  - command: packets/packets.sh
     description: install standard packets
     stdin: true
   - command: sudo packets/gems.sh
@@ -45,6 +45,9 @@
     ~/.config/Code - OSS/User/snippets:
       path: vscode/snippets
       if: uname -a | grep -iq manjaro
+    ~/Library/Application Support/Code/User/settings.json:
+      path: vscode/settings.json
+      if: uname -a | grep -iq darwin
     ~/.icons:
       path: gnome/icons
       if: gnome-shell --version

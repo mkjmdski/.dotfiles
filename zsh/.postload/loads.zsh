@@ -16,3 +16,6 @@ fi
 if [[ -f  /etc/profile.d/autojump.zsh ]]; then
     source /etc/profile.d/autojump.zsh
 fi
+if [[ -f /usr/local/share/autojump/autojump.zsh ]]; then
+    source /usr/local/share/autojump/autojump.zsh
+fi

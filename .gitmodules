@@ -4,3 +4,6 @@
 [submodule "Bibata_Cursor"]
 	path = Bibata_Cursor
 	url = https://github.com/KaizIqbal/Bibata_Cursor.git
+[submodule "zsh-completions"]
+	path = Bibata_Cursor
+	url = https://github.com/zsh-users/zsh-completions.git
