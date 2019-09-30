@@ -38,3 +38,10 @@ function setup_venv {
         pip3 install -r requirements.txt
     fi
 }
+
+function swap() {
+    local TMPFILE=tmp.$$
+    mv "$1" $TMPFILE
+    mv "$2" "$1"
+    mv $TMPFILE "$2"
+}

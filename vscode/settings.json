@@ -3,7 +3,7 @@
         "suppressShowKeyBindingsNotice": true
     },
     "workbench.iconTheme": "material-icon-theme",
-    "workbench.colorTheme": "Mars",
+    "workbench.colorTheme": "Dark+ Material",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,
@@ -16,7 +16,7 @@
     "window.closeWhenEmpty": true,
     "window.restoreFullscreen": true,
     "window.restoreWindows": "all",
-    "window.zoomLevel": 1,
+    "window.zoomLevel": 0,
     "editor.largeFileOptimizations": false,
     "editor.suggestSelection": "first",
     "files.watcherExclude": {
