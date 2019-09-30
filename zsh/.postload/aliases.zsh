@@ -37,3 +37,8 @@ alias hp="history | peco"
 hpc () {
     history | peco --query="$@"
 }
+
+alias rm=trash
+alias rmls=trash-list
+alias unrm=trash-restore
+alias rmrf=trash-empty
