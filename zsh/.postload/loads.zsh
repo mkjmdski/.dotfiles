@@ -20,9 +20,9 @@ if [[ -f /usr/local/share/autojump/autojump.zsh ]]; then
     source /usr/local/share/autojump/autojump.zsh
 fi
 
-if [ ! -d "~/.terraform-plugins" ]
+if [[ ! -d  "$HOME/.terraform-plugins" ]]
 then
-    mkdir "~/.terraform-plugins"
+mkdir  "$HOME/.terraform-plugins"
 fi
 
-export TF_PLUGIN_CACHE_DIR="~/.terraform-plugins"
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform-plugins"
