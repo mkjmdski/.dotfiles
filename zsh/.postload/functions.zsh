@@ -45,3 +45,6 @@ function swap() {
     mv "$2" "$1"
     mv $TMPFILE "$2"
 }
+
+alias git-r="find . -name ".git" -type d | sed 's/\/.git//' |  xargs -P10 -I{} git -C {}"
+

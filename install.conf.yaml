@@ -57,5 +57,8 @@
     ~/.local/share/gnome-shell/extensions:
       path: gnome/extensions
       if: gnome-shell --version
+    ~/.config/terminator/config:
+      path: terminator.config
+      if: terminator --version
 - shell:
   - command: zsh -ic "zplug load; zplug install"

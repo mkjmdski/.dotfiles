@@ -3,7 +3,7 @@
         "suppressShowKeyBindingsNotice": true
     },
     "workbench.iconTheme": "material-icon-theme",
-    "workbench.colorTheme": "Dark+ Material",
+    "workbench.colorTheme": "Material Theme Darker High Contrast",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,
