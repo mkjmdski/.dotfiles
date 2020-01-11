@@ -5,6 +5,7 @@ export LANG=en_US.UTF-8 # Default language
 export LC_ALL=en_US.UTF-8
 
 if [ ! "$PATH_LOADED" = "true" ]; then
+    command -v vg >/dev/null 2>&1 && eval "$(vg eval --shell zsh)"
     # Add go binaries
     if [ -d "$GOPATH" ]; then
         export PATH="$GOPATH/bin:$PATH"
