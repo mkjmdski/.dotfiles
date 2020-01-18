@@ -11,6 +11,7 @@ zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "zsh-users/zsh-history-substring-search", defer:3
 
+zplug "peterhurford/git-it-on.zsh"
 #### AUTOCOMPLETIONS FROM ZSH
 for plugin in docker docker-compose docker-machine; do
     zplug "plugins/$plugin", from:oh-my-zsh

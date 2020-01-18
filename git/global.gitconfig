@@ -96,3 +96,6 @@
 [rebase]
     instructionFormat = %s [%an]
 	amend = commit --amend --no-edit
+
+[sequence]
+    editor = interactive-rebase-tool

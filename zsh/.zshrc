@@ -14,3 +14,6 @@ for file in $DOTFILES/zsh/.postload/*.zsh; do
     source "${file}"
 done
 fpath=($DOTFILES/zsh-completions/src $fpath)
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /home/mlodzikos/bin/tfschema tfschema

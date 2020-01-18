@@ -26,14 +26,17 @@ function install_debian {
         git-lfs \
         chrome-gnome-shell \
         autojump \
-        trash-cli
+        trash-cli \
+        libncursesw5
 
     # dpkg
     wget https://github.com/sharkdp/fd/releases/download/v7.2.0/fd_7.2.0_amd64.deb
     wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat_0.9.0_amd64.deb
+    wget https://github.com/MitMaro/git-interactive-rebase-tool/releases/download/1.2.0/git-interactive-rebase-tool_1.2.0_amd64.deb
     dpkg -i fd_7.2.0_amd64.deb
     dpkg -i bat_0.9.0_amd64.deb
-    rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb
+    dpkg -i git-interactive-rebase-tool_1.2.0_amd64.deb
+    rm bat_0.9.0_amd64.deb fd_7.2.0_amd64.deb git-interactive-rebase-tool_1.2.0_amd64.deb
 
     # snap
     for app in code slack; do
@@ -42,32 +45,6 @@ function install_debian {
     for app in spotify caprine terraform; do
         snap install "${app}"
     done
-}
-
-function install_arch {
-    pacman -S --noconfirm \
-        gnupg \
-        git \
-        rng-tools \
-        gopass \
-        the_silver_searcher \
-        python \
-        python-pip \
-        most \
-        ruby \
-        ruby-rdoc \
-        neovim \
-        zsh \
-        jq \
-        fd \
-        bat \
-        terminator \
-        terraform \
-        autojump \
-        base-devel \
-        git-crypt \
-        git-lfs \
-
 }
 
 function install_osx {
@@ -88,8 +65,6 @@ done
 
 if apt --version &> /dev/null; then
     sudo install_debian
-elif pacman --version &> /dev/null; then
-    sudo install_arch
 elif uname -a | grep -iq darwin; then
     install_osx
 fi

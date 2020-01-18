@@ -34,3 +34,16 @@ if [ ! -f "Droid Sans Mono for Powerline Nerd Font Complete.otf" ]; then
     mkfontscale
     mkfontdir
 fi
+
+if ! git standup; then
+    curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
+fi
+
+if ! tfschema; then
+    (
+        cd /tmp
+        wget https://github.com/minamijoyo/tfschema/releases/download/v0.3.0/tfschema_0.3.0_linux_amd64.tar.gz
+        tar -xzf tfschema_0.3.0_linux_amd64.tar.gz
+        mv tfschema ~/bin
+    )
+fi

@@ -5,7 +5,6 @@ export LANG=en_US.UTF-8 # Default language
 export LC_ALL=en_US.UTF-8
 export GOENV_ROOT="$HOME/.goenv"
 if [ ! "$PATH_LOADED" = "true" ]; then
-eval "$(goenv init -)"
     # Add go binaries
     if [ -d "$GOPATH" ]; then
         export PATH="$GOPATH/bin:$PATH"
@@ -13,7 +12,7 @@ eval "$(goenv init -)"
         export PATH="$(go env GOPATH)/bin:$PATH"
         export GOPATH="$(go env GOPATH)"
     fi
-
+    eval "$(goenv init -)"
     if [[ $commands[javac] ]]; then
         export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"
     fi
