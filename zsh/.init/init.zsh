@@ -6,6 +6,7 @@ export LC_ALL=en_US.UTF-8
 export GOENV_ROOT="$HOME/.goenv"
 if [ ! "$PATH_LOADED" = "true" ]; then
     # Add go binaries
+    export PATH="$GOENV_ROOT/bin:$PATH"
     if [ -d "$GOPATH" ]; then
         export PATH="$GOPATH/bin:$PATH"
     elif [[ $commands[go] ]]; then

@@ -139,12 +139,16 @@ curl -o ~/bin/git-hooks https://raw.githubusercontent.com/icefox/git-hooks/maste
 gopass completion zsh > "$PWD/zsh/fpath/_gopass"
 chmod -x ~/bin/*
 
-if [ -d "~/.tfenv" ]
-then
-    git clone --branch master --depth 1 https://github.com/tfutils/tfenv.git ~/.tfenv
-else
-    (
-        cd ~/.tfenv
-        git pull
-    )
-fi
+for repo in "syndbg/goenv" "tfutils/tfenv"
+do
+    location="~/.$(echo $repo | cut -d'/' -f 2)"
+    if [ -d "$location" ]
+    then
+        git clone --branch master --depth 1 https://github.com/$repo.git "$location"
+    else
+        (
+            cd "$location"
+            git pull
+        )
+    fi
+done

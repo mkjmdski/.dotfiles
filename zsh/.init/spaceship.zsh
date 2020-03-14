@@ -76,4 +76,43 @@ spaceship_watson() {
     "$SPACESHIP_WATSON_SUFFIX"
 
 }
-SPACESHIP_PROMPT_ORDER=(time watson user dir host git git_last_commit package node ruby golang rust docker aws venv conda pyenv kubectl terraform exec_time line_sep battery vi_mode jobs exit_code char)
+
+
+SPACESHIP_TERRAFORM_VERSION_SHOW="${SPACESHIP_TERRAFORM_VERSION_SHOW=true}"
+SPACESHIP_TERRAFORM_VERSION_SYMBOL="${SPACESHIP_TERRAFORM_VERSION_SYMBOL="🎆️"}"
+SPACESHIP_TERRAFORM_VERSION_PREFIX="${SPACESHIP_TERRAFORM_VERSION_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"}"
+SPACESHIP_TERRAFORM_VERSION_SUFFIX="${SPACESHIP_TERRAFORM_VERSION_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"}"
+SPACESHIP_TERRAFORM_VERSION_COLOR="${SPACESHIP_TERRAFORM_VERSION_COLOR="0000ff"}"
+
+# ------------------------------------------------------------------------------
+# Section
+# ------------------------------------------------------------------------------
+
+# Show terraform version from tfenv
+# spaceship_ prefix before section's name is required!
+# Otherwise this section won't be loaded.
+
+spaceship_terraform_version() {
+  # If TERRAFORM_VERSION_SHOW is false, don't show watson section
+  [[ $SPACESHIP_TERRAFORM_VERSION_SHOW == false ]] && return
+
+  # Check if tfenv command is available for execution
+  spaceship::exists tfenv || return
+
+  # Use quotes around unassigned local variables to prevent
+  # getting replaced by global aliases
+  # http://zsh.sourceforge.net/Doc/Release/Shell-Grammar.html#Aliasing
+  local 'terraform_version'
+  terraform_version="$(/bin/cat /home/mlodzikos/.tfenv/version)"
+  # Exit section if variable is empty
+  [[ -z $terraform_version ]] && return
+  [ ! -d ".terraform" ] && return
+  # Display watson section
+  spaceship::section \
+    "$SPACESHIP_TERRAFORM_VERSION_COLOR" \
+    "$SPACESHIP_TERRAFORM_VERSION_PREFIX" \
+    "$SPACESHIP_TERRAFORM_VERSION_SYMBOL on terraform $terraform_version" \
+    "$SPACESHIP_TERRAFORM_VERSION_SUFFIX"
+}
+
+SPACESHIP_PROMPT_ORDER=(time watson user dir host git git_last_commit package node ruby golang rust docker aws venv conda pyenv kubectl terraform terraform_version exec_time line_sep battery vi_mode jobs exit_code char)
