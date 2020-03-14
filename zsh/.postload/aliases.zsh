@@ -28,7 +28,7 @@ fi
 alias gcd="cd-gitroot"
 
 alias cls="/bin/ls"
-
+alias crm="/bin/rm"
 alias dc="docker"
 alias dcc="docker-compose"
 
