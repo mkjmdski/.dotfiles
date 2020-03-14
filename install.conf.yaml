@@ -8,7 +8,7 @@
 - create:
   - "$HOME/bin"
 - shell:
-  - command: packets/packets.sh
+  - command: bash packets.sh
     description: install standard packets
     stdin: true
   - command: pip3 install --user --upgrade -r requierements.txt

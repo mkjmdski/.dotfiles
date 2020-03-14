@@ -1,6 +1,6 @@
 #!/bin/bash
 function github_release {
-    curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl
+    curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
 }
 
 function install_debian {
@@ -106,20 +106,16 @@ fi
 if apt --version; then
     export FONT_DIR="$HOME/Library/Fonts"
     sudo install_debian
-    curl -L --output tfschema.tgz "$(github_release 'minamijoyo/tfschema' 'linux')"
+    export platform=linux
 elif uname -a | grep -iq darwin; then
     export FONT_DIR="$HOME/.local/share/fonts"
     install_osx
-    curl -L --output tfschema.tgz "$(github_release 'minamijoyo/tfschema' 'darwin')"
+    export platform=darwin
 fi
 install_fonts
-tar -xzf tfschema.tgz
-mv tfschema ~/bin
-rm tfschema.tgz
+curl -L --output ~/bin/yaml2json "$(github_release wakeful/yaml2json $platform)"
+curl -L --output "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
 
-if ! git standup; then
-    curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
-fi
 
 if ! colorls -version;
 then
@@ -137,8 +133,7 @@ else
     gcloud components update
 fi
 
-if [ ! -f "$HOME/bin/cht.sh" ]; then
-    curl https://cht.sh/:cht.sh > ~/bin/cht.sh
-fi
-
+curl https://cht.sh/:cht.sh > ~/bin/cht.sh
+curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
 gopass completion zsh > "$PWD/zsh/fpath/_gopass"
+chmod -x ~/bin/*
