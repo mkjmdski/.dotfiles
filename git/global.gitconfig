@@ -44,18 +44,15 @@
 	s = status --branch --show-stash
 	m = commit --message
 	b = checkout -b
-	cam = commit --all --message
+	p = !git pull --rebase && git push
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
 	tags = tag --list -n10
  	uncommit = reset --soft HEAD^
  	stash-all = stash save --include-untracked
-	drop = stash drop
-	pop = stash pop
 	unstage = reset HEAD --
 	this = !git init && git add -A && git commit -m \"Initial commit.\"
-	mark = !bash -c \"git tag -a $1 -m $1 --force \"
 	overwrite = !git a && git amend && git force
 	branch-delete = !bash -c \" \
 		git branch -D $1 && \
