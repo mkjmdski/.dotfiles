@@ -138,3 +138,13 @@ curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/insta
 curl -o ~/bin/git-hooks https://raw.githubusercontent.com/icefox/git-hooks/master/git-hooks
 gopass completion zsh > "$PWD/zsh/fpath/_gopass"
 chmod -x ~/bin/*
+
+if [ -d "~/.tfenv" ]
+then
+    git clone --branch master --depth 1 https://github.com/tfutils/tfenv.git ~/.tfenv
+else
+    (
+        cd ~/.tfenv
+        git pull
+    )
+fi

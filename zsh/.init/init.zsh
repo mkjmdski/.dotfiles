@@ -25,6 +25,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     # Add custom bin files
     if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
     if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
-
+    export PATH="$HOME/.tfenv/bin:$PATH"
     export PATH_LOADED="true"
 fi
