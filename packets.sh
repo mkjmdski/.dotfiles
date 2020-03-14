@@ -7,8 +7,8 @@ function install_debian {
     gopass_apt="/etc/apt/sources.list.d/gopass.list"
     if [ ! -d "$gopass_apt" ]
     then
-        wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
-        echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | sudo tee $gopass_apt
+        wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | apt-key add -
+        echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | tee $gopass_apt
     fi
     apt update
     apt upgrade -y
