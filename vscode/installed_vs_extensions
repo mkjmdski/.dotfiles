@@ -27,6 +27,7 @@ marlon407.code-groovy
 mauve.terraform
 mikestead.dotenv
 ms-azuretools.vscode-docker
+ms-kubernetes-tools.vscode-kubernetes-tools
 ms-python.python
 ms-vscode.Go
 redhat.vscode-yaml
@@ -39,6 +40,5 @@ sparty02.sentinel-vscode
 techer.open-in-browser
 VisualStudioExptTeam.vscodeintellicode
 vscode-icons-team.vscode-icons
-vscoss.vscode-ansible
 wholroyd.HCL
 wholroyd.jinja
