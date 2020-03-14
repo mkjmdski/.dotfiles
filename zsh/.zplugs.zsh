@@ -23,4 +23,9 @@ SPACESHIP_BATTERY_THRESHOLD="80"
 SPACESHIP_EXIT_CODE_SHOW="true"
 SPACESHIP_EXIT_CODE_SYMBOL="✘ "
 
+zplug "MichaelAquilina/zsh-auto-notify"
+zplug "zpm-zsh/colorize"
+zplug "oldratlee/hacker-quotes"
+zplug "zpm-zsh/ssh"
+
 return 0 # in case zplug adds plugs ignore them
