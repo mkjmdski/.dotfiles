@@ -1,9 +1,9 @@
 /* jshint esnext:true */
 
+const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
-
 
 const MAX_RECURSE_DEPTH = 3;
 
@@ -132,7 +132,9 @@ function init()
 
 function enable()
 {
-    Main.panel.actor.get_children().forEach(
+    let panelActor = Main.panel instanceof Clutter.Actor ? Main.panel : Main.panel.actor;
+
+    panelActor.get_children().forEach(
         function(actor)
         {
             signalConnections.push({
