@@ -135,5 +135,6 @@ fi
 
 curl https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
+curl -o ~/bin/git-hooks https://raw.githubusercontent.com/icefox/git-hooks/master/git-hooks
 gopass completion zsh > "$PWD/zsh/fpath/_gopass"
 chmod -x ~/bin/*
