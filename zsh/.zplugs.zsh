@@ -18,10 +18,6 @@ for plugin in docker docker-compose docker-machine; do
 done
 
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
-SPACESHIP_TIME_SHOW="true"
-SPACESHIP_BATTERY_THRESHOLD="80"
-SPACESHIP_EXIT_CODE_SHOW="true"
-SPACESHIP_EXIT_CODE_SYMBOL="✘ "
 
 zplug "MichaelAquilina/zsh-auto-notify"
 zplug "zpm-zsh/colorize"

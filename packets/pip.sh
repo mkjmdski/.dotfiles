@@ -3,4 +3,5 @@ pip3 install \
     git+https://github.com/jeffkaufman/icdiff.git \
     gitup \
     git-sweep \
-    git-revise
+    git-revise \
+    td-watson
