@@ -9,10 +9,9 @@
     "files.trimTrailingWhitespace": true,
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
-    "editor.tabCompletion": true,
+    "editor.tabCompletion": "on",
     "editor.cursorStyle": "underline-thin",
     "workbench.startupEditor": "newUntitledFile",
-    "workbench.statusBar.feedback.visible": false,
     "window.closeWhenEmpty": true,
     "window.restoreFullscreen": true,
     "window.restoreWindows": "all",
@@ -37,5 +36,6 @@
         "enabled": true,
         "args": []
     },
-    "python.jediEnabled": false,
+    "python.jediEnabled": true,
+    "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
 }
