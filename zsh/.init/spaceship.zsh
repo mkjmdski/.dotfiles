@@ -107,6 +107,7 @@ spaceship_terraform_version() {
   # Exit section if variable is empty
   [[ -z $terraform_version ]] && return
   [ ! -d ".terraform" ] && return
+  [ "$(pwd)" = "$HOME" ] && return
   # Display watson section
   spaceship::section \
     "$SPACESHIP_TERRAFORM_VERSION_COLOR" \
