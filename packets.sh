@@ -117,13 +117,15 @@ curl -L --output ~/bin/yaml2json "$(github_release wakeful/yaml2json $platform)"
 curl -L --output "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
 
 
-if ! colorls -version;
+for gem in colorls lolcat
+if ! eval "$gem --version";
 then
-    gem install --user colorls
-    curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
+    gem install --user $gem
 else
-    gem update --user colorls
+    gem update --user $gem
 fi
+
+curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
 
 export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 if ! gcloud version;
