@@ -10,7 +10,7 @@
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
     "editor.tabCompletion": "on",
-    "editor.cursorStyle": "underline-thin",
+    "editor.cursorStyle": "block-outline",
     "workbench.startupEditor": "newUntitledFile",
     "window.closeWhenEmpty": true,
     "window.restoreFullscreen": true,
