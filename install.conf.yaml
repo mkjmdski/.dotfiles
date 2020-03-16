@@ -7,7 +7,6 @@
       stdout: true
 - create:
   - "$HOME/bin"
-  - "$HOME/.gems"
 - shell:
   - command: bash packets.sh
     description: install standard packets
