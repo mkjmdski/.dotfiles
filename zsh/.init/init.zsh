@@ -27,5 +27,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
     if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
     export PATH="$HOME/.tfenv/bin:$PATH"
+    export GEM_HOME="~/.gems"
     export PATH_LOADED="true"
 fi
