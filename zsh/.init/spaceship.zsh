@@ -116,4 +116,6 @@ spaceship_terraform_version() {
     "$SPACESHIP_TERRAFORM_VERSION_SUFFIX"
 }
 
+SPACESHIP_KUBECTL_SHOW='true'
+
 SPACESHIP_PROMPT_ORDER=(time watson user dir host git git_last_commit package node ruby golang rust docker aws venv conda pyenv kubectl terraform terraform_version exec_time line_sep battery vi_mode jobs exit_code char)
