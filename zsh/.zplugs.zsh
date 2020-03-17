@@ -20,8 +20,7 @@ done
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-auto-notify"
-zplug "zpm-zsh/colorize"
-zplug "oldratlee/hacker-quotes"
+AUTO_NOTIFY_IGNORE+=("vim" "cat")
 zplug "zpm-zsh/ssh"
 
 return 0 # in case zplug adds plugs ignore them
