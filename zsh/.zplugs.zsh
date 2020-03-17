@@ -21,6 +21,23 @@ zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-auto-notify"
 AUTO_NOTIFY_IGNORE+=("vim" "cat")
+
+zplug "MichaelAquilina/zsh-you-should-use"
+export YSU_HARDCORE=1
+
+zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
+export AUTOSWITCH_VIRTUAL_ENV_DIR="venv"
+
+zplug "MichaelAquilina/zsh-emojis"
+
+# Gist Commands
+zplug "MichaelAquilina/git-commands", \
+    as:command, \
+    use:git-clean-branches
+zplug "MichaelAquilina/git-commands", \
+    as:command, \
+    use:git-web
+
 zplug "zpm-zsh/ssh"
 
 return 0 # in case zplug adds plugs ignore them
