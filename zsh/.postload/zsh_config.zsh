@@ -12,9 +12,7 @@ bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
 HIST_STAMPS="dd.mm.yyyy" ## OH-MY-ZSH
-setopt hist_ignore_dups  # ignore duplication command history list
-setopt hist_ignore_space # ignore when commands starts with space
-
+setopt append_history share_history histignorealldups
 # use brace
 setopt brace_ccl
 
