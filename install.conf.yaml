@@ -9,32 +9,23 @@
   - "$HOME/bin"
   - "$HOME/.terraform-plugins"
 - shell:
-  - command: bash packets.sh
+  - command: ./packets
     stdin: true
   - chsh -s $(which zsh)
   - pip3 install --user --upgrade -r requierements.txt
-  - git config --global include.path "$PWD/git/global.gitconfig"
-  - git config --global core.excludesfile "$PWD/git/global.gitignore"
-  - for extension in $(cat vscode/installed_vs_extensions); do code --install-extension $extension; done
+  - git config --global include.path "$PWD/global.gitconfig"
+  - git config --global core.excludesfile "$PWD/global.gitignore"
+  - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
     ~/.config/nvim/colors/molokai.vim:
-      path: vim/molokai.vim
+      path: molokai.vim
     ~/.config/nvim/init.vim:
-      path: vim/.vimrc
+      path: .vimrc
     ~/.zshrc:
-      path: zsh/.zshrc
+      path: .zshrc
     ~/.config/Code/User/settings.json:
-      path: vscode/settings.json
-      if: uname -a | grep -iq ubuntu || uname -a | grep -iq arch
-    ~/.config/Code/User/snippets:
-      path: vscode/snippets
-      if: uname -a | grep -iq ubuntu || uname -a | grep -iq arch
-    ~/.config/Code - OSS/User/settings.json:
-      path: vscode/settings.json
-      if: uname -a | grep -iq manjaro
-    ~/.config/Code - OSS/User/snippets:
-      path: vscode/snippets
-      if: uname -a | grep -iq manjaro
+      path: settings.json
+      if: uname -a | grep -iq ubuntu
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode/settings.json
       if: uname -a | grep -iq darwin
@@ -51,4 +42,5 @@
       path: terminator.config
       if: terminator --version
 - shell:
-  - zsh -ic "zplug load; zplug install"
+  - source ~/.zplug/init.zsh && zplug install || exit 0
+  - source ~/.zplug/init.zsh; zplug update

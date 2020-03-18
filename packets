@@ -1,18 +1,30 @@
-#!/bin/bash
+#!/bin/bash -eux
+ergodox_kernel='''
+# Teensy rules for the Ergodox EZ Original / Shine / Glow
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789ABCD]?", MODE:="0666"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", MODE:="0666"
+
+# STM32 rules for the Planck EZ Standard / Glow
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
+    MODE:="0666", \
+    SYMLINK+="stm32_dfu"
+'''
 function github_release {
     curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
 }
 
 function install_debian {
     gopass_apt="/etc/apt/sources.list.d/gopass.list"
-    if [ ! -d "$gopass_apt" ]
+    if [ ! -f "$gopass_apt" ]
     then
-        wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | apt-key add -
-        echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | tee $gopass_apt
+        wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
+        echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | sudo tee $gopass_apt
     fi
-    apt update
-    apt upgrade -y
-    apt install -y \
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    sudo apt-get install -y \
         silversearcher-ag \
         most \
         jq \
@@ -37,35 +49,29 @@ function install_debian {
         libncursesw5 \
         gtk+3.0 \
         webkit2gtk-4.0 \
-        libusb-dev
+        libusb-dev \
+        inkscape \
+        x11-apps
 
     wally_kernel=/etc/udev/rules.d/50-wally.rules
     if [ ! -f "$wally_kernel" ]
     then
-        echo <<EOF
-# Teensy rules for the Ergodox EZ Original / Shine / Glow
-ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
-ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789ABCD]?", MODE:="0666"
-KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", MODE:="0666"
-
-# STM32 rules for the Planck EZ Standard / Glow
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
-    MODE:="0666", \
-    SYMLINK+="stm32_dfu"
-EOF > $wally_kernel
+        sudo echo $ergodox_kernel > $wally_kernel
     fi
     curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
     # dpkg
     for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool"
     do
-        name="$(echo $repo | cut -d'/' -f 2)"
-        curl -L --output "$name.deb" $(github_release $repo 'deb')
-        dpkg -i "$name.deb"
-        rm "$name.deb"
+        (
+            cd /tmp
+            name="$(echo $repo | cut -d'/' -f 2)"
+            curl -L --output "$name.deb" $(github_release $repo 'deb')
+            sudo dpkg -i "$name.deb"
+            rm "$name.deb"
+        )
     done
     # snap
-    for app in code slack; do
+    for app in code; do
         if ! snap list | grep "${app}"
         then
             snap install --classic "${app}"
@@ -77,6 +83,7 @@ EOF > $wally_kernel
             snap install "${app}"
         fi
     done
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
 }
 
 function install_osx {
@@ -89,23 +96,26 @@ function install_osx {
         brew install $p
     done
     echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    python3 get-pip.py
-    rm get-pip.py
+    (
+        cd /tmp
+        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+        python3 get-pip.py
+        rm get-pip.py
+    )
 }
 
 function install_fonts {
     (
-        if [ ! -d "$FONT_DIR" ]
+        if [ ! -d "${FONT_DIR}" ]
         then
-            mkdir -p $FONT_DIR
+            mkdir -p "${FONT_DIR}"
         fi
-        cd $FONT_DIR
+        cd "${FONT_DIR}"
         for font in "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/UbuntuMono/Regular/complete/Ubuntu%20Mono%20Nerd%20Font%20Complete%20Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete%20Mono.ttf"
         do
-            font_name="$(echo $font | rev | cut -d'/' -f1 | rev | sed 's|%20| |g')"
+            font_name="$(echo "${font}" | rev | cut -d'/' -f1 | rev | sed 's|%20| |g')"
             if [ ! -f "$font_name" ]; then
-                curl -fLo $font_name $font
+                curl -fL --output "${font_name}" "${font}"
             fi
         done
         fc-cache -vf
@@ -123,9 +133,9 @@ if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-if apt --version; then
+if apt-get --version &> /dev/null; then
     export FONT_DIR="$HOME/Library/Fonts"
-    sudo install_debian
+    install_debian
     export platform=linux
 elif uname -a | grep -iq darwin; then
     export FONT_DIR="$HOME/.local/share/fonts"
@@ -133,12 +143,13 @@ elif uname -a | grep -iq darwin; then
     export platform=darwin
 fi
 install_fonts
+
 curl -L --output ~/bin/yaml2json "$(github_release wakeful/yaml2json $platform)"
-curl -L --output "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
+curl -L "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
 
 
 for gem in colorls lolcat
-if ! eval "$gem --version";
+if ! eval "$gem --version"
 then
     gem install --user $gem
 else
@@ -155,7 +166,7 @@ else
     gcloud components update
 fi
 
-curl https://cht.sh/:cht.sh > ~/bin/cht.sh
+curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
 curl -o ~/bin/git-hooks https://raw.githubusercontent.com/icefox/git-hooks/master/git-hooks
 gopass completion zsh > "$PWD/zsh/fpath/_gopass"

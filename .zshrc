@@ -118,7 +118,7 @@ SPACESHIP_KUBECTL_SHOW='true'
 SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
 
 
-export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
+export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
 

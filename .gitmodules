@@ -1,6 +1,3 @@
 [submodule "dotbot"]
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
-[submodule "Bibata_Cursor"]
-	path = Bibata_Cursor
-	url = https://github.com/KaizIqbal/Bibata_Cursor.git
