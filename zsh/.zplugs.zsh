@@ -12,7 +12,7 @@ zplug "zsh-users/zsh-history-substring-search", defer:3
 
 zplug "peterhurford/git-it-on.zsh"
 
-for plugin in docker docker-compose docker-machine autojump extract command-not-found emoji fd gcloud doctl git-auto-fetch gpg-agent helm kubectl ubuntu web-search
+for plugin in docker docker-compose autojump extract command-not-found fd gcloud git-auto-fetch gpg-agent helm kubectl ubuntu web-search
 do
     zplug "plugins/$plugin", from:oh-my-zsh
 done
@@ -25,8 +25,8 @@ AUTO_NOTIFY_IGNORE+=("vim" "cat")
 zplug "MichaelAquilina/zsh-you-should-use"
 export YSU_HARDCORE=1
 
-zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
-export AUTOSWITCH_VIRTUAL_ENV_DIR="venv"
+# zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
+# export AUTOSWITCH_VIRTUAL_ENV_DIR="venv"
 
 # Gist Commands
 zplug "MichaelAquilina/git-commands", \

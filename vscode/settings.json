@@ -38,8 +38,4 @@
     },
     "python.jediEnabled": true,
     "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
-    "yaml.trace.server": "messages",
-    "yaml.schemas": {
-        "file:///home/mlodzikos/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
-    },
 }

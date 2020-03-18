@@ -2,19 +2,218 @@ export DOTFILES="$HOME/.dotfiles" # <- dotfiles directory
 
 fpath=($fpath $DOTFILES/zsh/fpath)
 
-for file in $DOTFILES/zsh/.init/*.zsh; do
-    source "${file}"
-done
+if [ ! "$PATH_LOADED" = "true" ]; then
+    # We want to extend path once
+    export EDITOR="$(which vim)"
+    # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
+    export LANG=en_US.UTF-8 # Default language
+    export LC_ALL=en_US.UTF-8
+    export GOENV_ROOT="$HOME/.goenv"
+    export PATH="$GOENV_ROOT/bin:$PATH"
+
+    eval "$(goenv init -)"
+
+    export PATH="$GOROOT/bin:$PATH"
+    export PATH="$PATH:$GOPATH/bin"
+
+    if [[ $commands[javac] ]]; then
+        export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"
+    fi
+    # Add yarn global binaries
+    if [[ $commands[yarn] ]]; then export PATH="$(yarn global bin):$PATH"; fi
+
+    # Add ruby gems
+    if [[ $commands[ruby] ]]; then export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"; fi
+
+    # Add custom bin files
+    if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
+    if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
+    export PATH="$HOME/.tfenv/bin:$PATH"
+    export TF_PLUGIN_CACHE_DIR="$HOME/.terraform-plugins"
+    export PATH_LOADED="true"
+fi
+
+SPACESHIP_TIME_SHOW="true"
+SPACESHIP_BATTERY_THRESHOLD="80"
+SPACESHIP_EXIT_CODE_SHOW="true"
+SPACESHIP_EXIT_CODE_SYMBOL="✘ "
+
+SPACESHIP_GIT_LAST_COMMIT_SHOW="${SPACESHIP_GIT_LAST_COMMIT_SHOW=true}"
+SPACESHIP_GIT_LAST_COMMIT_SYMBOL="${SPACESHIP_GIT_LAST_COMMIT_SYMBOL=""}"
+SPACESHIP_GIT_LAST_COMMIT_PREFIX="${SPACESHIP_GIT_LAST_COMMIT_PREFIX="("}"
+SPACESHIP_GIT_LAST_COMMIT_SUFFIX="${SPACESHIP_GIT_LAST_COMMIT_SUFFIX=") "}"
+SPACESHIP_GIT_LAST_COMMIT_COLOR="${SPACESHIP_GIT_LAST_COMMIT_COLOR="magenta"}"
+
+# ------------------------------------------------------------------------------
+# Section
+# ------------------------------------------------------------------------------
+
+# Show git_last_commit status
+# spaceship_ prefix before section's name is required!
+# Otherwise this section won't be loaded.
+spaceship_git_last_commit() {
+  # If SPACESHIP_GIT_LAST_COMMIT_SHOW is false, don't show git_last_commit section
+  [[ $SPACESHIP_GIT_LAST_COMMIT_SHOW == false ]] && return
+
+  spaceship::is_git || return
+
+  local 'git_last_commit_status'
+  git_last_commit_status=$(git log --pretty='format:%s|%cr' "HEAD^..HEAD" 2>/dev/null | head -n 1)
+
+  # Exit section if variable is empty
+  [[ -z $git_last_commit_status ]] && return
+
+  # Display git_last_commit section
+  spaceship::section \
+    "$SPACESHIP_GIT_LAST_COMMIT_COLOR" \
+    "$SPACESHIP_GIT_LAST_COMMIT_PREFIX" \
+    "$SPACESHIP_GIT_LAST_COMMIT_SYMBOL$git_last_commit_status" \
+    "$SPACESHIP_GIT_LAST_COMMIT_SUFFIX"
+
+}
+
+#
+# Google Cloud Platform (gcloud)
+#
+# gcloud is a tool that provides the primary command-line interface to Google Cloud Platform.
+# Link: https://cloud.google.com/sdk/gcloud/
+
+# ------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
+
+SPACESHIP_GCLOUD_SHOW="${SPACESHIP_GCLOUD_SHOW=true}"
+SPACESHIP_GCLOUD_PREFIX="${SPACESHIP_GCLOUD_PREFIX="using "}"
+SPACESHIP_GCLOUD_SUFFIX="${SPACESHIP_GCLOUD_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"}"
+SPACESHIP_GCLOUD_SYMBOL="${SPACESHIP_GCLOUD_SYMBOL="☁️"}"
+SPACESHIP_GCLOUD_COLOR="${SPACESHIP_GCLOUD_COLOR="26"}"
+
+
+# ------------------------------------------------------------------------------
+# Section
+# ------------------------------------------------------------------------------
+
+# Shows active gcloud configuration.
+spaceship_gcloud() {
+  [[ $SPACESHIP_GCLOUD_SHOW == false ]] && return
+
+  # Check if the glcoud-cli is installed
+  spaceship::exists gcloud || return
+
+  # Check if there is an active config
+  [[ -f ~/.config/gcloud/active_config ]] || return
+
+  # Reads the current config from the file
+  local GCLOUD_CONFIG=${$(head -n1 ~/.config/gcloud/active_config)}
+  # Get active project
+  local GCLOUD_ACTIVE_PROJECT=$(cat ~/.config/gcloud/configurations/config_$GCLOUD_CONFIG | grep project | cut -d '=' -f 2)
+  [[ -z $GCLOUD_ACTIVE_PROJECT ]] && return
+  spaceship::section \
+    "$SPACESHIP_GCLOUD_COLOR" \
+    "$SPACESHIP_GCLOUD_PREFIX" \
+    "${SPACESHIP_GCLOUD_SYMBOL}$GCLOUD_ACTIVE_PROJECT " \
+    "$SPACESHIP_GCLOUD_SUFFIX"
+}
+SPACESHIP_KUBECTL_SHOW='true'
+SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
+
 
 export ZPLUG_LOADFILE="$DOTFILES/zsh/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
 
-for file in $DOTFILES/zsh/.postload/*.zsh; do
-    source "${file}"
-done
-fpath=($DOTFILES/zsh-completions/src $fpath)
 
-autoload -U +X bashcompinit && bashcompinit
+if [[ $commands[colorls] ]]; then
+    alias ls="colorls"
+    alias l="ls -lA"
+fi
+
+## thefuck
+if [[ $commands[thefuck] ]]; then
+    eval $(thefuck --alias)
+    alias f="fuck --yes"
+fi
+
+if [[ $commands[jq] ]]; then
+    alias jq="jq -C"
+fi
+
+if [[ $commands[nvim] ]]; then
+    alias vim="nvim"
+    alias vi="nvim"
+fi
+
+if [[ $commands[bat] ]]; then
+    alias cat="PAGER=less bat -p"
+fi
+alias eyaml="EDITOR='code --wait' eyaml"
+## git
+alias cls="/bin/ls"
+alias crm="/bin/rm"
+alias dc="docker"
+alias dcc="docker-compose"
+
+alias hp="history | peco"
+alias history="fc -li 1"
+hpc () {
+    history | peco --query="$@"
+}
+
+alias rm=trash
+alias rmls=trash-list
+alias unrm=trash-restore
+alias rmrf=trash-empty
+
+function git-cd {
+    local root
+    root=$(git rev-parse --show-toplevel)
+    eval $root
+}
+
+function gopass-clipboard {
+    local secret
+    secret=$(gopass show $1 | head -n 1)
+    clipcopy <<< $secret
+}
+
+function take {
+  mkdir -p $@ && cd ${@:$#}
+}
+
+function swap() {
+    local TMPFILE=tmp.$$
+    mv "$1" $TMPFILE
+    mv "$2" "$1"
+    mv $TMPFILE "$2"
+}
+
+# auto menu complete
+setopt auto_menu
+
+# auto change directory
+setopt auto_cd
+
+#### HISTORY SEARCH
+autoload history-search-end
+bindkey '^[OA' history-substring-search-up
+bindkey '^[OB' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
+HIST_STAMPS="dd.mm.yyyy" ## OH-MY-ZSH
+setopt append_history share_history histignorealldups
+# use brace
+setopt brace_ccl
+
+# compacked complete list display
+setopt list_packed
+
+# multi redirect (e.x. echo "hello" > hoge1.txt > hoge2.txt)
+setopt multios
+
+setopt auto_remove_slash        # self explicit
+setopt chase_links              # resolve symlinks
+
+# autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C ~/bin/tfschema tfschema
 complete -o nospace -C "${HOME}/.tfenv/versions/$(cat /home/mlodzikos/.tfenv/version)/terraform" terraform
