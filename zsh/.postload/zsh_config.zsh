@@ -26,4 +26,3 @@ setopt multios
 
 setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks
-setopt correct                  # try to correct spelling of commands
