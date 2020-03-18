@@ -3,7 +3,6 @@
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,history,termsupport,key-bindings}.zsh"
-zplug "plugins/extract", from:oh-my-zsh
 
 #### ZSH MAGIC
 zplug "zsh-users/zsh-autosuggestions"
@@ -12,11 +11,12 @@ zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "zsh-users/zsh-history-substring-search", defer:3
 
 zplug "peterhurford/git-it-on.zsh"
-#### AUTOCOMPLETIONS FROM ZSH
-for plugin in docker docker-compose docker-machine; do
+
+for plugin in docker docker-compose docker-machine autojump extract command-not-found emoji fd gcloud doctl git-auto-fetch gpg-agent helm kubectl ubuntu web-search
+do
     zplug "plugins/$plugin", from:oh-my-zsh
 done
-
+export GIT_AUTO_FETCH_INTERVAL=300
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-auto-notify"
@@ -28,16 +28,9 @@ export YSU_HARDCORE=1
 zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
 export AUTOSWITCH_VIRTUAL_ENV_DIR="venv"
 
-zplug "MichaelAquilina/zsh-emojis"
-
 # Gist Commands
 zplug "MichaelAquilina/git-commands", \
     as:command, \
     use:git-clean-branches
-zplug "MichaelAquilina/git-commands", \
-    as:command, \
-    use:git-web
-
-zplug "zpm-zsh/ssh"
 
 return 0 # in case zplug adds plugs ignore them

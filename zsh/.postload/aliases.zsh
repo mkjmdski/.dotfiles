@@ -23,7 +23,7 @@ fi
 if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
 fi
-
+alias eyaml="EDITOR='code --wait' eyaml"
 ## git
 alias cls="/bin/ls"
 alias crm="/bin/rm"
@@ -63,30 +63,3 @@ function swap() {
     mv "$2" "$1"
     mv $TMPFILE "$2"
 }
-
-if [ -d "${HOME}/google-cloud-sdk" ]; then
-    . $HOME/google-cloud-sdk/completion.zsh.inc
-    . $HOME/google-cloud-sdk/path.zsh.inc
-elif [ -d "/opt/google-cloud-sdk" ]; then
-    . /opt/google-cloud-sdk/completion.zsh.inc
-    . /opt/google-cloud-sdk/path.zsh.inc
-fi
-
-#### LOAD AUTOJUMP
-if [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]]; then
-    source $HOME/.autojump/etc/profile.d/autojump.sh;
-fi
-if [[ -f /usr/share/autojump/autojump.sh ]]; then
-    . /usr/share/autojump/autojump.sh
-fi
-if [[ -f  /etc/profile.d/autojump.zsh ]]; then
-    source /etc/profile.d/autojump.zsh
-fi
-if [[ -f /usr/local/share/autojump/autojump.zsh ]]; then
-    source /usr/local/share/autojump/autojump.zsh
-fi
-
-if [[ ! -d  "$HOME/.terraform-plugins" ]]
-then
-mkdir  "$HOME/.terraform-plugins"
-fi

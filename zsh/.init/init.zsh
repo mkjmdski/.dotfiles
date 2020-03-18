@@ -1,19 +1,17 @@
-# We want to extend path once
-export EDITOR="$(which vim)"
-# export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
-export LANG=en_US.UTF-8 # Default language
-export LC_ALL=en_US.UTF-8
-export GOENV_ROOT="$HOME/.goenv"
 if [ ! "$PATH_LOADED" = "true" ]; then
-    # Add go binaries
+    # We want to extend path once
+    export EDITOR="$(which vim)"
+    # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
+    export LANG=en_US.UTF-8 # Default language
+    export LC_ALL=en_US.UTF-8
+    export GOENV_ROOT="$HOME/.goenv"
     export PATH="$GOENV_ROOT/bin:$PATH"
-    if [ -d "$GOPATH" ]; then
-        export PATH="$GOPATH/bin:$PATH"
-    elif [[ $commands[go] ]]; then
-        export PATH="$(go env GOPATH)/bin:$PATH"
-        export GOPATH="$(go env GOPATH)"
-    fi
+
     eval "$(goenv init -)"
+
+    export PATH="$GOROOT/bin:$PATH"
+    export PATH="$PATH:$GOPATH/bin"
+
     if [[ $commands[javac] ]]; then
         export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"
     fi

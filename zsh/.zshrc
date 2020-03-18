@@ -17,3 +17,4 @@ fpath=($DOTFILES/zsh-completions/src $fpath)
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C ~/bin/tfschema tfschema
+complete -o nospace -C "${HOME}/.tfenv/versions/$(cat /home/mlodzikos/.tfenv/version)/terraform" terraform

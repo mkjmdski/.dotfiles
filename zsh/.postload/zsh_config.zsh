@@ -18,12 +18,6 @@ setopt hist_ignore_space # ignore when commands starts with space
 # use brace
 setopt brace_ccl
 
-# auto directory pushd that you can get dirs list by cd -[tab]
-setopt auto_pushd
-setopt pushd_ignore_dups        # no duplicates in dir stack
-setopt pushd_silent             # no dir stack after pushd or popd
-setopt pushd_to_home            # `pushd` = `pushd $HOME`
-
 # compacked complete list display
 setopt list_packed
 
