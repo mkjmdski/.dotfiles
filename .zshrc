@@ -30,6 +30,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
     export PATH="$HOME/.tfenv/bin:$PATH"
     export TF_PLUGIN_CACHE_DIR="$HOME/.terraform-plugins"
+    export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
     export PATH_LOADED="true"
 fi
 
@@ -118,7 +119,6 @@ SPACESHIP_KUBECTL_SHOW='true'
 SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
 
 
-export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
 source ~/.zplug/init.zsh
 zplug load
 
@@ -126,6 +126,7 @@ zplug load
 if [[ $commands[colorls] ]]; then
     alias ls="colorls"
     alias l="ls -lA"
+    alias cls="/bin/ls"
 fi
 
 ## thefuck
@@ -146,34 +147,38 @@ fi
 if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
 fi
-alias eyaml="EDITOR='code --wait' eyaml"
-## git
-alias cls="/bin/ls"
-alias crm="/bin/rm"
-alias dc="docker"
-alias dcc="docker-compose"
 
-alias hp="history | peco"
+if [[ $commadns[eyaml] ]]; then
+    alias eyaml="EDITOR='code --wait' eyaml"
+fi
+
+if [[ $commands[docker] ]]; then
+    alias dc="docker"
+    alias dcc="docker-compose"
+fi
+
+if [[ $commands[gcloud] ]]; then
+    alias gcl="gcloud config configurations list"
+    function gca {
+        gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
+    }
+fi
+
 alias history="fc -li 1"
-hpc () {
-    history | peco --query="$@"
-}
+alias hp="history | peco"
 
-alias rm=trash
-alias rmls=trash-list
-alias unrm=trash-restore
-alias rmrf=trash-empty
+if [[ $commands[trash] ]]; then
+    alias rm=trash
+    alias rmls=trash-list
+    alias unrm=trash-restore
+    alias rmrf=trash-empty
+    alias crm="/bin/rm"
+fi
 
-function git-cd {
-    local root
-    root=$(git rev-parse --show-toplevel)
-    eval $root
-}
+alias git-cd='cd $(git rev-parse --show-toplevel)'
 
 function gopass-clipboard {
-    local secret
-    secret=$(gopass show $1 | head -n 1)
-    clipcopy <<< $secret
+    clipcopy <<< $(gopass show $1 | head -n 1)
 }
 
 function take {
