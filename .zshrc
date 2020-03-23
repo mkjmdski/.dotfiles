@@ -59,7 +59,10 @@ spaceship_git_last_commit() {
   spaceship::is_git || return
 
   local 'git_last_commit_status'
-  git_last_commit_status=$(git log --pretty='format:%s|%cr' "HEAD^..HEAD" 2>/dev/null | head -n 1)
+  # last commit in all repository
+#   git_last_commit_status=$(git log --pretty='format:%s|%cr' "HEAD^..HEAD" 2>/dev/null | head -n 1)
+  # last commit in the current direcotry
+  git_last_commit_status=$(git show --pretty='format:%s|%cr' $(git rev-list -1 HEAD -- .) 2>/dev/null | head -n 1)
 
   # Exit section if variable is empty
   [[ -z $git_last_commit_status ]] && return
