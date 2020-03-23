@@ -53,7 +53,7 @@
 	tags = tag --list -n10
  	uncommit = reset --soft HEAD^
  	stash-all = stash save --include-untracked
-	unstage = reset HEAD --
+	unstage = reset HEAD
 	this = !git init && git add -A && git commit -m \"Initial commit.\"
 	overwrite = !git a && git amend && git force
 	branch-delete = !bash -c \" \
