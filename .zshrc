@@ -179,7 +179,9 @@ if [[ $commands[trash] ]]; then
 fi
 
 alias git-cd='cd $(git rev-parse --show-toplevel)'
-
+function newest {
+    cls -Art $1* | tail -n 1
+}
 function gopass-clipboard {
     clipcopy <<< $(gopass show $1 | head -n 1)
 }
