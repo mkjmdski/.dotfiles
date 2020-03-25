@@ -169,6 +169,7 @@ fi
 
 alias history="fc -li 1"
 alias hp="history | peco"
+alias minify-json="jq -Mrc . <"
 
 if [[ $commands[trash] ]]; then
     alias rm=trash
