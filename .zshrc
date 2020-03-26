@@ -171,6 +171,15 @@ alias history="fc -li 1"
 alias hp="history | peco"
 alias minify-json="jq -Mrc . <"
 
+alias ke="k exec"
+alias ket="ke -it"
+function kgpf {
+    kgp -n $1 -o name | head -n 1
+}
+function ketf {
+    ket -n $1 $(kgpf $1) -- "${2-sh}"
+}
+
 if [[ $commands[trash] ]]; then
     alias rm=trash
     alias rmls=trash-list
