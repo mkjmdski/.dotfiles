@@ -46,6 +46,7 @@
 	b = checkout -b
 	c = checkout
 	p = !git pull --rebase && git push
+	head = show HEAD
 	skip = push -o ci.skip
 	mr = !bash -c \"git push -o merge_request.remove_source_branch -o merge_request.target=${1-master}\"
 	amend = commit --amend --no-edit
