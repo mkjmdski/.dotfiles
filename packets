@@ -67,16 +67,24 @@ function install_debian {
     sudo ergodox
 
     # dpkg
-    for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool"
-    do
-        (
-            cd /tmp
-            name="$(echo $repo | cut -d'/' -f 2)"
-            curl -L --output "$name.deb" $(github_release $repo 'deb')
+    (
+        cd /tmp
+        for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool"
+        do
+                name="$(echo $repo | cut -d'/' -f 2)"
+                curl -L --output "$name.deb" $(github_release $repo 'deb')
+                sudo dpkg -i "$name.deb"
+                rm "$name.deb"
+        done
+        for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb
+        do
+            name="$(echo $packet | rev | cut -d'/' -f 1 | rev)"
+            curl -L --output "$name.deb" "${packet}"
             sudo dpkg -i "$name.deb"
             rm "$name.deb"
-        )
-    done
+        done
+    )
+
     # snap
     for app in code; do
         if ! snap list | grep "${app}"
