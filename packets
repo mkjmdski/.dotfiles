@@ -62,7 +62,8 @@ function install_debian {
         webkit2gtk-4.0 \
         libusb-dev \
         inkscape \
-        x11-apps
+        x11-apps \
+        openvpn
 
     sudo ergodox
 
