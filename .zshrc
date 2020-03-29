@@ -238,4 +238,8 @@ setopt chase_links              # resolve symlinks
 
 # autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C ~/bin/tfschema tfschema
-complete -o nospace -C "${HOME}/.tfenv/versions/$(cat /home/mlodzikos/.tfenv/version)/terraform" terraform
+tf_ver="/home/mlodzikos/.tfenv/version"
+if [ -f "$tf_ver" ]; then
+    tf_ver="${HOME}/.tfenv/versions/$(cat $tf_ver)/terraform"
+    complete -o nospace -C $tf_ver terraform
+fi
