@@ -11,7 +11,7 @@
 - shell:
   - command: ./packets
     stdin: true
-  - chsh -s $(which zsh)
+  - sudo chsh -s $(which zsh)
   - pip3 install --user --upgrade -r requierements.txt
   - git config --global include.path "$PWD/global.gitconfig"
   - git config --global core.excludesfile "$PWD/global.gitignore"

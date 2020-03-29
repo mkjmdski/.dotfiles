@@ -1,4 +1,5 @@
 #!/bin/bash -eux
+
 ergodox_kernel='''
 # Teensy rules for the Ergodox EZ Original / Shine / Glow
 ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
@@ -11,6 +12,16 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
     MODE:="0666", \
     SYMLINK+="stm32_dfu"
 '''
+function ergodox {
+    wally_kernel=/etc/udev/rules.d/50-wally.rules
+    if [ ! -f "$wally_kernel" ]
+    then
+        echo $ergodox_kernel > $wally_kernel
+    fi
+    curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
+
+}
+
 function github_release {
     curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
 }
@@ -53,12 +64,8 @@ function install_debian {
         inkscape \
         x11-apps
 
-    wally_kernel=/etc/udev/rules.d/50-wally.rules
-    if [ ! -f "$wally_kernel" ]
-    then
-        sudo echo $ergodox_kernel > $wally_kernel
-    fi
-    curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
+    sudo ergodox
+
     # dpkg
     for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool"
     do
@@ -134,13 +141,13 @@ if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
 fi
 
 if apt-get --version &> /dev/null; then
-    export FONT_DIR="$HOME/Library/Fonts"
-    install_debian
-    export platform=linux
-elif uname -a | grep -iq darwin; then
     export FONT_DIR="$HOME/.local/share/fonts"
-    install_osx
+    export platform=linux
+    install_debian
+elif uname -a | grep -iq darwin; then
+    export FONT_DIR="$HOME/Library/Fonts"
     export platform=darwin
+    install_osx
 fi
 install_fonts
 
@@ -149,12 +156,14 @@ curl -L "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
 
 
 for gem in colorls lolcat
-if ! eval "$gem --version"
-then
-    gem install --user $gem
-else
-    gem update --user $gem
-fi
+do
+    if ! eval "$gem --version"
+    then
+        gem install --user $gem
+    else
+        gem update --user $gem
+    fi
+done
 
 curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
 
@@ -174,8 +183,8 @@ chmod -x ~/bin/*
 
 for repo in "syndbg/goenv" "tfutils/tfenv"
 do
-    location="~/.$(echo $repo | cut -d'/' -f 2)"
-    if [ -d "$location" ]
+    location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
+    if [ ! -d "$location" ]
     then
         git clone --branch master --depth 1 https://github.com/$repo.git "$location"
     else
