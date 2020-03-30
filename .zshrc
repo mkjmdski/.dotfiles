@@ -151,9 +151,7 @@ if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
 fi
 
-if [[ $commadns[eyaml] ]]; then
-    alias eyaml="EDITOR='code --wait' eyaml"
-fi
+alias eyaml="EDITOR='code --wait' eyaml"
 
 if [[ $commands[docker] ]]; then
     alias dc="docker"

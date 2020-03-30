@@ -19,10 +19,6 @@ done
 export GIT_AUTO_FETCH_INTERVAL=1800
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
-zplug "MichaelAquilina/zsh-auto-notify"
-AUTO_NOTIFY_IGNORE+=("vim" "cat")
-AUTO_NOTIFY_THRESHOLD=300
-
 zplug "MichaelAquilina/zsh-you-should-use"
 export YSU_HARDCORE=1
 
