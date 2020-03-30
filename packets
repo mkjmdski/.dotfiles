@@ -19,7 +19,6 @@ function ergodox {
         echo $ergodox_kernel > $wally_kernel
     fi
     curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
-
 }
 
 function github_release {
@@ -63,10 +62,11 @@ function install_debian {
         libusb-dev \
         inkscape \
         x11-apps \
-        openvpn
+        openvpn \
+        docker \
+        curl
 
     sudo ergodox
-
     # dpkg
     (
         cd /tmp
@@ -107,7 +107,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in the_silver_searcher jq gnupg2 git gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python trash-cli libusb
+    for p in the_silver_searcher jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python trash-cli libusb zsh
     do
         brew install $p
     done
@@ -140,15 +140,6 @@ function install_fonts {
     )
 }
 
-if [ ! -d "$HOME/.zplug" ]; then
-    git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
-fi
-
-if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
-    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
 if apt-get --version &> /dev/null; then
     export FONT_DIR="$HOME/.local/share/fonts"
     export platform=linux
@@ -158,6 +149,16 @@ elif uname -a | grep -iq darwin; then
     export platform=darwin
     install_osx
 fi
+
+if [ ! -d "$HOME/.zplug" ]; then
+    git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
+fi
+
+if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
+    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
 install_fonts
 
 curl -L --output ~/bin/yaml2json "$(github_release wakeful/yaml2json $platform)"
@@ -177,7 +178,7 @@ done
 curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
 
 export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-if ! gcloud version;
+if ! gcloud version
 then
     curl https://sdk.cloud.google.com | bash
 else
