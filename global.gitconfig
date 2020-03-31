@@ -41,14 +41,11 @@
 #### ALIASES
 [alias]
 	a = add --all
-	s = status --branch --show-stash
 	m = commit --message
-	b = checkout -b
-	c = checkout
 	p = !git pull --rebase && git push
-	head = show HEAD
+	s = status --branch --show-stash
+	u = push --set-upstream origin
 	skip = push -o ci.skip
-	mr = !bash -c \"git push -o merge_request.remove_source_branch -o merge_request.target=${1-master}\"
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
