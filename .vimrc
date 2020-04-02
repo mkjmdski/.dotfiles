@@ -16,7 +16,7 @@ let g:SimpylFold_docstring_preview=1
 set encoding=utf-8
 let g:ycm_autoclose_preview_window_after_completion=1
 map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
-
+set clipboard+=unnamedplus
 cnoremap !py !python3<Space>
 
 let g:AutoPairsFlyMode = 1
