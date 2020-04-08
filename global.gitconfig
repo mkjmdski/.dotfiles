@@ -46,6 +46,7 @@
 	s = status --branch --show-stash
 	u = push --set-upstream origin
  	st = stash save --include-untracked
+	pop = stash pop
 	skip = push -o ci.skip
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
