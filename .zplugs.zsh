@@ -21,3 +21,7 @@ zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-you-should-use"
 export YSU_HARDCORE=1
+
+zplug "MichaelAquilina/git-commands", \
+    as:command, \
+    use:git-clean-branches

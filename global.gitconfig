@@ -113,4 +113,5 @@
 	overwrite = !git a && git amend && git force
 	# gitlab specific
 	skip = push -o ci.skip
-	mr = push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=master --set-upstream origin
+	mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
+	mr-u = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git rev-parse --abbrev-ref HEAD) ; }; f"
