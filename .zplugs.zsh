@@ -21,5 +21,3 @@ zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-you-should-use"
 export YSU_HARDCORE=1
-
-return 0 # in case zplug adds plugs ignore them
