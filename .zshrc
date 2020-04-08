@@ -186,7 +186,6 @@ if [[ $commands[trash] ]]; then
 fi
 
 alias git-cd='cd $(git rev-parse --show-toplevel)'
-alias gnome-restart="dbus-send --type=method_call --print-reply --dest=org.gnome.Shell /org/gnome/Shell org.gnome.Shell.Eval string:'global.reexec_self()'"
 
 function newest {
     cls -Art $1* | tail -n 1
