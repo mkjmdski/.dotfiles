@@ -134,8 +134,7 @@ fi
 
 ## thefuck
 if [[ $commands[thefuck] ]]; then
-    eval $(thefuck --alias)
-    alias f="fuck --yes"
+    eval $(thefuck --alias f --enable-experimental-instant-mode)
 fi
 
 if [[ $commands[jq] ]]; then
@@ -216,8 +215,6 @@ setopt auto_cd
 autoload history-search-end
 bindkey '^[OA' history-substring-search-up
 bindkey '^[OB' history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
 HIST_STAMPS="dd.mm.yyyy" ## OH-MY-ZSH
 setopt append_history share_history histignorealldups
