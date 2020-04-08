@@ -38,4 +38,13 @@
     },
     "python.jediEnabled": true,
     "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.markdownlint": true
+    },
+    "markdownlint.config": {
+        "MD024": false,
+        "MD025": false,
+        "MD026": false,
+        "MD033": false
+    }
 }

@@ -45,13 +45,13 @@
 	p = !git pull --rebase && git push
 	s = status --branch --show-stash
 	u = push --set-upstream origin
+ 	st = stash save --include-untracked
 	skip = push -o ci.skip
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
 	tags = tag --list -n10
  	uncommit = reset --soft HEAD^
- 	stash-all = stash save --include-untracked
 	unstage = reset HEAD
 	this = !git init && git add -A && git commit -m \"Initial commit.\"
 	overwrite = !git a && git amend && git force
@@ -66,16 +66,16 @@
 
 #### MERGETOOLS
 # PyCharm
-[merge]
-    tool = pycharm
-[mergetool "pycharm"]
-	cmd = /usr/local/bin/charm merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
-# VIM
 # [merge]
-# 	tool = vimdiff
-# 	conflictstyle = diff3
-# [mergetool "vimdiff"]
-# 	prompt = false
+#     tool = pycharm
+# [mergetool "pycharm"]
+# 	cmd = /usr/local/bin/charm merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
+# VIM
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+[mergetool "vimdiff"]
+	prompt = false
 
 
 #### DIFF TOOLS

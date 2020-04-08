@@ -154,7 +154,6 @@ fi
 alias eyaml="EDITOR='code --wait' eyaml"
 
 if [[ $commands[docker] ]]; then
-    alias dc="docker"
     alias dcc="docker-compose"
 fi
 
