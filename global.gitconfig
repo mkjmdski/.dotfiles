@@ -47,6 +47,7 @@
 	u = push --set-upstream origin
  	st = stash save --include-untracked
 	pop = stash pop
+	dirs= "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
 	skip = push -o ci.skip
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
