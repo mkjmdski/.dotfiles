@@ -198,11 +198,15 @@ function take {
   mkdir -p $@ && cd ${@:$#}
 }
 
-function swap() {
+function swap {
     local TMPFILE=tmp.$$
     mv "$1" $TMPFILE
     mv "$2" "$1"
     mv $TMPFILE "$2"
+}
+
+function trail {
+    grep "\S" | awk '{$1=$1};1'
 }
 
 # auto menu complete
