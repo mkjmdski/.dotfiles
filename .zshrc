@@ -134,7 +134,8 @@ fi
 
 ## thefuck
 if [[ $commands[thefuck] ]]; then
-    eval $(thefuck --alias f --enable-experimental-instant-mode)
+    eval $(thefuck --alias)
+    alias f="fuck --yes"
 fi
 
 if [[ $commands[jq] ]]; then
