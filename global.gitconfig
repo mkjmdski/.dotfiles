@@ -45,7 +45,6 @@
 [pull]
 	#always rebase and stash before pulling
 	rebase = true
-	autostash = true
 
 [status]
 	# show branch and stash
@@ -53,8 +52,8 @@
 	showStash = true
 
 [rebase]
+	autoStash = true
     instructionFormat = %s [%an]
-	amend = commit --amend --no-edit
 
 [sequence]
     editor = interactive-rebase-tool
