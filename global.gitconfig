@@ -107,6 +107,7 @@
 		git tag -d $1 && \
 		git push origin :refs/tags/$1 \
 	\"
+	current-branch = "rev-parse --abbrev-ref HEAD"
 	# show changed dirs
 	dirs = "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
@@ -114,3 +115,4 @@
 	skip = push -o ci.skip
 	mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
 	mr-u = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git rev-parse --abbrev-ref HEAD) ; }; f"
+	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
