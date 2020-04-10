@@ -95,6 +95,12 @@ function install_debian {
             snap install "${app}"
         fi
     done
+    for app in tre; do
+        if ! snap list | grep "${app}"
+        then
+            snap install --devmode --beta "${app}"
+        fi
+    done
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
 }
 
