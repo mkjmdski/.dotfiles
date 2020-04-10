@@ -57,18 +57,18 @@ function install_debian {
         openvpn \
         docker \
         curl \
-        xclip \
-        nodejs
+        xclip
+        # nodejs
 
-    curl -L https://npmjs.org/install.sh | sudo sh
+    # curl -L https://npmjs.org/install.sh | sudo sh
     wally_kernel=/etc/udev/rules.d/50-wally.rules
     sudo echo $ergodox_kernel > $wally_kernel
     curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
-    for package in yaml-cli quote-cli
-    do
-        sudo npm install -g $package
-    done
-    sudo chown -R $USER:$(id -gn $USER) /home/mlodzikos/.config
+    # for package in yaml-cli quote-cli
+    # do
+    #     sudo npm install -g $package
+    # done
+    # sudo chown -R $USER:$(id -gn $USER) /home/mlodzikos/.config
     # dpkg
     (
         cd /tmp
