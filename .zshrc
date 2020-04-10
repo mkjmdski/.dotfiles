@@ -166,10 +166,6 @@ if [[ $commands[gcloud] ]]; then
     }
 fi
 
-if [[ $commands[yaml] ]]; then
-    eval $(yaml env -)
-fi
-
 alias history="fc -li 1"
 alias hp="history | peco"
 alias minify-json="jq -Mrc . <"
@@ -224,6 +220,28 @@ function to-double-quote {
     sed "s/'/\"/g"
 }
 
+# Usage: increment_version <version> [<position>]
+increment_version() {
+ local v=$1
+ if [ -z $2 ]; then
+    local rgx='^((?:[0-9]+\.)*)([0-9]+)($)'
+ else
+    local rgx='^((?:[0-9]+\.){'$(($2-1))'})([0-9]+)(\.|$)'
+    for (( p=`grep -o "\."<<<".$v"|wc -l`; p<$2; p++)); do
+       v+=.0; done; fi
+ val=`echo -e "$v" | perl -pe 's/^.*'$rgx'.*$/$2/'`
+ echo "$v" | perl -pe s/$rgx.*$'/${1}'`printf %0${#val}s $(($val+1))`/
+}
+
+function bump-yaml-version {
+    local file="${1}"
+    local address="${2}"
+    local position="${3-3}"
+    local actual_version=$(yaml get "${file}" "${address}")
+    local new_version=$(increment_version "${actual_version}" "${position}")
+    yaml set "${file}" "${address}" "${new_version}"
+}
+
 
 # auto menu complete
 setopt auto_menu
@@ -259,4 +277,4 @@ if [ -f "$tf_ver" ]; then
 fi
 
 # let the cow say something smart
-quote | cowsay | lolcat
+# quote | cowsay | lolcat
