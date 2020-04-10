@@ -24,6 +24,7 @@ function install_debian {
         wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
         echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | sudo tee $gopass_apt
     fi
+
     sudo apt-get update
     sudo apt-get upgrade -y
     sudo apt-get install -y \
@@ -57,7 +58,7 @@ function install_debian {
         openvpn \
         docker \
         curl \
-        xclip
+        xclip 
         # nodejs
 
     # curl -L https://npmjs.org/install.sh | sudo sh

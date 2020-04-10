@@ -222,11 +222,11 @@ function to-double-quote {
 
 function bump-yaml-version {
     local file="${1}"
-    local address="${2}.version"
+    local address=".${2}[\"version\"]"
     local position="${3-3}"
-    local actual_version=$(yaml get "${file}" "${address}")
+    local actual_version=$(yq -r "${address}" "${file}")
     local new_version=$(increment_version "${actual_version}" "${position}")
-    yaml set "${file}" "${address}" "${new_version}"
+    yq --yaml-roundtrip --in-place "${address}=${new_version}" "${file}"
 }
 
 

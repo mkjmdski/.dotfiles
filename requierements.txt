@@ -7,3 +7,5 @@ gitup
 git-sweep
 {% comment %} https://github.com/drbild/json2yaml {% endcomment %}
 json2yaml
+{% comment %} https://github.com/kislyuk/yq {% endcomment %}
+yq
