@@ -127,8 +127,10 @@ zplug load
 
 
 if [[ $commands[colorls] ]]; then
-    alias ls="colorls"
-    alias l="ls -lA"
+    alias ls="colorls --almost-all --git-status --group-directories-first"
+    alias l="ls -l"
+    alias ldir="l --dirs"
+    alias lf="l --files"
     alias cls="/bin/ls"
 fi
 
