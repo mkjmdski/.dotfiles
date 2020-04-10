@@ -212,6 +212,15 @@ function trail {
     grep "\S" | awk '{$1=$1};1'
 }
 
+function to-single-quote {
+    sed "s/\"/'/g"
+}
+
+function to-double-quote {
+    sed "s/'/\"/g"
+}
+
+
 # auto menu complete
 setopt auto_menu
 
