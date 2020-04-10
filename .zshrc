@@ -253,3 +253,6 @@ if [ -f "$tf_ver" ]; then
     tf_ver="${HOME}/.tfenv/versions/$(cat $tf_ver)/terraform"
     complete -o nospace -C $tf_ver terraform
 fi
+
+# let the cow say something smart
+quote | cowsay | lolcat
