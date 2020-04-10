@@ -166,6 +166,10 @@ if [[ $commands[gcloud] ]]; then
     }
 fi
 
+if [[ $commands[yaml] ]]; then
+    eval $(yaml env -)
+fi
+
 alias history="fc -li 1"
 alias hp="history | peco"
 alias minify-json="jq -Mrc . <"
