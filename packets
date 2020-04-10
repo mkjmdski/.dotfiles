@@ -68,6 +68,7 @@ function install_debian {
     do
         sudo npm install -g $package
     done
+    sudo chown -R $USER:$(id -gn $USER) /home/mlodzikos/.config
     # dpkg
     (
         cd /tmp
