@@ -123,7 +123,7 @@ spaceship_gcloud() {
 alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
 SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
 
-
+compinit
 source ~/.zplug/init.zsh
 zplug load
 

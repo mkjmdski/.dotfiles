@@ -25,3 +25,5 @@ export YSU_HARDCORE=1
 zplug "MichaelAquilina/git-commands", \
     as:command, \
     use:git-clean-branches
+
+zplug "hlissner/zsh-autopair", defer:2
