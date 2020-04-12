@@ -138,10 +138,10 @@ if [[ $commands[colorls] ]]; then
 fi
 
 ## thefuck
-if [[ $commands[thefuck] ]]; then
-    eval $(thefuck --alias)
-    alias f="fuck --yes"
-fi
+# if [[ $commands[thefuck] ]]; then
+#     eval $(thefuck --alias)
+#     alias f="fuck --yes"
+# fi
 
 if [[ $commands[jq] ]]; then
     alias json-minify="$(which jq) -Mrc . <"
