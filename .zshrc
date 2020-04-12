@@ -121,7 +121,6 @@ spaceship_gcloud() {
 }
 
 alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
-alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
 SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
 
 
@@ -167,6 +166,7 @@ if [[ $commands[gcloud] ]]; then
     function gca {
         gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
     }
+    alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
 fi
 
 alias history="fc -li 1"
@@ -258,7 +258,6 @@ setopt multios
 setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks
 
-# autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C ~/bin/tfschema tfschema
 tf_ver="/home/mlodzikos/.tfenv/version"
 if [ -f "$tf_ver" ]; then
