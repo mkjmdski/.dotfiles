@@ -86,7 +86,7 @@ spaceship_git_last_commit() {
 # Configuration
 # ------------------------------------------------------------------------------
 
-SPACESHIP_GCLOUD_SHOW="${SPACESHIP_GCLOUD_SHOW=true}"
+SPACESHIP_GCLOUD_SHOW="${SPACESHIP_GCLOUD_SHOW=false}"
 SPACESHIP_GCLOUD_PREFIX="${SPACESHIP_GCLOUD_PREFIX="using "}"
 SPACESHIP_GCLOUD_SUFFIX="${SPACESHIP_GCLOUD_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"}"
 SPACESHIP_GCLOUD_SYMBOL="${SPACESHIP_GCLOUD_SYMBOL="☁️"}"
@@ -105,6 +105,7 @@ spaceship_gcloud() {
   spaceship::exists gcloud || return
 
   # Check if there is an active config
+  [[ -d ~/.config/gcloud ]] || return
   [[ -f ~/.config/gcloud/active_config ]] || return
 
   # Reads the current config from the file
@@ -118,7 +119,9 @@ spaceship_gcloud() {
     "${SPACESHIP_GCLOUD_SYMBOL}$GCLOUD_ACTIVE_PROJECT " \
     "$SPACESHIP_GCLOUD_SUFFIX"
 }
-SPACESHIP_KUBECTL_SHOW='true'
+
+alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
+alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
 SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
 
 
