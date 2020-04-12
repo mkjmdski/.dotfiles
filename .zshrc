@@ -232,6 +232,7 @@ function bump-yaml-version {
     yq --yaml-roundtrip --in-place "${address}=${new_version}" "${file}"
 }
 
+alias fpp="EDITOR='code --wait' fpp"
 
 # auto menu complete
 setopt auto_menu

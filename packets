@@ -213,3 +213,6 @@ do
         )
     fi
 done
+
+sudo git clone --depth 1 https://github.com/facebook/PathPicker.git /usr/local/path-picker
+sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
