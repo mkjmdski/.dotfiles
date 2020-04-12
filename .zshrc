@@ -233,7 +233,8 @@ function bump-yaml-version {
 }
 
 alias fpp="EDITOR='code --wait' fpp"
-
+alias tolower="tr '[:upper:]' '[:lower:]'"
+alias toupper="tr '[:lower:]' '[:upper:]'"
 # auto menu complete
 setopt auto_menu
 
