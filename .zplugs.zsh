@@ -7,7 +7,8 @@ zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,histo
 #### ZSH MAGIC
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "zdharma/fast-syntax-highlighting", defer:2
+# zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "zsh-users/zsh-history-substring-search", defer:3
 
 zplug "peterhurford/git-it-on.zsh"
