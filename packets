@@ -216,3 +216,17 @@ done
 
 sudo git clone --depth 1 https://github.com/facebook/PathPicker.git /usr/local/path-picker
 sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
+
+
+(
+  cd "$(mktemp -d)" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.{tar.gz,yaml}" &&
+  tar zxvf krew.tar.gz &&
+  KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
+  "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
+  "$KREW" update
+)
+
+
+kubectl krew install ctx
+kubectl krew install ns
