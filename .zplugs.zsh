@@ -30,3 +30,4 @@ zplug "MichaelAquilina/git-commands", \
 zplug "hlissner/zsh-autopair", defer:2
 
 zplug "Tarrasch/zsh-bd"
+zplug "jimeh/zsh-peco-history", defer:2
