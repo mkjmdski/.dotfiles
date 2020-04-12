@@ -143,6 +143,7 @@ if [[ $commands[thefuck] ]]; then
 fi
 
 if [[ $commands[jq] ]]; then
+    alias json-minify="$(which jq) -Mrc . <"
     alias jq="jq -C"
 fi
 
@@ -171,7 +172,6 @@ fi
 
 alias history="fc -li 1"
 alias hp="history | peco"
-alias minify-json="jq -Mrc . <"
 
 alias ke="k exec"
 alias ket="ke -it"

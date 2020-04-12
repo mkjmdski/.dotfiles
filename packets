@@ -58,13 +58,14 @@ function install_debian {
         openvpn \
         docker \
         curl \
-        xclip 
+        xclip
         # nodejs
 
     # curl -L https://npmjs.org/install.sh | sudo sh
     wally_kernel=/etc/udev/rules.d/50-wally.rules
     sudo echo $ergodox_kernel > $wally_kernel
     curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
+    curl -L --output ~/bin/broot https://dystroy.org/broot/download/x86_64-linux/broot
     # for package in yaml-cli quote-cli
     # do
     #     sudo npm install -g $package
@@ -184,8 +185,6 @@ do
     fi
 done
 
-curl https://raw.githubusercontent.com/athityakumar/colorls/master/zsh/_colorls  > "$PWD/zsh/fpath/_colorls"
-
 export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 if ! gcloud version
 then
@@ -198,7 +197,7 @@ curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L https://raw.githubusercontent.com/kamranahmedse/git-standup/master/installer.sh | sudo sh
 curl -o ~/bin/git-hooks https://raw.githubusercontent.com/icefox/git-hooks/master/git-hooks
 curl -L git.io/trans -o ~/bin/trans
-gopass completion zsh > "$PWD/zsh/fpath/_gopass"
+
 chmod -x ~/bin/*
 
 for repo in "syndbg/goenv" "tfutils/tfenv"
