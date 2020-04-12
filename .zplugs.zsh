@@ -27,3 +27,5 @@ zplug "MichaelAquilina/git-commands", \
     use:git-clean-branches
 
 zplug "hlissner/zsh-autopair", defer:2
+
+zplug "Tarrasch/zsh-bd"
