@@ -9,3 +9,5 @@ git-sweep
 json2yaml
 {% comment %} https://github.com/kislyuk/yq {% endcomment %}
 yq
+{% comment %} https://github.com/shobrook/rebound {% endcomment %}
+rebound-cli
