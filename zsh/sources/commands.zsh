@@ -100,6 +100,10 @@ if [[ $commands[histdb] ]]; then
     alias history="histdb"
 fi
 
+if [[ $commands[pydf] ]]; then
+    alias df="pydf"
+fi
+
 function newest {
     /bin/ls -Art $1* | tail -n 1
 }

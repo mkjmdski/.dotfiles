@@ -13,3 +13,5 @@ yq
 rebound-cli
 {% comment %} https://github.com/dbcli/mycli {% endcomment %}
 mycli
+{% comment %} https://github.com/k4rtik/pydf-pypi {% endcomment %}
+pydf
