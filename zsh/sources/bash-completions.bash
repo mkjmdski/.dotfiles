@@ -1,4 +1,3 @@
-bashcompinit
 _gita_completions()
 {
 

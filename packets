@@ -56,7 +56,8 @@ function install_debian {
         openvpn \
         docker \
         curl \
-        xclip
+        xclip \
+        sqlite3
         # nodejs
 
     # curl -L https://npmjs.org/install.sh | sudo sh
@@ -221,6 +222,7 @@ done
 sudo git clone --depth 1 https://github.com/facebook/PathPicker.git /usr/local/path-picker
 sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
 
+git clone --depth 1 https://github.com/larkery/zsh-histdb ~/.zsh-histdb
 
 (
   cd "$(mktemp -d)" &&

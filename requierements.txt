@@ -11,3 +11,5 @@ json2yaml
 yq
 {% comment %} https://github.com/shobrook/rebound {% endcomment %}
 rebound-cli
+{% comment %} https://github.com/dbcli/mycli {% endcomment %}
+mycli
