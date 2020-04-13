@@ -173,7 +173,6 @@ if [[ $commands[gcloud] ]]; then
 fi
 
 alias history="fc -li 1"
-alias hp="history | peco"
 
 alias ke="k exec"
 alias ket="ke -it"

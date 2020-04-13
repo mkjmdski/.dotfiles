@@ -1,8 +1,8 @@
 {% comment %} https://github.com/nvbn/thefuck {% endcomment %}
 thefuck
 git+https://github.com/jeffkaufman/icdiff.git
-{% comment %} https://github.com/earwig/git-repo-updater {% endcomment %}
-gitup
+{% comment %} https://github.com/nosarthur/gita {% endcomment %}
+gita
 {% comment %} https://github.com/arc90/git-sweep {% endcomment %}
 git-sweep
 {% comment %} https://github.com/drbild/json2yaml {% endcomment %}
