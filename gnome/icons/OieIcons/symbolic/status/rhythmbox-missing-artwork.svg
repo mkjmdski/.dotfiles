@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="rhythmbox-missing-artwork.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
+  <metadata
+     id="metadata821">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs819" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="656"
+     id="namedview817"
+     showgrid="true"
+     inkscape:zoom="30.0625"
+     inkscape:cx="8"
+     inkscape:cy="8"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7">
+    <inkscape:grid
+       type="xygrid"
+       id="grid820" />
+  </sodipodi:namedview>
+  <path
+     d="m 13.373112,1.0002595 -6.3760629,1.667 c -0.5540055,0.13 -1.0010098,0.646 -1.0010098,1.148 v 7.9530015 a 3.2100315,3.21 0 0 0 -2.03202,-0.192 c -1.3500132,0.307 -2.1970215,1.299 -1.9070186,2.214 0.2900028,0.916 1.6200158,1.428 2.9700291,1.12 1.0780105,-0.244 1.8200178,-0.936 1.939019,-1.666 l 0.03,-7.5160015 6.0020592,-1.64 V 10.01826 a 3.2080314,3.208 0 0 0 -2.03002,-0.19 c -1.3500136,0.306 -2.1980219,1.298001 -1.908019,2.213001 0.2900028,0.916 1.620016,1.427 2.970029,1.12 1.077011,-0.244 1.820018,-0.936 1.938019,-1.666 l 0.032,-9.7850015 a 0.71000696,0.71 0 0 0 -0.626006,-0.71 z"
+     id="path5"
+     inkscape:connector-curvature="0"
+     style="opacity:0.1;fill:#373737;stroke-width:1" />
+</svg>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   enable-background="new"
+   version="1.1"
+   id="svg16"
+   sodipodi:docname="battery-empty-symbolic.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
+  <metadata
+     id="metadata22">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs20" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="656"
+     id="namedview18"
+     showgrid="true"
+     inkscape:zoom="14.75"
+     inkscape:cx="7.3328435"
+     inkscape:cy="7.2397562"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg16">
+    <inkscape:grid
+       type="xygrid"
+       id="grid837" />
+  </sodipodi:namedview>
+  <title
+     id="title2">Paper Symbolic Icon Theme</title>
+  <path
+     inkscape:connector-curvature="0"
+     id="path2897"
+     d="m 2.6621396,3 c -0.8388,0.01 -1.45129,-0.0151 -1.95311998,0.26171 -0.25092,0.13844 -0.45077,0.37358 -0.56055,0.66602 -0.10978,0.29244 -0.1484264,0.63972 -0.14843,1.07812 L -1.038e-5,11 c -3.7e-6,0.43841 0.0386,0.78568 0.14843,1.07812 0.10978,0.29244 0.30963,0.52562 0.56055,0.66406 C 1.2107996,13.01906 1.8232896,12.9903 2.6620896,13 h 0.002 9.7030504 0.002 c 0.8388,-0.01 1.45324,0.019 1.95507,-0.25782 0.25092,-0.13844 0.44882,-0.37162 0.5586,-0.66406 C 14.99248,11.78568 14.96781,11.43722 15,11 v -1 h 1 l 5e-5,-4.0000001 h -1 V 5.00585 c 0,-0.4384 -0.007,-0.78568 -0.11719,-1.07812 C 14.77308,3.63529 14.57518,3.40015 14.32426,3.26171 13.82243,2.98483 13.20799,3.0097 12.36919,3 h -0.002 -9.7030504 z m 0.0137,1 H 12.36717 c 0.85282,0.0102 1.29765,0.0391 1.47461,0.13671 0.0287,0.0158 0.0734,0.0571 0.10547,0.14258 0.0231,0.0613 0.0527,0.2988 0.0527,0.72656 L 13.9999,11 c -4e-6,0.42737 -0.0293,0.66416 -0.0527,0.72656 -0.0321,0.0855 -0.0768,0.12479 -0.10547,0.14062 -0.1724,0.0951 -0.6176,0.12232 -1.47461,0.13282 h -9.6932904 -0.0117 c -0.85438,-0.0102 -1.2983,-0.0377 -1.4707,-0.13282 -0.0287,-0.0158 -0.0734,-0.0552 -0.10547,-0.14062 -0.0462,-0.12283 -0.085903,-0.34837 -0.0859,-0.72656 l 5e-5,-5.99415 c 3.2e-6,-0.37814 0.0399,-0.60386 0.0859,-0.72656 0.0321,-0.0855 0.0768,-0.12676 0.10547,-0.14258 0.1779,-0.0981 0.62006,-0.12641 1.48438,-0.13671 z"
+     style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:none;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#d33636;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4.00000048;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+     sodipodi:nodetypes="ccsssccccccccsccccsccccccccccsscccccccsscccc" />
+</svg>

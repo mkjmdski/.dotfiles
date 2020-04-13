@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="wire.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
+  <metadata
+     id="metadata15">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs13" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1320"
+     inkscape:window-height="718"
+     id="namedview11"
+     showgrid="false"
+     inkscape:zoom="4.9166667"
+     inkscape:cx="24.20339"
+     inkscape:cy="24"
+     inkscape:window-x="46"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9" />
+  <linearGradient
+     id="a"
+     gradientUnits="userSpaceOnUse"
+     x1="4.333"
+     x2="45.115"
+     y1="8.65"
+     y2="24.879">
+    <stop
+       offset="0"
+       stop-color="#a8ff00"
+       id="stop2" />
+    <stop
+       offset="1"
+       stop-color="#15ff00"
+       id="stop4" />
+  </linearGradient>
+  <path
+     d="m4.333 8.65v20.678a11.797 11.797 0 0 0 23.595 0v-16.872a3.679 3.679 0 0 0 -7.358 0v16.872a11.797 11.797 0 0 0 23.595 0v-20.678"
+     fill="none"
+     stroke="url(#a)"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="1.9"
+     id="path7"
+     style="stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none" />
+</svg>
