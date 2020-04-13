@@ -94,10 +94,6 @@ elif [[ $commands[terraform] ]]; then
     complete -o nospace -C $(which terraform) terraform
 fi
 
-if [[ $commands[histdb] ]]; then
-    alias history="histdb"
-fi
-
 if [[ $commands[pydf] ]]; then
     alias df="pydf"
 fi
@@ -136,3 +132,4 @@ function to-double-quote {
 alias git-cd='cd $(git root)'
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias toupper="tr '[:lower:]' '[:upper:]'"
+alias history='fc -il 1'

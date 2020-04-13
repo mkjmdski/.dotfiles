@@ -1,5 +1,5 @@
 export DOTFILES="$HOME/.dotfiles"
-
+HIST_STAMPS="yyyy-mm-dd"
 fpath=($fpath $DOTFILES/zsh/fpath)
 
 if [ ! "$PATH_LOADED" = "true" ]; then
@@ -35,10 +35,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 fi
 
-source $HOME/.zsh-histdb/sqlite-history.zsh
-autoload -Uz add-zsh-hook
-add-zsh-hook precmd histdb-update-outcome
-
 source $DOTFILES/zsh/sources/spaceship.zsh
 compinit
 source ~/.zplug/init.zsh
@@ -48,9 +44,6 @@ source $DOTFILES/zsh/sources/git-extra-completions.zsh
 source $DOTFILES/zsh/sources/bash-completions.bash
 source $DOTFILES/zsh/sources/commands.zsh
 
-source $HOME/.zsh-histdb/histdb-interactive.zsh
-
-bindkey '^r' _histdb-isearch
 # auto change directory
 setopt auto_cd
 # use brace

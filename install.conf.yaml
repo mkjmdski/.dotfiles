@@ -17,6 +17,12 @@
   - git config --global core.excludesfile "$PWD/global.gitignore"
   - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
+    ~/.config/conky:
+      path: conky
+    ~/.local/share/applications/show-desktop.desktop:
+      path: applications/show-desktop.desktop
+    ~/.peco/config.json:
+      path: peco.json
     ~/.config/nvim/colors/molokai.vim:
       path: molokai.vim
     ~/.config/nvim/init.vim:

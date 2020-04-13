@@ -57,7 +57,8 @@ function install_debian {
         docker \
         curl \
         xclip \
-        sqlite3
+        conky-all \
+        xdotool
         # nodejs
 
     # curl -L https://npmjs.org/install.sh | sudo sh
