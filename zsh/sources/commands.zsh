@@ -104,6 +104,10 @@ if [[ $commands[pydf] ]]; then
     alias df="pydf"
 fi
 
+if [[ $commands[apt-get] ]]; then
+    alias apt-get="sudo apt-get"
+fi
+
 function newest {
     /bin/ls -Art $1* | tail -n 1
 }
