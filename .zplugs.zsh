@@ -13,7 +13,7 @@ zplug "zsh-users/zsh-history-substring-search", defer:3
 
 zplug "peterhurford/git-it-on.zsh"
 
-for plugin in docker docker-compose autojump extract command-not-found fd gcloud git-auto-fetch gpg-agent helm kubectl ubuntu web-search last-working-dir
+for plugin in docker fasd docker-compose extract command-not-found fd gcloud git-auto-fetch gpg-agent helm kubectl ubuntu web-search last-working-dir
 do
     zplug "plugins/$plugin", from:oh-my-zsh
 done

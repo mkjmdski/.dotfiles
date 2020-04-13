@@ -46,7 +46,6 @@ function install_debian {
         git-crypt \
         git-lfs \
         chrome-gnome-shell \
-        autojump \
         trash-cli \
         libncursesw5 \
         gtk+3.0 \
@@ -108,6 +107,12 @@ function install_debian {
             snap install --devmode --beta "${app}"
         fi
     done
+    for app in fasd; do
+        if ! snap list | grep "${app}"
+        then
+            snap install --beta "${app}"
+        fi
+    done
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
 }
 
@@ -116,7 +121,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python trash-cli libusb zsh
+    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh
     do
         brew install $p
     done
