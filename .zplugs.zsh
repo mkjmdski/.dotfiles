@@ -2,7 +2,13 @@
 # this allows zplug to update itself on `zplug update`
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
+# oh-my-zsh
 zplug "robbyrussell/oh-my-zsh", use:"lib/{clipboard,completion,directories,termsupport,key-bindings}.zsh"
+for plugin in docker fasd docker-compose extract command-not-found fd gcloud git-auto-fetch gpg-agent helm kubectl ubuntu web-search last-working-dir
+do
+    zplug "plugins/$plugin", from:oh-my-zsh
+done
+GIT_AUTO_FETCH_INTERVAL=1800
 
 #### ZSH MAGIC
 zplug "zsh-users/zsh-autosuggestions"
@@ -25,11 +31,6 @@ ZSH_AUTOSUGGEST_STRATEGY=histdb_top_here
 
 zplug "peterhurford/git-it-on.zsh"
 
-for plugin in docker fasd docker-compose extract command-not-found fd gcloud git-auto-fetch gpg-agent helm kubectl ubuntu web-search last-working-dir
-do
-    zplug "plugins/$plugin", from:oh-my-zsh
-done
-GIT_AUTO_FETCH_INTERVAL=1800
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "MichaelAquilina/zsh-you-should-use"

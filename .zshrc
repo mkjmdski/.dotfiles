@@ -48,6 +48,9 @@ source $DOTFILES/zsh/sources/git-extra-completions.zsh
 source $DOTFILES/zsh/sources/bash-completions.bash
 source $DOTFILES/zsh/sources/commands.zsh
 
+source $HOME/.zsh-histdb/histdb-interactive.zsh
+
+bindkey '^r' _histdb-isearch
 # auto change directory
 setopt auto_cd
 # use brace
@@ -56,6 +59,3 @@ setopt brace_ccl
 setopt list_packed
 setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks
-
-source $HOME/.zsh-histdb/histdb-interactive.zsh
-bindkey '^r' _histdb-isearch
