@@ -28,7 +28,6 @@ function install_debian {
     sudo apt-get update
     sudo apt-get upgrade -y
     sudo apt-get install -y \
-        silversearcher-ag \
         most \
         jq \
         python3 \
@@ -74,7 +73,7 @@ function install_debian {
     # dpkg
     (
         cd /tmp
-        for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool"
+        for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool" "BurntSushi/ripgrep"
         do
                 name="$(echo $repo | cut -d'/' -f 2)"
                 curl -L --output "$name.deb" $(github_release $repo 'deb')
@@ -117,7 +116,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in the_silver_searcher jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python trash-cli libusb zsh
+    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd autojump python trash-cli libusb zsh
     do
         brew install $p
     done
