@@ -96,23 +96,14 @@
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
- 	uncommit = reset --soft HEAD^
+ 	uncommit = back
 	unstage = reset HEAD
-	this = !git init && git add -A && git commit -m \"Initial commit.\"
-	branch-delete = !bash -c \" \
-		git branch -D $1 && \
-		git push origin :$1 \
-	\"
-	tag-delete = !sh -c \" \
-		git tag -d $1 && \
-		git push origin :refs/tags/$1 \
-	\"
 	current-branch = "rev-parse --abbrev-ref HEAD"
 	# show changed dirs
 	dirs = "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
 	# gitlab specific
-	skip = push -o ci.skip
-	mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
-	mr-u = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git rev-parse --abbrev-ref HEAD) ; }; f"
+	push-ci-skip = push -o ci.skip
+	make-mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
+	make-mr-upstram = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
