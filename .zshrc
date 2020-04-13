@@ -128,6 +128,7 @@ compinit
 source ~/.zplug/init.zsh
 zplug load
 
+eval "$(jira --completion-script-zsh)"
 
 if [[ $commands[colorls] ]]; then
     alias ls="colorls --almost-all --git-status --group-directories-first"
