@@ -107,3 +107,16 @@
 	make-mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
 	make-mr-upstram = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[user]
+	email = mikolaj.mlodzikowski@gmail.com
+	name = Mikołaj Młodzikowski
+
+[includeIf "gitdir:~/repos/eg/"]
+    path = .gitconfig-work
