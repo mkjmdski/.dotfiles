@@ -102,6 +102,10 @@ if [[ $commands[apt-get] ]]; then
     alias apt-get="sudo apt-get"
 fi
 
+if [[ $commands[dpkg] ]]; then
+    alias dpkg="sudo dpkg"
+fi
+
 function newest {
     /bin/ls -Art $1* | tail -n 1
 }
