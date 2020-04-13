@@ -6,11 +6,9 @@ if [[ $commands[kubectl] ]]; then
     alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
     alias ke="k exec"
     alias ket="ke -it"
-    function kgpf {
-        kgp -n $1 -o name | head -n 1
-    }
+    alias kgpf="kgp -o name | head -n 1"
     function ketf {
-        ket -n $1 $(kgpf $1) -- "${2-sh}"
+        ket $(kgpf) -- "${1-sh}"
     }
 fi
 
