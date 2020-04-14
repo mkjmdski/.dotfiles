@@ -56,6 +56,9 @@ zinit light laggardkernel/zsh-thefuck
 zinit ice as"program" pick"git-hooks"
 zinit load icefox/git-hooks
 
+zinit ice from"gh-r" as"program" mv"jira* -> jira"
+zinit load go-jira/jira
+
 source $sources/bash-completions.bash
 source $sources/commands.zsh
 

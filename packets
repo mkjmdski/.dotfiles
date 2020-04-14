@@ -200,7 +200,6 @@ else
 fi
 
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
-curl -L -o ~/bin/jira $(github_release go-jira/jira linux)
 curl -L git.io/trans -o ~/bin/trans
 
 chmod -x ~/bin/*
