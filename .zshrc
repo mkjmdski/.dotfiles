@@ -53,6 +53,9 @@ zinit light brymck/print-alias
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
 
+zinit ice as"program" pick"git-hooks"
+zinit load icefox/git-hooks
+
 source $sources/bash-completions.bash
 source $sources/commands.zsh
 
