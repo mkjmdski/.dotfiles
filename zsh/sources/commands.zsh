@@ -85,9 +85,10 @@ if [[ $commands[tfschema] ]]; then
 fi
 
 if [[ $commands[tfenv] ]]; then
-    tf_ver="/home/mlodzikos/.tfenv/version"
+    tfenv_root=$(echo $(which tfenv) | rev | cut -d/ -f 3- | rev)
+    tf_ver="${tfenv_root}/version"
     if [ -f "$tf_ver" ]; then
-        tf_ver="${HOME}/.tfenv/versions/$(cat $tf_ver)/terraform"
+        tf_ver="${tfenv_root}/versions/$(cat $tf_ver)/terraform"
         complete -o nospace -C $tf_ver terraform
     fi
 elif [[ $commands[terraform] ]]; then
