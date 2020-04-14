@@ -5,7 +5,9 @@ source $sources/path.zsh
 source $sources/spaceship.zsh
 
 source ~/.zinit/bin/zinit.zsh
+autoload -Uz compinit
 compinit
+zstyle ':completion:*' menu select
 
 for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
