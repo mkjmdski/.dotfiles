@@ -1,16 +1,17 @@
 export DOTFILES="$HOME/.dotfiles"
+sources="$DOTFILES/zsh/sources"
 
-source $DOTFILES/zsh/sources/path.zsh
-source $DOTFILES/zsh/sources/spaceship.zsh
+source $sources/path.zsh
+source $sources/spaceship.zsh
 
 HIST_STAMPS="yyyy-mm-dd"
 compinit
 source ~/.zplug/init.zsh
 zplug load
 
-source $DOTFILES/zsh/sources/git-extra-completions.zsh
-source $DOTFILES/zsh/sources/bash-completions.bash
-source $DOTFILES/zsh/sources/commands.zsh
+source $sources/git-extra-completions.zsh
+source $sources/bash-completions.bash
+source $sources/commands.zsh
 
 # auto change directory
 setopt auto_cd
