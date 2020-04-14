@@ -107,6 +107,10 @@ if [[ $commands[dpkg] ]]; then
     alias dpkg="sudo dpkg"
 fi
 
+if [ $commands[helm] ]; then
+  source <(helm completion zsh)
+fi
+
 if [[ $commands[helmsman] ]]; then
     alias helmsman='GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json KUBE_CONTEXT=$(kubectl config current-context) helmsman'
 fi
