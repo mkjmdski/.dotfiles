@@ -13,13 +13,13 @@ for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
 done
 
-for binary in fasd gcloud kubectl; do
+for binary in fasd kubectl; do
     if [[ $commands[$binary] ]]; then
         zinit snippet OMZ::plugins/$binary/$binary.plugin.zsh
     fi
 done
 
-for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir
+for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir gcloud
 do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
