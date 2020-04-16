@@ -107,8 +107,6 @@ function install_debian {
         install_ergodox
     fi
 
-    curl -L --output ~/bin/broot https://dystroy.org/broot/download/x86_64-linux/broot
-
     (
         cd /tmp
         for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool" "BurntSushi/ripgrep"
@@ -160,10 +158,11 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh ripgrep
+    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh ripgrep broot
     do
         brew install $p
     done
+    broot --install
     if ! cat ~/.gnupg/gpg-agent.conf | grep -q /usr/local/bin/pinentry-mac; then
         echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
     fi
