@@ -31,3 +31,5 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export PATH_LOADED="true"
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 fi
+alias tolower="tr '[:upper:]' '[:lower:]'"
+alias toupper="tr '[:lower:]' '[:upper:]'"

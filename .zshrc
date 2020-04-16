@@ -59,6 +59,14 @@ zinit load icefox/git-hooks
 zinit ice from"gh-r" as"program" mv"jira* -> jira"
 zinit load go-jira/jira
 
+zinit ice from"gh-r" as"program" mv"yaml2json* -> yaml2json"
+zinit load wakeful/yaml2json
+
+if [ "$(uname | tolower)" = "darwin" ]; then
+    zinit ice from"gh-r" as"program" mv"macos-interactive-rebase-tool -> git-interactive-rebase-tool" bpick"macos-interactive-rebase-tool"
+    zinit load MitMaro/git-interactive-rebase-tool
+fi
+
 source $sources/bash-completions.bash
 source $sources/commands.zsh
 

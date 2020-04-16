@@ -1,6 +1,46 @@
 #!/bin/bash -eux
 
-ergodox_kernel='''
+
+function github_release {
+    curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
+}
+
+function install_gem {
+    gem=$1
+    if ! eval "$gem --version"
+    then
+        gem install --user $gem
+    else
+        gem update --user $gem
+    fi
+}
+
+function setup_gcloud {
+    export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    if ! gcloud version
+    then
+        curl https://sdk.cloud.google.com | bash
+    else
+        gcloud components update
+    fi
+}
+
+function setup_binary_env {
+    repo=$1
+    location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
+    if [ ! -d "$location" ]
+    then
+        git clone --branch master --depth 1 https://github.com/$repo.git "$location"
+    else
+        (
+            cd "$location"
+            git pull
+        )
+    fi
+}
+
+function install_ergodox {
+    ergodox_kernel='''
 # Teensy rules for the Ergodox EZ Original / Shine / Glow
 ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
 ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
@@ -12,10 +52,12 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
     MODE:="0666", \
     SYMLINK+="stm32_dfu"
 '''
-
-function github_release {
-    curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
+    wally_kernel=/etc/udev/rules.d/50-wally.rules
+    sudo echo $ergodox_kernel > $wally_kernel
+    curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
 }
+
+
 
 function install_debian {
     gopass_apt="/etc/apt/sources.list.d/gopass.list"
@@ -61,17 +103,12 @@ function install_debian {
         xdotool
         # nodejs
 
-    # curl -L https://npmjs.org/install.sh | sudo sh
-    wally_kernel=/etc/udev/rules.d/50-wally.rules
-    sudo echo $ergodox_kernel > $wally_kernel
-    curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
+    if ! which wally &> /dev/null; then
+        install_ergodox
+    fi
+
     curl -L --output ~/bin/broot https://dystroy.org/broot/download/x86_64-linux/broot
-    # for package in yaml-cli quote-cli
-    # do
-    #     sudo npm install -g $package
-    # done
-    # sudo chown -R $USER:$(id -gn $USER) /home/mlodzikos/.config
-    # dpkg
+
     (
         cd /tmp
         for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool" "BurntSushi/ripgrep"
@@ -81,7 +118,7 @@ function install_debian {
                 sudo dpkg -i "$name.deb"
                 rm "$name.deb"
         done
-        for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb
+        for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
         do
             name="$(echo $packet | rev | cut -d'/' -f 1 | rev)"
             curl -L --output "$name.deb" "${packet}"
@@ -123,11 +160,13 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh
+    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh ripgrep
     do
         brew install $p
     done
-    echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+    if ! cat ~/.gnupg/gpg-agent.conf | grep -q /usr/local/bin/pinentry-mac; then
+        echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+    fi
     (
         cd /tmp
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -166,8 +205,9 @@ elif uname -a | grep -iq darwin; then
     install_osx
 fi
 
-if [ ! -d "$HOME/.zplug" ]; then
-    git clone --depth=1 https://github.com/zplug/zplug ~/.zplug
+if [ ! -d "~/.zinit" ]; then
+    mkdir ~/.zinit
+    git clone --depth 1 https://github.com/zdharma/zinit.git ~/.zinit/bin
 fi
 
 if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
@@ -176,28 +216,12 @@ if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
 fi
 
 install_fonts
-
-curl -L --output ~/bin/yaml2json "$(github_release wakeful/yaml2json $platform)"
-curl -L "$(github_release 'minamijoyo/tfschema' $platform)" | tar -xz -C ~/bin
-
+setup_gcloud
 
 for gem in colorls lolcat
 do
-    if ! eval "$gem --version"
-    then
-        gem install --user $gem
-    else
-        gem update --user $gem
-    fi
+    install_gem $gem
 done
-
-export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-if ! gcloud version
-then
-    curl https://sdk.cloud.google.com | bash
-else
-    gcloud components update
-fi
 
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L git.io/trans -o ~/bin/trans
@@ -206,20 +230,12 @@ chmod -x ~/bin/*
 
 for repo in "syndbg/goenv" "tfutils/tfenv"
 do
-    location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
-    if [ ! -d "$location" ]
-    then
-        git clone --branch master --depth 1 https://github.com/$repo.git "$location"
-    else
-        (
-            cd "$location"
-            git pull
-        )
-    fi
+    setup_binary_env $repo
 done
 
 sudo git clone --depth 1 https://github.com/facebook/PathPicker.git /usr/local/path-picker
 sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
+chmod +x /usr/local/bin/fpp
 
 (
   cd "$(mktemp -d)" &&
@@ -230,6 +246,5 @@ sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
   "$KREW" update
 )
 
-
-kubectl krew install ctx
-kubectl krew install ns
+zsh -c "kubectl krew install ctx"
+zsh -c "kubectl krew install ns"

@@ -144,6 +144,4 @@ function to-double-quote {
 }
 
 alias git-cd='cd $(git root)'
-alias tolower="tr '[:upper:]' '[:lower:]'"
-alias toupper="tr '[:lower:]' '[:upper:]'"
 alias history='fc -il 1'
