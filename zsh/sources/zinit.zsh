@@ -72,6 +72,3 @@ fi
 
 zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
 zinit load docker/compose
-
-zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
-zinit light trapd00r/LS_COLORS
