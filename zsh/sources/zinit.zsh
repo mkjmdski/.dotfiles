@@ -8,7 +8,10 @@ for binary in fasd kubectl; do
     fi
 done
 
-for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir gcloud
+zinit ice from"gh-r" as"program"
+zinit load junegunn/fzf-bin
+
+for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir gcloud zsh-interactive-cd
 do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
@@ -66,3 +69,9 @@ if [ "$(uname | tolower)" = "darwin" ]; then
     zinit ice from"gh-r" as"program" mv"macos-interactive-rebase-tool -> git-interactive-rebase-tool" bpick"macos-interactive-rebase-tool"
     zinit load MitMaro/git-interactive-rebase-tool
 fi
+
+zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
+zinit load docker/compose
+
+zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
+zinit light trapd00r/LS_COLORS
