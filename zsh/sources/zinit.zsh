@@ -72,3 +72,18 @@ fi
 
 zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
 zinit load docker/compose
+
+
+if [[ $commands[helm] ]]; then
+    zinit ice from"gh-r" as"program" mv"helm* -> helm"
+    zinit load helm/helm
+else
+    zinit ice from"gh-r" as"program" mv"helm* -> helm"
+    zinit load helm/helm
+    helm plugin install https://github.com/databus23/helm-diff --version master
+    helm plugin install https://github.com/futuresimple/helm-secrets
+    helm plugin install https://github.com/hayorov/helm-gcs
+fi
+
+zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
+zinit load Praqma/helmsman

@@ -20,6 +20,7 @@ function setup_gcloud {
     if ! gcloud version
     then
         curl https://sdk.cloud.google.com | bash
+        gcloud components install kubectl
     else
         gcloud components update
     fi
@@ -217,7 +218,7 @@ fi
 install_fonts
 setup_gcloud
 
-for gem in colorls lolcat
+for gem in colorls lolcat hiera-eyaml
 do
     install_gem $gem
 done
