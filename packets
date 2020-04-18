@@ -246,5 +246,6 @@ chmod +x /usr/local/bin/fpp
   "$KREW" update
 )
 
-zsh -c "kubectl krew install ctx"
-zsh -c "kubectl krew install ns"
+for plugin in ctx ns cssh view-utilization view-secret; do
+    zsh -c "kubectl krew install $plugin"
+done
