@@ -2,7 +2,7 @@ for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
 done
 
-for binary in fasd kubectl doctl; do
+for binary in fasd kubectl; do
     if [[ $commands[$binary] ]]; then
         zinit snippet OMZ::plugins/$binary/$binary.plugin.zsh
     fi

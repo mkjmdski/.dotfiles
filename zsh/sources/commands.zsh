@@ -116,6 +116,10 @@ if [[ $commands[helmsman] ]]; then
     alias helmsman='GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json KUBE_CONTEXT=$(kubectl config current-context) helmsman'
 fi
 
+if [ $commands[doctl] ]; then
+  source <(doctl completion zsh)
+fi
+
 function newest {
     /bin/ls -Art $1* | tail -n 1
 }
