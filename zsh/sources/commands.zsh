@@ -42,12 +42,39 @@ if [[ $commands[docker] ]]; then
     alias dcc="docker-compose"
 fi
 
-if [[ $commands[gcloud] ]]; then
-    alias gcl="gcloud config configurations list"
-    function gca {
-        gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
-    }
-    alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
+
+if [[ -z "${CLOUDSDK_HOME}" ]]; then
+  search_locations=(
+    "$HOME/google-cloud-sdk"
+    "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
+    "/usr/share/google-cloud-sdk"
+    "/snap/google-cloud-sdk/current"
+    "/usr/lib64/google-cloud-sdk/"
+    "/opt/google-cloud-sdk"
+  )
+
+  for gcloud_sdk_location in $search_locations; do
+    if [[ -d "${gcloud_sdk_location}" ]]; then
+      CLOUDSDK_HOME="${gcloud_sdk_location}"
+      break
+    fi
+  done
+fi
+
+if (( ${+CLOUDSDK_HOME} )); then
+  if (( ! $+commands[gcloud] )); then
+    # Only source this if GCloud isn't already on the path
+    if [[ -f "${CLOUDSDK_HOME}/path.zsh.inc" ]]; then
+      source "${CLOUDSDK_HOME}/path.zsh.inc"
+    fi
+  fi
+  alias gcl="gcloud config configurations list"
+  function gca {
+      gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
+  }
+  alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
+  source "${CLOUDSDK_HOME}/completion.zsh.inc"
+  export CLOUDSDK_HOME
 fi
 
 if [[ $commands[trash] ]]; then
@@ -78,10 +105,6 @@ fi
 
 if [[ $commands[fpp] ]]; then
     alias fpp="EDITOR='code --wait' fpp"
-fi
-
-if [[ $commands[tfschema] ]]; then
-    complete -o nospace -C ~/bin/tfschema tfschema
 fi
 
 if [[ $commands[tfenv] ]]; then
@@ -116,8 +139,12 @@ if [[ $commands[helmsman] ]]; then
     alias helmsman='GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json KUBE_CONTEXT=$(kubectl config current-context) helmsman'
 fi
 
-if [ $commands[doctl] ]; then
+if [[ $commands[doctl] ]]; then
   source <(doctl completion zsh)
+fi
+
+if [[ $commands[br] ]]; then
+    alias br="br --conf $DOTFILES/broot.toml"
 fi
 
 function newest {

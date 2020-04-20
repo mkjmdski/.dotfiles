@@ -1,0 +1,5 @@
+[[verbs]]
+invocation = "edit"
+key = "F2"
+shortcut = "e"
+execution = "code {file}"
