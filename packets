@@ -110,13 +110,6 @@ function install_debian {
 
     (
         cd /tmp
-        for repo in "sharkdp/fd" "sharkdp/bat" "MitMaro/git-interactive-rebase-tool" "BurntSushi/ripgrep"
-        do
-                name="$(echo $repo | cut -d'/' -f 2)"
-                curl -L --output "$name.deb" $(github_release $repo 'deb')
-                sudo dpkg -i "$name.deb"
-                rm "$name.deb"
-        done
         for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
         do
             name="$(echo $packet | rev | cut -d'/' -f 1 | rev)"

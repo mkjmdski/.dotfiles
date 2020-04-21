@@ -65,10 +65,21 @@ if [ "$(uname | tolower)" = "linux" ]; then
     else
         source $br_program
     fi
+    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/bat"
+    zinit load sharkdp/bat
+
+    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/interactive-rebase-tool"
+    zinit load MitMaro/git-interactive-rebase-tool
+
+    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/fd"
+    zinit load sharkdp/fd
+
+    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/rg"
+    zinit load BurntSushi/ripgrep
 fi
 
 if [ "$(uname | tolower)" = "darwin" ]; then
-    zinit ice from"gh-r" as"program" mv"macos-interactive-rebase-tool -> git-interactive-rebase-tool" bpick"macos-interactive-rebase-tool"
+    zinit ice from"gh-r" as"program" mv"macos-interactive-rebase-tool -> interactive-rebase-tool" bpick"macos-interactive-rebase-tool"
     zinit load MitMaro/git-interactive-rebase-tool
 fi
 
@@ -90,7 +101,7 @@ function helm-plugins-install {
 zinit id-as=helm as='monitor|program' extract \
     dlink="https://get.helm.sh/helm-%VERSION%-$(uname | tolower)-amd64.tar.gz" \
     pick"$(uname | tolower)-amd64/helm" \
-    atinit"helm-plugins-install" \
+    atload"helm-plugins-install" \
         is-snippet for https://github.com/helm/helm/releases/
 
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
