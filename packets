@@ -1,10 +1,5 @@
 #!/bin/bash -eux
 
-
-function github_release {
-    curl -sL https://api.github.com/repos/$1/releases/latest | jq -r '.assets[].browser_download_url' | grep amd64 | grep $2 | grep -v musl | grep -v sha256
-}
-
 function install_gem {
     gem=$1
     if ! eval "$gem --version"
@@ -86,8 +81,6 @@ function install_debian {
         neovim \
         zsh \
         terminator \
-        git-crypt \
-        git-lfs \
         chrome-gnome-shell \
         trash-cli \
         libncursesw5 \
@@ -132,12 +125,6 @@ function install_debian {
             snap install "${app}"
         fi
     done
-    for app in tre; do
-        if ! snap list | grep "${app}"
-        then
-            snap install --devmode --beta "${app}"
-        fi
-    done
     for app in fasd; do
         if ! snap list | grep "${app}"
         then
@@ -152,7 +139,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh git-crypt git-lfs fd fasd python trash-cli libusb zsh ripgrep broot
+    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh fd fasd python trash-cli libusb zsh ripgrep broot
     do
         brew install $p
     done
