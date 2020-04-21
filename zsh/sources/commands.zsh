@@ -10,6 +10,7 @@ if [[ $commands[kubectl] ]]; then
     function ketf {
         ket $(kgpf) -- "${1-sh}"
     }
+    source <(kubectl completion zsh)
 fi
 
 if [[ $commands[colorls] ]]; then
