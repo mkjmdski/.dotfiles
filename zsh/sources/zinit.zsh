@@ -106,3 +106,6 @@ zinit id-as=helm as='monitor|program' extract \
 
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
+
+zinit ice form"gh-r" as"program" mv"terraformer* -> terraformer" bpick"terraformer-all-$(uname | tolower)-amd64"
+zinit load GoogleCloudPlatform/terraformer
