@@ -107,5 +107,14 @@ zinit id-as=helm as='monitor|program' extract \
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
 
-zinit ice form"gh-r" as"program" mv"terraformer* -> terraformer" bpick"terraformer-all-$(uname | tolower)-amd64"
+function terraformer-install {
+    GO111MODULE=on go mod vendor
+    go run build/main.go google
+    go run build/main.go cloudflare
+    echo 'provider "google" {}' > init.tf
+    echo 'provider "cloudflare" {}' >> init.tf
+    terraform init
+}
+
+zinit ice as"program" atclone"terraformer-install" atpull'%atclone' pick"terraformer-{google,cloudflare}"
 zinit load GoogleCloudPlatform/terraformer
