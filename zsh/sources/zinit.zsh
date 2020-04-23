@@ -118,3 +118,6 @@ function terraformer-install {
 
 zinit ice as"program" atclone"terraformer-install" atpull'%atclone' pick"terraformer-{google,cloudflare}"
 zinit load GoogleCloudPlatform/terraformer
+
+zinit ice from"gh-r" as"program" mv"jiq* -> jiq"
+zinit load fiatjaf/jiq
