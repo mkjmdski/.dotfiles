@@ -13,14 +13,6 @@ if [[ $commands[kubectl] ]]; then
     source <(kubectl completion zsh)
 fi
 
-if [[ $commands[colorls] ]]; then
-    alias ls="colorls --almost-all --git-status --group-directories-first"
-    alias l="ls -l"
-    alias ldir="l --dirs"
-    alias lf="l --files"
-    alias cls="/bin/ls"
-fi
-
 if [[ $commands[jq] ]]; then
     alias json-minify="$(which jq) -Mrc . <"
     alias jq="jq -C"
@@ -33,10 +25,6 @@ fi
 
 if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
-fi
-
-if [[ $commands[eyaml] ]]; then
-    alias eyaml="EDITOR='code --wait' eyaml"
 fi
 
 if [[ $commands[docker] ]]; then

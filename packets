@@ -1,15 +1,5 @@
 #!/bin/bash -eux
 
-function install_gem {
-    gem=$1
-    if ! eval "$gem --version"
-    then
-        gem install --user $gem
-    else
-        gem update --user $gem
-    fi
-}
-
 function setup_gcloud {
     export CLOUDSDK_CORE_DISABLE_PROMPTS=1
     if ! gcloud version
@@ -197,11 +187,6 @@ fi
 
 install_fonts
 setup_gcloud
-
-for gem in colorls lolcat hiera-eyaml
-do
-    install_gem $gem
-done
 
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L git.io/trans -o ~/bin/trans

@@ -122,3 +122,20 @@ zinit load GoogleCloudPlatform/terraformer
 
 zinit ice from"gh-r" as"program" mv"jiq* -> jiq"
 zinit load fiatjaf/jiq
+
+function gem-alias {
+    alias ls="colorls --almost-all --git-status --group-directories-first"
+    alias l="ls -l"
+    alias ldir="l --dirs"
+    alias lf="l --files"
+    alias cls="/bin/ls"
+    eyaml () {
+        local bindir="/home/mlodzikos/.zinit/plugins/zdharma---null/bin"
+        local -x GEM_HOME="/home/mlodzikos/.zinit/plugins/zdharma---null"
+        local -xU PATH="/home/mlodzikos/.zinit/plugins/zdharma---null"/bin:"$bindir":"$PATH"
+        EDITOR='code --wait' "$bindir"/"eyaml" "$@"
+    }
+}
+
+zinit ice gem'!colorls' gem'!hiera-eyaml' atload"gem-alias"
+zinit load zdharma/null
