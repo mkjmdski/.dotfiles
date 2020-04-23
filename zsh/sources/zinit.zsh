@@ -1,4 +1,5 @@
 zinit light zinit-zsh/z-a-as-monitor
+zinit light zinit-zsh/z-a-bin-gem-node
 
 for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
