@@ -57,11 +57,11 @@ if (( ${+CLOUDSDK_HOME} )); then
       source "${CLOUDSDK_HOME}/path.zsh.inc"
     fi
   fi
+  alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
   alias gcl="gcloud config configurations list"
   function gca {
       gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
   }
-  alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
   source "${CLOUDSDK_HOME}/completion.zsh.inc"
   export CLOUDSDK_HOME
 fi
