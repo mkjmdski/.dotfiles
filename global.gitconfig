@@ -105,7 +105,7 @@
 	# gitlab specific
 	push-ci-skip = push -o ci.skip
 	make-mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
-	make-mr-upstram = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
+	make-mr-upstream = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
 
 [filter "lfs"]
