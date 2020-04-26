@@ -14,6 +14,7 @@
   "editor.tabCompletion": "on",
   "editor.wordWrap": "on",
   "editor.matchBrackets": "always",
+  "editor.fontSize": 17,
   "explorer.confirmDelete": false,
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
