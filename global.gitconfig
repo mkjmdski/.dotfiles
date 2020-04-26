@@ -91,12 +91,12 @@
 	p = !git pull && git push
 	s = status
 	u = push --set-upstream origin
- 	st = stash save --include-untracked
+	st = stash save --include-untracked
 	pop = stash pop
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
- 	uncommit = back
+	uncommit = back
 	unstage = reset HEAD
 	current-branch = "rev-parse --abbrev-ref HEAD"
 	# show changed dirs

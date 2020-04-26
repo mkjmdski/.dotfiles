@@ -50,5 +50,5 @@
     "bashIde.explainshellEndpoint": "http://localhost:5000",
     "gitProjectManager.baseProjectsFolders": [
         "~/repos"
-    ],
+    ]
 }
