@@ -2,8 +2,8 @@
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
-    "workbench.iconTheme": "vscode-icons",
-    "workbench.colorTheme": "Atom One Dark",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorTheme": "Cyberpunk",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,
@@ -46,5 +46,9 @@
         "MD025": false,
         "MD026": false,
         "MD033": false
-    }
+    },
+    "bashIde.explainshellEndpoint": "http://localhost:5000",
+    "gitProjectManager.baseProjectsFolders": [
+        "~/repos"
+    ],
 }

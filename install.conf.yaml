@@ -32,8 +32,14 @@
     ~/.config/Code/User/settings.json:
       path: settings.json
       if: uname -a | grep -iq ubuntu
+    ~/.config/Code/User/keybindings.json:
+      path: keybindings.json
+      if: uname -a | grep -iq ubuntu
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode/settings.json
+      if: uname -a | grep -iq darwin
+    ~/Library/Application Support/Code/User/keybindings.json:
+      path: vscode/keybindings.json
       if: uname -a | grep -iq darwin
     ~/.icons:
       path: gnome/icons
@@ -47,6 +53,3 @@
     ~/.config/terminator/config:
       path: terminator.config
       if: terminator --version
-- shell:
-  - source ~/.zplug/init.zsh && zplug install || exit 0
-  - source ~/.zplug/init.zsh; zplug update
