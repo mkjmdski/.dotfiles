@@ -1,75 +1,76 @@
 {
-    "gitlens.advanced.messages": {
-        "suppressShowKeyBindingsNotice": true
-    },
-    "workbench.iconTheme": "material-icon-theme",
-    "workbench.colorTheme": "Dracula",
-    "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000,
-    "files.trimTrailingWhitespace": true,
-    "editor.wordWrap": "on",
-    "editor.formatOnSave": true,
-    "explorer.confirmDelete": false,
-    "editor.tabCompletion": "on",
-    "editor.cursorStyle": "block-outline",
-    "workbench.startupEditor": "newUntitledFile",
-    "window.closeWhenEmpty": true,
-    "window.restoreFullscreen": true,
-    "window.restoreWindows": "all",
-    "window.zoomLevel": 0,
-    "editor.largeFileOptimizations": false,
-    "editor.suggestSelection": "first",
-    "files.watcherExclude": {
-        "**/dump/**": true,
-        "**/img/**": true,
-        "**/var/cache/**": true
-    },
-    "terraform.indexing": {
-        "enabled": false,
-        "liveIndexing": false,
-        "delay": 500,
-        "exclude": [
-            ".terraform/**/*",
-            "**/.terraform/**/*"
-        ]
-    },
-    "terraform.languageServer": {
-        "enabled": true,
-        "args": []
-    },
-    "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.markdownlint": true
-    },
-    "markdownlint.config": {
-        "MD024": false,
-        "MD025": false,
-        "MD026": false,
-        "MD033": false
-    },
-    "bashIde.explainshellEndpoint": "http://localhost:5000",
-    "gitProjectManager.baseProjectsFolders": [
-        "~/repos"
+  "[python]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.markdownlint": true
+  },
+  "editor.cursorStyle": "block-outline",
+  "editor.formatOnSave": true,
+  "editor.largeFileOptimizations": false,
+  "editor.suggestSelection": "first",
+  "editor.tabCompletion": "on",
+  "editor.wordWrap": "on",
+  "editor.matchBrackets": "always",
+  "explorer.confirmDelete": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/dump/**": true,
+    "**/img/**": true,
+    "**/var/cache/**": true
+  },
+  "gitProjectManager.baseProjectsFolders": [
+    "~/repos"
+  ],
+  "gitlens.advanced.messages": {
+    "suppressShowKeyBindingsNotice": true
+  },
+  "markdownlint.config": {
+    "MD024": false,
+    "MD025": false,
+    "MD026": false,
+    "MD033": false
+  },
+  "python.autoComplete.addBrackets": true,
+  "python.dataScience.addGotoCodeLenses": false,
+  "python.dataScience.allowImportFromNotebook": false,
+  "python.dataScience.allowInput": false,
+  "python.dataScience.allowLiveShare": false,
+  "python.dataScience.askForLargeDataFrames": false,
+  "python.dataScience.collapseCellInputCodeByDefault": false,
+  "python.dataScience.colorizeInputBox": false,
+  "python.dataScience.debugJustMyCode": false,
+  "python.dataScience.decorateCells": false,
+  "python.dataScience.enableAutoMoveToNextCell": false,
+  "python.dataScience.enableCellCodeLens": false,
+  "python.dataScience.enableGather": false,
+  "python.dataScience.enablePlotViewer": false,
+  "python.dataScience.enabled": false,
+  "python.formatting.provider": "black",
+  "python.jediEnabled": false,
+  "terraform.codelens.enabled": true,
+  "terraform.indexing": {
+    "delay": 500,
+    "enabled": false,
+    "exclude": [
+      ".terraform/**/*",
+      "**/.terraform/**/*"
     ],
-    "[python]": {
-        "editor.tabSize": 4,
-        "editor.insertSpaces": true
-    },
-    "python.autoComplete.addBrackets": true,
-    "python.dataScience.allowImportFromNotebook": false,
-    "python.dataScience.addGotoCodeLenses": false,
-    "python.dataScience.allowLiveShare": false,
-    "python.dataScience.allowInput": false,
-    "python.dataScience.askForLargeDataFrames": false,
-    "python.dataScience.collapseCellInputCodeByDefault": false,
-    "python.dataScience.colorizeInputBox": false,
-    "python.dataScience.debugJustMyCode": false,
-    "python.dataScience.decorateCells": false,
-    "python.dataScience.enableAutoMoveToNextCell": false,
-    "python.dataScience.enableCellCodeLens": false,
-    "python.dataScience.enabled": false,
-    "python.dataScience.enableGather": false,
-    "python.dataScience.enablePlotViewer": false,
-    "python.formatting.provider": "black",
-    "python.jediEnabled": false
+    "liveIndexing": false
+  },
+  "terraform.languageServer": {
+    "args": [],
+    "enabled": true
+  },
+  "window.closeWhenEmpty": true,
+  "window.restoreFullscreen": true,
+  "window.restoreWindows": "all",
+  "window.zoomLevel": 0,
+  "workbench.colorTheme": "Dracula",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.startupEditor": "newUntitledFile"
 }
