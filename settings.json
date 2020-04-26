@@ -3,7 +3,7 @@
         "suppressShowKeyBindingsNotice": true
     },
     "workbench.iconTheme": "material-icon-theme",
-    "workbench.colorTheme": "Cyberpunk",
+    "workbench.colorTheme": "Dracula",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,

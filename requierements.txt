@@ -15,3 +15,8 @@ rebound-cli
 mycli
 {% comment %} https://github.com/k4rtik/pydf-pypi {% endcomment %}
 pydf
+{% comment %} linters {% endcomment %}
+flake8
+pep8
+jedi
+pylint

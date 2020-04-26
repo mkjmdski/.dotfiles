@@ -1,10 +1,10 @@
 aaron-bond.better-comments
+AdamCaviness.theme-monokai-dark-soda
 ahmadawais.shades-of-purple
 akamud.vscode-theme-onedark
 Atishay-Jain.All-Autocomplete
 batisteo.vscode-django
 bierner.markdown-emoji
-brandontosch.hiera-eyaml
 BriteSnow.vscode-toggle-quotes
 bungcip.better-toml
 christian-kohler.path-intellisense
@@ -12,6 +12,7 @@ CoenraadS.bracket-pair-colorizer-2
 DavidAnson.vscode-markdownlint
 donjayamanne.python-extension-pack
 DotJoshJohnson.xml
+dracula-theme.theme-dracula
 dunstontc.viml
 eamodio.gitlens
 EditorConfig.EditorConfig
@@ -25,6 +26,7 @@ formulahendry.auto-rename-tag
 foxundermoon.shell-format
 groksrc.ruby
 hangxingliu.vscode-nginx-conf-hint
+himanoa.Python-autopep8
 imperez.smarty
 jpogran.puppet-vscode
 keyring.Lua
@@ -37,6 +39,7 @@ mauve.terraform
 max-SS.Cyberpunk
 mechatroner.rainbow-csv
 mikestead.dotenv
+mohsen1.prettify-json
 ms-azuretools.vscode-docker
 ms-kubernetes-tools.vscode-kubernetes-tools
 ms-python.python
