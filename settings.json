@@ -8,6 +8,7 @@
     "files.autoSaveDelay": 1000,
     "files.trimTrailingWhitespace": true,
     "editor.wordWrap": "on",
+    "editor.formatOnSave": true,
     "explorer.confirmDelete": false,
     "editor.tabCompletion": "on",
     "editor.cursorStyle": "block-outline",
@@ -36,7 +37,6 @@
         "enabled": true,
         "args": []
     },
-    "python.jediEnabled": true,
     "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint": true
@@ -50,5 +50,26 @@
     "bashIde.explainshellEndpoint": "http://localhost:5000",
     "gitProjectManager.baseProjectsFolders": [
         "~/repos"
-    ]
+    ],
+    "[python]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "python.autoComplete.addBrackets": true,
+    "python.dataScience.allowImportFromNotebook": false,
+    "python.dataScience.addGotoCodeLenses": false,
+    "python.dataScience.allowLiveShare": false,
+    "python.dataScience.allowInput": false,
+    "python.dataScience.askForLargeDataFrames": false,
+    "python.dataScience.collapseCellInputCodeByDefault": false,
+    "python.dataScience.colorizeInputBox": false,
+    "python.dataScience.debugJustMyCode": false,
+    "python.dataScience.decorateCells": false,
+    "python.dataScience.enableAutoMoveToNextCell": false,
+    "python.dataScience.enableCellCodeLens": false,
+    "python.dataScience.enabled": false,
+    "python.dataScience.enableGather": false,
+    "python.dataScience.enablePlotViewer": false,
+    "python.formatting.provider": "black",
+    "python.jediEnabled": false
 }
