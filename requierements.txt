@@ -1,19 +1,19 @@
 git+https://github.com/jeffkaufman/icdiff.git
-{% comment %} https://github.com/nvbn/thefuck {% endcomment %}
+# https://github.com/nvbn/thefuck 
 thefuck
-{% comment %} https://github.com/nosarthur/gita {% endcomment %}
+# https://github.com/nosarthur/gita
 gita
-{% comment %} https://github.com/arc90/git-sweep {% endcomment %}
+# https://github.com/arc90/git-sweep
 git-sweep
-{% comment %} https://github.com/drbild/json2yaml {% endcomment %}
+# https://github.com/drbild/json2yaml
 json2yaml
-{% comment %} https://github.com/kislyuk/yq {% endcomment %}
+# https://github.com/kislyuk/yq
 yq
-{% comment %} https://github.com/shobrook/rebound {% endcomment %}
+# https://github.com/shobrook/rebound
 rebound-cli
-{% comment %} https://github.com/dbcli/mycli {% endcomment %}
+# https://github.com/dbcli/mycli
 mycli
-{% comment %} https://github.com/k4rtik/pydf-pypi {% endcomment %}
+# https://github.com/k4rtik/pydf-pypi
 pydf
-{% comment %} linters {% endcomment %}
+# linters
 black

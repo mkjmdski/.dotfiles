@@ -1,9 +1,5 @@
 aaron-bond.better-comments
-AdamCaviness.theme-monokai-dark-soda
-ahmadawais.shades-of-purple
-akamud.vscode-theme-onedark
 Atishay-Jain.All-Autocomplete
-batisteo.vscode-django
 bierner.markdown-emoji
 BriteSnow.vscode-toggle-quotes
 bungcip.better-toml
@@ -16,7 +12,6 @@ dracula-theme.theme-dracula
 dunstontc.viml
 eamodio.gitlens
 EditorConfig.EditorConfig
-EliverLara.mars
 eriklynd.json-tools
 felipecaputo.git-project-manager
 felixfbecker.php-debug
@@ -26,17 +21,14 @@ formulahendry.auto-rename-tag
 foxundermoon.shell-format
 groksrc.ruby
 hangxingliu.vscode-nginx-conf-hint
-himanoa.Python-autopep8
 imperez.smarty
 jpogran.puppet-vscode
 keyring.Lua
-kumar-harsh.graphql-for-vscode
 lamartire.git-indicators
 lonefy.vscode-JS-CSS-HTML-formatter
 magicstack.MagicPython
 marlon407.code-groovy
 mauve.terraform
-max-SS.Cyberpunk
 mechatroner.rainbow-csv
 mikestead.dotenv
 mohsen1.prettify-json
@@ -64,7 +56,6 @@ techer.open-in-browser
 usernamehw.errorlens
 vincaslt.highlight-matching-tag
 VisualStudioExptTeam.vscodeintellicode
-vscode-icons-team.vscode-icons
 wholroyd.HCL
 wholroyd.jinja
 wmaurer.vscode-jumpy
