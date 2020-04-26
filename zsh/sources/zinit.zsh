@@ -139,3 +139,6 @@ function gem-alias {
 
 zinit ice gem'!colorls' gem'!hiera-eyaml' atload"gem-alias"
 zinit load zdharma/null
+
+zinit ice from"gh-r" as"program" mv"shfmt* -> shfmt"
+zinit load mvdan/sh
