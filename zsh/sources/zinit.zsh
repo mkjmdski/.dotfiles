@@ -14,8 +14,7 @@ done
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd
-do
+for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd; do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
 GIT_AUTO_FETCH_INTERVAL=1800
@@ -87,7 +86,7 @@ fi
 zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
 zinit load docker/compose
 
-function helm-plugins-install {
+function helm-plugins-install() {
     if ! helm plugin list | grep -q diff; then
         helm plugin install https://github.com/databus23/helm-diff --version master
     fi
@@ -103,17 +102,17 @@ zinit id-as=helm as='monitor|program' extract \
     dlink="https://get.helm.sh/helm-%VERSION%-$(uname | tolower)-amd64.tar.gz" \
     pick"$(uname | tolower)-amd64/helm" \
     atload"helm-plugins-install" \
-        is-snippet for https://github.com/helm/helm/releases/
+    is-snippet for https://github.com/helm/helm/releases/
 
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
 
-function terraformer-install {
+function terraformer-install() {
     GO111MODULE=on go mod vendor
     go run build/main.go google
     go run build/main.go cloudflare
-    echo 'provider "google" {}' > init.tf
-    echo 'provider "cloudflare" {}' >> init.tf
+    echo 'provider "google" {}' >init.tf
+    echo 'provider "cloudflare" {}' >>init.tf
     terraform init
 }
 
@@ -123,13 +122,13 @@ zinit load GoogleCloudPlatform/terraformer
 zinit ice from"gh-r" as"program" mv"jiq* -> jiq"
 zinit load fiatjaf/jiq
 
-function gem-alias {
+function gem-alias() {
     alias ls="colorls --almost-all --git-status --group-directories-first"
     alias l="ls -l"
     alias ldir="l --dirs"
     alias lf="l --files"
     alias cls="/bin/ls"
-    eyaml () {
+    eyaml() {
         local bindir="/home/mlodzikos/.zinit/plugins/zdharma---null/bin"
         local -x GEM_HOME="/home/mlodzikos/.zinit/plugins/zdharma---null"
         local -xU PATH="/home/mlodzikos/.zinit/plugins/zdharma---null"/bin:"$bindir":"$PATH"

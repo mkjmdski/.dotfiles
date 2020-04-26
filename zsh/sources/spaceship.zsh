@@ -1,4 +1,3 @@
-
 SPACESHIP_TIME_SHOW="true"
 SPACESHIP_BATTERY_THRESHOLD="80"
 SPACESHIP_EXIT_CODE_SHOW="true"
@@ -25,7 +24,7 @@ spaceship_git_last_commit() {
 
   local 'git_last_commit_status'
   # last commit in all repository
-#   git_last_commit_status=$(git log --pretty='format:%s|%cr' "HEAD^..HEAD" 2>/dev/null | head -n 1)
+  #   git_last_commit_status=$(git log --pretty='format:%s|%cr' "HEAD^..HEAD" 2>/dev/null | head -n 1)
   # last commit in the current direcotry
   git_last_commit_status=$(git show --pretty='format:%s|%cr' $(git rev-list -1 HEAD -- .) 2>/dev/null | head -n 1)
 
@@ -57,7 +56,6 @@ SPACESHIP_GCLOUD_SUFFIX="${SPACESHIP_GCLOUD_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SU
 SPACESHIP_GCLOUD_SYMBOL="${SPACESHIP_GCLOUD_SYMBOL="☁️"}"
 SPACESHIP_GCLOUD_COLOR="${SPACESHIP_GCLOUD_COLOR="26"}"
 
-
 # ------------------------------------------------------------------------------
 # Section
 # ------------------------------------------------------------------------------
@@ -74,7 +72,7 @@ spaceship_gcloud() {
   [[ -f ~/.config/gcloud/active_config ]] || return
 
   # Reads the current config from the file
-  local GCLOUD_CONFIG=${$(head -n1 ~/.config/gcloud/active_config)}
+  local GCLOUD_CONFIG="$(head -n1 ~/.config/gcloud/active_config)"
   # Get active project
   local GCLOUD_ACTIVE_PROJECT=$(cat ~/.config/gcloud/configurations/config_$GCLOUD_CONFIG | grep project | cut -d '=' -f 2)
   [[ -z $GCLOUD_ACTIVE_PROJECT ]] && return
