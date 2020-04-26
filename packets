@@ -46,18 +46,9 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
 
 
 function install_debian {
-    gopass_apt="/etc/apt/sources.list.d/gopass.list"
-    if [ ! -f "$gopass_apt" ]
-    then
-        wget -q -O- https://api.bintray.com/orgs/gopasspw/keys/gpg/public.key | sudo apt-key add -
-        echo "deb https://dl.bintray.com/gopasspw/gopass trusty main" | sudo tee $gopass_apt
-    fi
-
     sudo apt-get update
     sudo apt-get upgrade -y
     sudo apt-get install -y \
-        most \
-        jq \
         python3 \
         python3-pip \
         python3-dev \
@@ -66,8 +57,6 @@ function install_debian {
         ruby-dev \
         rng-tools \
         gnupg \
-        gopass \
-        peco \
         neovim \
         zsh \
         terminator \
@@ -129,7 +118,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in  jq gnupg2 gopass pinentry-mac peco bat neovim zsh fd fasd python trash-cli libusb zsh ripgrep broot
+    for p in gnupg2 pinentry-mac bat neovim zsh fd fasd python trash-cli libusb zsh ripgrep broot
     do
         brew install $p
     done

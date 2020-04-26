@@ -81,17 +81,6 @@ if [[ $commands[gopass] ]]; then
     }
 fi
 
-if [[ $commands[yq] ]]; then
-    function bump-yaml-version {
-        local file="${1}"
-        local address=".${2}[\"version\"]"
-        local position="${3-3}"
-        local actual_version=$(yq -r "${address}" "${file}")
-        local new_version=$(increment_version "${actual_version}" "${position}")
-        yq --yaml-roundtrip --in-place "${address}=${new_version}" "${file}"
-    }
-fi
-
 if [[ $commands[fpp] ]]; then
     alias fpp="EDITOR='code --wait' fpp"
 fi

@@ -119,6 +119,9 @@ function terraformer-install() {
 zinit ice as"program" atclone"terraformer-install" atpull'%atclone' pick"terraformer-{google,cloudflare}"
 zinit load GoogleCloudPlatform/terraformer
 
+zinit ice from"gh-r" as"program" mv"jq* -> jq"
+zinit load stedolan/jq
+
 zinit ice from"gh-r" as"program" mv"jiq* -> jiq"
 zinit load fiatjaf/jiq
 
@@ -141,3 +144,9 @@ zinit load zdharma/null
 
 zinit ice from"gh-r" as"program" mv"shfmt* -> shfmt"
 zinit load mvdan/sh
+
+zinit ice from"gh-r" as"program" mv"peco* -> peco" pick"peco/peco"
+zinit load peco/peco
+
+zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"gopass* -> gopass" pick"gopass/gopass"
+zinit load gopasspw/gopass
