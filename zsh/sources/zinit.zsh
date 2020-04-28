@@ -150,3 +150,6 @@ zinit load peco/peco
 
 zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"gopass* -> gopass" pick"gopass/gopass"
 zinit load gopasspw/gopass
+
+zinit ice from"gh-r" as"program"
+zinit load dduan/tre
