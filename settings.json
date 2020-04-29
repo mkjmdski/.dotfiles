@@ -1,14 +1,16 @@
 {
   "[python]": {
     "editor.insertSpaces": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true
   },
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveTimeout": 10000,
   "editor.codeActionsOnSave": {
-    "source.fixAll.markdownlint": true
+    "source.fixAll": true
   },
   "editor.cursorStyle": "block-outline",
-  "editor.formatOnSave": true,
   "editor.largeFileOptimizations": false,
   "editor.suggestSelection": "first",
   "editor.tabCompletion": "on",
@@ -17,7 +19,7 @@
   "editor.fontSize": 17,
   "explorer.confirmDelete": false,
   "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 1000,
+  "files.autoSaveDelay": 2500,
   "files.trimTrailingWhitespace": true,
   "files.watcherExclude": {
     "**/dump/**": true,
@@ -76,5 +78,6 @@
   "workbench.startupEditor": "newUntitledFile",
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "diffEditor.maxComputationTime": 0
 }
