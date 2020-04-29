@@ -59,12 +59,13 @@ if (( ${+CLOUDSDK_HOME} )); then
   fi
   alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
   alias gcl="gcloud config configurations list"
-  function gca {
-      gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
-  }
   source "${CLOUDSDK_HOME}/completion.zsh.inc"
   export CLOUDSDK_HOME
 fi
+
+function gca {
+    gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
+}
 
 if [[ $commands[trash] ]]; then
     alias rm=trash
