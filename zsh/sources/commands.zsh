@@ -122,8 +122,26 @@ if [[ $commands[doctl] ]]; then
   source <(doctl completion zsh)
 fi
 
-if [[ $commands[br] ]]; then
-    alias br="br --conf $DOTFILES/broot.toml"
+if [[ $commands[broot] ]]; then
+    function br {
+        f=$(mktemp)
+        (
+            set +e
+            broot --outcmd "$f" "$@"
+            code=$?
+            if [ "$code" != 0 ]; then
+                /bin/rm -f "$f"
+                exit "$code"
+            fi
+        )
+        code=$?
+        if [ "$code" != 0 ]; then
+        return "$code"
+        fi
+        d=$(<"$f")
+        /bin/rm -f "$f"
+        eval "$d"
+    }
 fi
 
 function newest {

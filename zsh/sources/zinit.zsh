@@ -59,23 +59,9 @@ zinit load wakeful/yaml2json
 if [ "$(uname | tolower)" = "linux" ]; then
     zinit ice from"gh-r" as"program" pick"build/x86_64-linux/broot"
     zinit load Canop/broot
-    br_program="$HOME/.config/broot/launcher/bash/br"
-    if [ ! "-f" "${br_program}" ]; then
-        broot --install
-    else
-        source $br_program
-    fi
-    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/bat"
-    zinit load sharkdp/bat
 
     zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/interactive-rebase-tool"
     zinit load MitMaro/git-interactive-rebase-tool
-
-    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/fd"
-    zinit load sharkdp/fd
-
-    zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/rg"
-    zinit load BurntSushi/ripgrep
 fi
 
 if [ "$(uname | tolower)" = "darwin" ]; then
@@ -153,3 +139,12 @@ zinit load gopasspw/gopass
 
 zinit ice from"gh-r" as"program"
 zinit load dduan/tre
+
+zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"bat* -> bat" pick"bat/bat"
+zinit load sharkdp/bat
+
+zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"fd* -> fd" pick"fd/fd"
+zinit load sharkdp/fd
+
+zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
+zinit load BurntSushi/ripgrep

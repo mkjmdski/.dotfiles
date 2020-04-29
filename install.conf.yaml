@@ -17,6 +17,8 @@
   - git config --global core.excludesfile "$PWD/global.gitignore"
   - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
+    ~/.config/broot/conf.toml:
+      path: broot.toml
     ~/.config/conky:
       path: conky
     ~/.local/share/applications/show-desktop.desktop:

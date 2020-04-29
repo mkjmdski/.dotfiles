@@ -118,7 +118,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in gnupg2 pinentry-mac bat neovim zsh fd fasd python trash-cli libusb zsh ripgrep broot
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb zsh broot
     do
         brew install $p
     done
