@@ -98,7 +98,7 @@ function install_debian {
             snap install --classic "${app}"
         fi
     done
-    for app in spotify; do
+    for app in spotify doctl; do
         if ! snap list | grep "${app}"
         then
             snap install "${app}"
@@ -118,7 +118,7 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb zsh broot
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb zsh broot doctl
     do
         brew install $p
     done
