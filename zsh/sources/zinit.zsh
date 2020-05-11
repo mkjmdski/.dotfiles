@@ -14,7 +14,7 @@ done
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-for plugin in extract command-not-found git-auto-fetch gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd; do
+for plugin in extract command-not-found gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd; do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
 GIT_AUTO_FETCH_INTERVAL=1800
