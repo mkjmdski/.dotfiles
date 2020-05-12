@@ -75,7 +75,8 @@ function install_debian {
         conky-all \
         xdotool \
         libgtop-2.0-11 \
-        gir1.2-gtop-2.0
+        gir1.2-gtop-2.0 \
+        gnome-tweak-tool
 
     if ! which wally &> /dev/null; then
         install_ergodox
