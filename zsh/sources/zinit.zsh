@@ -118,21 +118,22 @@ zinit load stedolan/jq
 zinit ice from"gh-r" as"program" mv"jiq* -> jiq"
 zinit load fiatjaf/jiq
 
-function gem-alias() {
+function _ls-aliases() {
     alias ls="colorls --almost-all --git-status --group-directories-first"
     alias l="ls -l"
     alias ldir="l --dirs"
     alias lf="l --files"
     alias cls="/bin/ls"
-    eyaml() {
-        local bindir="/home/mlodzikos/.zinit/plugins/zdharma---null/bin"
-        local -x GEM_HOME="/home/mlodzikos/.zinit/plugins/zdharma---null"
-        local -xU PATH="/home/mlodzikos/.zinit/plugins/zdharma---null"/bin:"$bindir":"$PATH"
-        EDITOR='code --wait' "$bindir"/"eyaml" "$@"
-    }
 }
 
-zinit ice gem'!colorls' gem'!hiera-eyaml' atload"gem-alias"
+zinit ice gem'!colorls' atload"_ls-aliases" id-as'colorls'
+zinit load zdharma/null
+
+function _eyaml-alias() {
+    alias eyaml="EDITOR='code --wait' eyaml"
+}
+
+zinit ice gem'!hiera-eyaml' atload"ls-aliases" atload'_eyaml-alias' id-as'eyaml'
 zinit load zdharma/null
 
 zinit ice from"gh-r" as"program" mv"shfmt* -> shfmt"
