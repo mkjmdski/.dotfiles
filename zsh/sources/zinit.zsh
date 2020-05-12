@@ -90,6 +90,13 @@ zinit id-as=helm as='monitor|program' extract \
     atload"helm-plugins-install" \
     is-snippet for https://github.com/helm/helm/releases/
 
+zplugin id-as'sentinel' as'monitor|program' extract \
+    dlink0'/sentinel/%VERSION%/' \
+    dlink="/sentinel/%VERSION%/sentinel_%VERSION%_$(uname | tolower)_amd64.zip" \
+    mv"sentinel* -> sentinel" \
+    pick"sentinel/sentinel" for \
+        http://releases.hashicorp.com/sentinel/
+
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
 

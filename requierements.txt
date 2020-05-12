@@ -1,5 +1,5 @@
 git+https://github.com/jeffkaufman/icdiff.git
-# https://github.com/nvbn/thefuck 
+# https://github.com/nvbn/thefuck
 thefuck
 # https://github.com/nosarthur/gita
 gita
@@ -17,3 +17,5 @@ mycli
 pydf
 # linters
 black
+# python in shell
+pypyp

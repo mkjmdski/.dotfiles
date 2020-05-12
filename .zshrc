@@ -10,8 +10,8 @@ compinit
 zstyle ':completion:*' menu select
 
 source $sources/zinit.zsh
-source $sources/bash-completions.bash
 source $sources/commands.zsh
+source $sources/bash-completions.bash
 
 # auto change directory
 setopt auto_cd
