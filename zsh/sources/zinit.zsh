@@ -136,7 +136,7 @@ function _eyaml-alias() {
     alias eyaml="EDITOR='code --wait' hiera-eyaml"
 }
 
-zinit ice gem'!hiera-eyaml' id-as'hiera-eyaml' atload'_eyaml-alias' mv'bin/eyaml -> bin/hiera-eyaml'
+zinit ice gem'!hiera-eyaml' id-as'hiera-eyaml' atload'_eyaml-alias'
 zinit load zdharma/null
 
 zinit ice from"gh-r" as"program" mv"shfmt* -> shfmt"
