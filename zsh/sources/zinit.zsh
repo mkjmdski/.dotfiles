@@ -130,10 +130,13 @@ zinit ice gem'!colorls' atload"_ls-aliases" id-as'colorls'
 zinit load zdharma/null
 
 function _eyaml-alias() {
-    alias eyaml="EDITOR='code --wait' eyaml"
+    if [ -f '~/.zinit/plugins/hiera-eyaml/bin/eyaml' ]; then
+        mv '~/.zinit/plugins/hiera-eyaml/bin/eyaml' '~/.zinit/plugins/hiera-eyaml/bin/hiera-eyaml'
+    fi
+    alias eyaml="EDITOR='code --wait' hiera-eyaml"
 }
 
-zinit ice gem'!hiera-eyaml' atload"ls-aliases" atload'_eyaml-alias' id-as'eyaml'
+zinit ice gem'!hiera-eyaml' id-as'hiera-eyaml' atload'_eyaml-alias' mv'bin/eyaml -> bin/hiera-eyaml'
 zinit load zdharma/null
 
 zinit ice from"gh-r" as"program" mv"shfmt* -> shfmt"
