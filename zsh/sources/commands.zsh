@@ -173,3 +173,17 @@ function to-double-quote {
 
 alias git-cd='cd $(git root)'
 alias history='fc -il 1'
+
+function chpwd {
+    if [ -d ".git" ]; then
+        if [ ! -f ".git/index.lock" ]; then
+            git pull &
+        fi
+    fi
+    if [ -f "docker-compose.yaml" ] || [ -f "docker-compose.yml" ]; then
+        dcc pull
+    fi
+    if [ -d "venv" ] && [  "$VIRTUAL_ENV" != "" ]; then
+        source venv/bin/activate
+    fi
+}
