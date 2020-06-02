@@ -30,6 +30,9 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
     export PATH_LOADED="true"
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 fi
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias toupper="tr '[:lower:]' '[:upper:]'"

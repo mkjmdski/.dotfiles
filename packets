@@ -205,3 +205,5 @@ chmod +x /usr/local/bin/fpp
 for plugin in ctx ns cssh view-utilization view-secret; do
     zsh -c "kubectl krew install $plugin"
 done
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
