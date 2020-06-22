@@ -66,8 +66,10 @@
     "liveIndexing": false
   },
   "terraform.languageServer": {
-    "args": [],
-    "enabled": true
+    "external": true,
+    "args": [
+      "serve"
+    ]
   },
   "window.closeWhenEmpty": true,
   "window.restoreFullscreen": true,
@@ -79,5 +81,6 @@
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
-  "diffEditor.maxComputationTime": 0
+"diffEditor.maxComputationTime": 0,
+"python.languageServer": "Microsoft"
 }
