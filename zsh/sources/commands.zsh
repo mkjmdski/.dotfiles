@@ -183,7 +183,10 @@ function chpwd {
     if [ -f "docker-compose.yaml" ] || [ -f "docker-compose.yml" ]; then
         dcc pull &
     fi
-    if [ -d "venv" ] && [  "$VIRTUAL_ENV" != "" ]; then
+    if [ -d "venv" ] && [ -z "$VIRTUAL_ENV" ]; then
         source venv/bin/activate
+    fi
+    if [ ! -d "venv" ] && [ ! -z "$VIRTUAL_ENV" ]; then
+        deactivate
     fi
 }
