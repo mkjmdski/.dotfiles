@@ -175,7 +175,7 @@ alias git-cd='cd $(git root)'
 alias history='fc -il 1'
 
 function chpwd {
-    if [ -d ".git" ]; then
+    if [ -d ".git" ] || [ -f ".git" ]; then
         if [ ! -f ".git/index.lock" ]; then
             git pull &
         fi
