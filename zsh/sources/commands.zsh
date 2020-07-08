@@ -144,6 +144,10 @@ if [[ $commands[broot] ]]; then
     }
 fi
 
+if [[ $commands[ns1] ]]; then
+    eval "$(_NS1_COMPLETE=source ns1)"
+fi
+
 function newest {
     /bin/ls -Art $1* | tail -n 1
 }
