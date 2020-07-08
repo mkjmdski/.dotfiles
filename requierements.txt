@@ -19,3 +19,5 @@ pydf
 black
 # python in shell
 pypyp
+# https://github.com/ns1/ns1-cli
+ns1cli
