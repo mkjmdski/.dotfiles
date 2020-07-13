@@ -94,7 +94,7 @@ function install_debian {
     )
 
     # snap
-    for app in code; do
+    for app in code whatsdesk telegram-desktop caprine; do
         if ! snap list | grep "${app}"
         then
             snap install --classic "${app}"
