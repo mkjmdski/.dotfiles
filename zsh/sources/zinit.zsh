@@ -69,8 +69,8 @@ if [ "$(uname | tolower)" = "darwin" ]; then
     zinit load MitMaro/git-interactive-rebase-tool
 fi
 
-zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
-zinit load docker/compose
+# zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
+# zinit load docker/compose
 
 function helm-plugins-install() {
     if ! helm plugin list | grep -q diff; then

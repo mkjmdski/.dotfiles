@@ -21,3 +21,5 @@ black
 pypyp
 # https://github.com/ns1/ns1-cli
 ns1cli
+# https://github.com/docker/compose
+docker-compose
