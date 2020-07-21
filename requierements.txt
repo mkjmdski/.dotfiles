@@ -23,3 +23,5 @@ pypyp
 ns1cli
 # https://github.com/docker/compose
 docker-compose
+# https://github.com/seddonym/import-linter/
+import-linter
