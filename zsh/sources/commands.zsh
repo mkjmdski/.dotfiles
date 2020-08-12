@@ -194,3 +194,5 @@ function chpwd {
         deactivate
     fi
 }
+
+alias vpn='sudo openvpn "$(pwd | rev | cut -d/ -f1 | rev).conf"'
