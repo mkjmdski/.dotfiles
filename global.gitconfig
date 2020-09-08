@@ -109,7 +109,7 @@
 	make-mr-upstream = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
 	squash-branch = "!f() { git reset $(git merge-base ${2:-master} $(git current-branch)) ; git a ; git m ${1:-$(git log -1 --pretty=%B)} ; }; f"
-	rebase-main = "!f() {git checkout ${1:-master}; git pull; git checkout $(git current-branch); git rebase ${1:-master} ; }; f"
+	rebase-main = "!f() {b="$(git current-branch)"; git checkout ${1:-master}; git pull; git checkout $b; git rebase ${1:-master} ; }; f"
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
