@@ -100,7 +100,7 @@ function install_debian {
             snap install --classic "${app}"
         fi
     done
-    for app in spotify doctl; do
+    for app in spotify doctl bump; do
         if ! snap list | grep "${app}"
         then
             snap install "${app}"
