@@ -92,6 +92,7 @@
 	amp = "!f(){ git add -A && git commit -m \"$@\"; git push || git p ; }; f"
 	mp = "!f(){ git commit -m \"$@\"; git push || git p ; }; f"
 	s = status
+	annotate = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git push || git p }; f"
 	u = push --set-upstream origin
 	st = stash save --include-untracked
 	pop = stash pop
