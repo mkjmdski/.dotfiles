@@ -88,6 +88,8 @@
 [alias]
 	a = add --all
 	m = commit --message
+	amp = "!f(){ git add -A && git commit -m \"$@\" && git push ; }; f"
+	mp = "!f(){ git commit -m $@ && git push ; }; f"
 	p = !git pull && git push
 	s = status
 	u = push --set-upstream origin
