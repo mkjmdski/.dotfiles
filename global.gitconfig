@@ -102,6 +102,8 @@
 	uncommit = back
 	unstage = reset HEAD
 	current-branch = "rev-parse --abbrev-ref HEAD"
+	tag-delete = delete-tag
+	branch-delete = delete-branch
 	# show changed dirs
 	dirs = "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
