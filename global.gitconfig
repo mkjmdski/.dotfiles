@@ -86,11 +86,11 @@
 
 #### ALIASES
 [alias]
+	p = !git pull && git push
 	a = add --all
 	m = commit --message
-	amp = "!f(){ git add -A && git commit -m \"$@\" && git push ; }; f"
-	mp = "!f(){ git commit -m $@ && git push ; }; f"
-	p = !git pull && git push
+	amp = "!f(){ git add -A && git commit -m \"$@\" && git p ; }; f"
+	mp = "!f(){ git commit -m \"$@\" && git p ; }; f"
 	s = status
 	u = push --set-upstream origin
 	st = stash save --include-untracked
