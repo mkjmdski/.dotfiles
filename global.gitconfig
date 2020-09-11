@@ -125,5 +125,5 @@
 	email = mikolaj.mlodzikowski@gmail.com
 	name = Mikołaj Młodzikowski
 
-[includeIf "gitdir:~/repos/eg/"]
+[includeIf "gitdir:~/repos/eg/**"]
     path = .gitconfig-work
