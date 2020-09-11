@@ -7,9 +7,7 @@ if [[ $commands[kubectl] ]]; then
     alias ke="k exec"
     alias ket="ke -it"
     alias kgpf="kgp -o name | head -n 1"
-    function ketf {
-        ket $(kgpf) -- "${1-sh}"
-    }
+    alias ketf="ket $(kgpf) -- /bin/sh"
     source <(kubectl completion zsh)
 fi
 
