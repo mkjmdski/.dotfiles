@@ -89,10 +89,12 @@
 	p = !git pull && git push
 	a = add --all
 	m = commit --message
+	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
+	bamp = "!f(){ git a && git commit -m \"$1\" && bump \"${2:-patch}\" && git annotate-tag && git push || git p ; }; f"
 	amp = "!f(){ git add -A && git commit -m \"$@\"; git push || git p ; }; f"
 	mp = "!f(){ git commit -m \"$@\"; git push || git p ; }; f"
 	s = status
-	annotate = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git push || git p }; f"
+	annotate-tag = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git push || git p ; }; f"
 	u = push --set-upstream origin
 	st = stash save --include-untracked
 	pop = stash pop
