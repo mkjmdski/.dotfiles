@@ -214,7 +214,7 @@ function socks {
         firefox --ProfileManager
         firefox -P socks
     else
-        session=${SOCKS_SESSION_DURATION:-28800}
+        session_time=${SOCKS_SESSION_DURATION:-28800}
         echo "starting ssh session to '${1}' with duration $session_time seconds"
         ssh -D "${SOCKS_SESSION_PORT:-1337}" $1 /bin/bash -c "sleep $session_time"  </dev/null &>/dev/null & #start session for 8 hours
         session="$!"
