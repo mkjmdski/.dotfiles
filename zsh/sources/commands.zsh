@@ -202,20 +202,28 @@ alias vpn='sudo openvpn "$(pwd | rev | cut -d/ -f1 | rev).conf"'
 function socks {
     if [ "$1" = "--help" ]; then
         echo 'SETUP'
-        echo '0. run socks --init'
+        echo '0. run: socks --init'
         echo '1. script will start firefox with Profile Manager by running: firefox --ProfileManager'
         echo '2. create manually a new profile named "socks" and keep "default" profile as default, exit firefox'
         echo '3. script will start firefox with the new profile by running: firefox -P socks'
-        echo '4. configure manully socks proxy on port 1337 by running search for `proxy` word in settings tab'
+        echo '4. configure manully socks proxy on port 1337 (script default) by running search for `proxy` word in settings tab'
         echo '5. exit firefox and use socks script'
         echo '6. USAGE: socks gatewayname [domain-url.com]'
+        echo '7. SETTINGS (env variables): SOCKS_SESSION_DURATION to control session time (sleep command over ssh) and SOCKS_SESSION_PORT to change default port which is used by browser'
     elif [ "$1" = "--init" ]; then
         firefox --ProfileManager
         firefox -P socks
     else
-        ssh -D 1337 $1 /bin/bash -c "sleep ${SOCKS_SESSION_DURATION:-28800}"  </dev/null &>/dev/null & #start session for 8 hours
+        session=${SOCKS_SESSION_DURATION:-28800}
+        echo "starting ssh session to '${1}' with duration $session_time seconds"
+        ssh -D "${SOCKS_SESSION_PORT:-1337}" $1 /bin/bash -c "sleep $session_time"  </dev/null &>/dev/null & #start session for 8 hours
         session="$!"
+        wait_time=5
+        echo "waiting $wait_time seconds for ssh session to initialize (if you will see communicate: proxy server is refusing connections, just wait a little bit longer and refresh the browser)"
+        sleep $wait_time
+        echo "starting firefox"
         firefox --P socks $2
+        echo "killing ssh session "
         kill -9 $session
     fi
 }
