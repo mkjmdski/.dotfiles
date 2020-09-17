@@ -202,16 +202,20 @@ alias vpn='sudo openvpn "$(pwd | rev | cut -d/ -f1 | rev).conf"'
 function socks {
     if [ "$1" = "--help" ]; then
         echo 'SETUP'
-        echo 'start firefox with Profile Manager'
-        echo 'firefox --ProfileManager'
-        echo 'create a new profile named socks and keep default profile as default, exit firefox'
-        echo 'enter manualy new firefox profile from cli'
-        echo 'firefox -P socks'
-        echo 'configure socks proxy on port 1337 and exit firefox'
-        echo 'USAGE: socks gatewayname [domain-url.com]'
+        echo '0. run socks --init'
+        echo '1. script will start firefox with Profile Manager by running: firefox --ProfileManager'
+        echo '2. create manually a new profile named "socks" and keep "default" profile as default, exit firefox'
+        echo '3. script will start firefox with the new profile by running: firefox -P socks'
+        echo '4. configure manully socks proxy on port 1337 by running search for `proxy` word in settings tab'
+        echo '5. exit firefox and use socks script'
+        echo '6. USAGE: socks gatewayname [domain-url.com]'
+    elif [ "$1" = "--init" ]; then
+        firefox --ProfileManager
+        firefox -P socks
+    else
+        ssh -D 1337 $1 /bin/bash -c "sleep ${SOCKS_SESSION_DURATION:-28800}"  </dev/null &>/dev/null & #start session for 8 hours
+        session="$!"
+        firefox --P socks $2
+        kill -9 $session
     fi
-    ssh -D 1337 $1 /bin/bash -c "sleep ${SOCKS_SESSION_DURATION:-28800}"  </dev/null &>/dev/null & #start session for 8 hours
-    session="$!"
-    firefox --P socks $2
-    kill -9 $session
 }
