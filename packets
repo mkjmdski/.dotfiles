@@ -180,7 +180,7 @@ setup_gcloud
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L git.io/trans -o ~/bin/trans
 
-chmod -x ~/bin/*
+sudo chmod -x ~/bin/*
 
 for repo in "syndbg/goenv" "tfutils/tfenv"
 do
