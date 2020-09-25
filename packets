@@ -78,16 +78,14 @@ function install_debian {
         gir1.2-gtop-2.0 \
         gnome-tweak-tool
 
-    if ! which wally &> /dev/null; then
-        install_ergodox
-    fi
-
     (
         cd /tmp
         for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
         do
             name="$(echo $packet | rev | cut -d'/' -f 1 | rev)"
-            curl -L --output "$name.deb" "${packet}"
+            if [ ! -f "$name.deb" ]; then
+                curl -L --output "$name.deb" "${packet}"
+            fi
             sudo dpkg -i "$name.deb"
             rm "$name.deb"
         done
