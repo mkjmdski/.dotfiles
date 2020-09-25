@@ -47,8 +47,8 @@ zinit light brymck/print-alias
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
 
-zinit ice as"program" pick"git-hooks"
-zinit load icefox/git-hooks
+# zinit ice as"program" pick"git-hooks"
+# zinit load icefox/git-hooks
 
 zinit ice from"gh-r" as"program" mv"jira* -> jira"
 zinit load go-jira/jira
@@ -72,30 +72,30 @@ fi
 # zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
 # zinit load docker/compose
 
-function helm-plugins-install() {
-    if ! helm plugin list | grep -q diff; then
-        helm plugin install https://github.com/databus23/helm-diff --version master
-    fi
-    if ! helm plugin list | grep -vq diff; then
-        helm plugin install https://github.com/futuresimple/helm-secrets
-    fi
-    if ! helm plugin list | grep -q gcs; then
-        helm plugin install https://github.com/hayorov/helm-gcs
-    fi
-}
+# function helm-plugins-install() {
+#     if ! helm plugin list | grep -q diff; then
+#         helm plugin install https://github.com/databus23/helm-diff --version master
+#     fi
+#     if ! helm plugin list | grep -vq diff; then
+#         helm plugin install https://github.com/futuresimple/helm-secrets
+#     fi
+#     if ! helm plugin list | grep -q gcs; then
+#         helm plugin install https://github.com/hayorov/helm-gcs
+#     fi
+# }
 
-zinit id-as=helm as='monitor|program' extract \
-    dlink="https://get.helm.sh/helm-%VERSION%-$(uname | tolower)-amd64.tar.gz" \
-    pick"$(uname | tolower)-amd64/helm" \
-    atload"helm-plugins-install" \
-    is-snippet for https://github.com/helm/helm/releases/
+# zinit id-as=helm as='monitor|program' extract \
+#     dlink="https://get.helm.sh/helm-%VERSION%-$(uname | tolower)-amd64.tar.gz" \
+#     pick"$(uname | tolower)-amd64/helm" \
+#     atload"helm-plugins-install" \
+#     is-snippet for https://github.com/helm/helm/releases/
 
-zplugin id-as'sentinel' as'monitor|program' extract \
-    dlink0'/sentinel/%VERSION%/' \
-    dlink="/sentinel/%VERSION%/sentinel_%VERSION%_$(uname | tolower)_amd64.zip" \
-    mv"sentinel* -> sentinel" \
-    pick"sentinel/sentinel" for \
-        http://releases.hashicorp.com/sentinel/
+# zplugin id-as'sentinel' as'monitor|program' extract \
+#     dlink0'/sentinel/%VERSION%/' \
+#     dlink="/sentinel/%VERSION%/sentinel_%VERSION%_$(uname | tolower)_amd64.zip" \
+#     mv"sentinel* -> sentinel" \
+#     pick"sentinel/sentinel" for \
+#         http://releases.hashicorp.com/sentinel/
 
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
