@@ -33,6 +33,36 @@ if [ ! "$PATH_LOADED" = "true" ]; then
 
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    if [[ -z "${CLOUDSDK_HOME}" ]]; then
+        search_locations=(
+            "$HOME/google-cloud-sdk"
+            "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
+            "/usr/share/google-cloud-sdk"
+            "/snap/google-cloud-sdk/current"
+            "/usr/lib64/google-cloud-sdk/"
+            "/opt/google-cloud-sdk"
+        )
+
+        for gcloud_sdk_location in $search_locations; do
+            if [[ -d "${gcloud_sdk_location}" ]]; then
+            CLOUDSDK_HOME="${gcloud_sdk_location}"
+            break
+            fi
+        done
+        fi
+
+        if (( ${+CLOUDSDK_HOME} )); then
+        if (( ! $+commands[gcloud] )); then
+            # Only source this if GCloud isn't already on the path
+            if [[ -f "${CLOUDSDK_HOME}/path.zsh.inc" ]]; then
+            source "${CLOUDSDK_HOME}/path.zsh.inc"
+            fi
+        fi
+        alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
+        alias gcl="gcloud config configurations list"
+        source "${CLOUDSDK_HOME}/completion.zsh.inc"
+        export CLOUDSDK_HOME
+    fi
 fi
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias toupper="tr '[:lower:]' '[:upper:]'"

@@ -29,38 +29,6 @@ if [[ $commands[docker] ]]; then
     alias dcc="docker-compose"
 fi
 
-
-if [[ -z "${CLOUDSDK_HOME}" ]]; then
-  search_locations=(
-    "$HOME/google-cloud-sdk"
-    "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
-    "/usr/share/google-cloud-sdk"
-    "/snap/google-cloud-sdk/current"
-    "/usr/lib64/google-cloud-sdk/"
-    "/opt/google-cloud-sdk"
-  )
-
-  for gcloud_sdk_location in $search_locations; do
-    if [[ -d "${gcloud_sdk_location}" ]]; then
-      CLOUDSDK_HOME="${gcloud_sdk_location}"
-      break
-    fi
-  done
-fi
-
-if (( ${+CLOUDSDK_HOME} )); then
-  if (( ! $+commands[gcloud] )); then
-    # Only source this if GCloud isn't already on the path
-    if [[ -f "${CLOUDSDK_HOME}/path.zsh.inc" ]]; then
-      source "${CLOUDSDK_HOME}/path.zsh.inc"
-    fi
-  fi
-  alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
-  alias gcl="gcloud config configurations list"
-  source "${CLOUDSDK_HOME}/completion.zsh.inc"
-  export CLOUDSDK_HOME
-fi
-
 function gca {
     gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
 }
