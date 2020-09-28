@@ -11,7 +11,7 @@
 - shell:
   - command: ./packets
     stdin: true
-  - sudo chsh -s $(which zsh)
+  - chsh -s $(which zsh)
   - pip3 install --user --upgrade -r requierements.txt
   - git config --global include.path "$PWD/global.gitconfig"
   - git config --global core.excludesfile "$PWD/global.gitignore"
@@ -56,4 +56,4 @@
       path: terminator.config
       if: terminator --version
 - shell:
-  - gnome-shell-extensiol-tool --help &> /dev/ null && cd gnome/extensions && for extension in *; do gnome-shell-extension-tool -e $e; done || echo 'no gnome'
+  - for ext in $(gnome-extensions list); do gnome-extensions enable $ext; done || echo 'no gnome'
