@@ -76,8 +76,19 @@ function install_debian {
         xdotool \
         libgtop-2.0-11 \
         gir1.2-gtop-2.0 \
-        gnome-tweak-tool
-
+        gnome-tweak-tool \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg-agent \
+        software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository \
+            "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) \
+            stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce docker-ce-cli containerd.io
     (
         cd /tmp
         for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
