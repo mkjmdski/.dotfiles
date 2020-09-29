@@ -1,3 +1,35 @@
+3.30.0
+======
+* Bump version
+
+3.29.91
+=======
+* Misc. bug fixes [Florian; #90]
+
+Contributors:
+  Florian Müllner
+
+3.29.90
+=======
+* Misc. bug fixes [Florian; #786496]
+
+Contributors:
+  Florian Müllner
+
+3.29.3
+======
+* Adjust to global.screen removal [Jonas; #759538]
+
+Contributors:
+  Jonas Ådahl, Florian Müllner
+
+3.29.2
+======
+* Misc. bug fixes [Florian; #69]
+
+Contributors:
+  Florian Müllner
+
 3.28.1
 ======
 * Misc. bug fixes [Xiaoguang, Florian; #59, #62]

@@ -1221,10 +1221,11 @@ TopBar.prototype = {
 
         this._stlabel =  new St.Label({style_class: 'grid-title', text: this._title});
 
-        this._closebutton = new GTileStatusButton('close-button');
-        this._closebutton.container.add_style_class_name('close-button-container');
+        this._closebutton = new St.Button({style_class: 'close-button'})
+        this._closebutton.add_style_class_name('close-button-container');
+        this._connect_id = this._closebutton.connect('button-press-event', Lang.bind(this, this._onButtonPress));
 
-        this.actor.add_actor(this._closebutton.container);
+        this.actor.add_actor(this._closebutton);
         this.actor.add_actor(this._stlabel);
 
     },
@@ -1239,6 +1240,16 @@ TopBar.prototype = {
         log("title: "+this._title);
         this._stlabel.text = this._title;
 
+    },
+
+    _onButtonPress() {
+      log("Close button");
+      toggleTiling();
+    },
+
+    destroy() {
+      this._closebutton.disconnect(this._connect_id);
+      super.destroy();
     },
 };
 
@@ -1743,13 +1754,14 @@ Grid.prototype = {
         this.elementsDelegate.reset();
         let time = (gridSettings[SETTINGS_ANIMATION]) ? 0.3 : 0 ;
 
-	Main.uiGroup.set_child_above_sibling(this.actor, null);
+        Main.uiGroup.set_child_above_sibling(this.actor, null);
+
         Main.layoutManager.removeChrome(this.actor);
         Main.layoutManager.addChrome(this.actor);
         //this.actor.y = 0 ;
-        this.actor.scale_y= 0;
-        this.actor.scale_x= 0;
         if (time > 0 ) {
+            this.actor.scale_y= 0;
+            this.actor.scale_x= 0;
             Tweener.addTween(this.actor, {
                 time: this.animation_time,
                 opacity: 255,
@@ -1761,9 +1773,10 @@ Grid.prototype = {
             });
         }
         else {
+            this.actor.scale_x = this.normalScaleX;
+            this.actor.scale_y = this.normalScaleY;
             this.actor.opacity = 255;
             this.actor.visible = true;
-            this.actor.scale_y = this.normalScaleY;
         }
 
         this.interceptHide = false;
@@ -1772,8 +1785,9 @@ Grid.prototype = {
     hide: function(immediate) {
       log("hide " + immediate);
         this.elementsDelegate.reset();
+        let time = (gridSettings[SETTINGS_ANIMATION]) ? 0.3 : 0 ;
         //log("hide " + time);
-        if (!immediate && this.animation_time > 0) {
+        if (!immediate && time > 0) {
             Tweener.addTween(this.actor, {
                 time: this.animation_time,
                 opacity: 0,
@@ -1794,13 +1808,9 @@ Grid.prototype = {
     },
 
     _onHideComplete: function() {
-        if(!this.interceptHide && this) {
-            Main.layoutManager.removeChrome(this);
-        }
     },
 
     _onShowComplete: function() {
-
     },
 
     _onResize: function(actor, event) {

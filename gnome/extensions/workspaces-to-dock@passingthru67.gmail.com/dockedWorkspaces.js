@@ -12,27 +12,24 @@
 
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Clutter = imports.gi.Clutter;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const St = imports.gi.St;
-const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
-const IconTheme = imports.gi.Gtk.IconTheme;
 const Params = imports.misc.params;
 
 const Main = imports.ui.main;
 const WorkspacesView = imports.ui.workspacesView;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
-const Tweener = imports.ui.tweener;
 const WorkspaceSwitcherPopup = imports.ui.workspaceSwitcherPopup;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const Layout = imports.ui.layout;
-const MessageTray = imports.ui.messageTray;
+const AppDisplay = imports.ui.appDisplay;
 
-const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Config = imports.misc.config;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -40,7 +37,7 @@ const Extension = Me.imports.extension;
 const Convenience = Me.imports.convenience;
 const MyWorkspaceThumbnail = Me.imports.myWorkspaceThumbnail;
 const ShortcutsPanel = Me.imports.shortcutsPanel;
-const MyWorkspaceSwitcherPopup = Me.imports.myWorkspaceSwitcherPopup;
+const MyWorkspaceSwitcher = Me.imports.myWorkspaceSwitcher;
 const MyPressureBarrier = Me.imports.myPressureBarrier;
 
 const DashToDock_UUID = "dash-to-dock@micxgx.gmail.com";
@@ -103,60 +100,46 @@ function getDockStateDesc(state) {
     return desc;
 }
 
-var ThumbnailsSlider = new Lang.Class({
-    Name: 'workspacestodockThumbnailsSlider',
-
-    _init: function(params) {
-        this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
-        let initialTriggerWidth = 1;
-
-        // Default local params
-        let localDefaults = {
-            side: St.Side.LEFT,
-            initialSlideValue: 1,
-            initialSlideoutSize: initialTriggerWidth
-        }
-
-        let localParams = Params.parse(params, localDefaults, true);
-
-        if (params){
-            // Remove local params before passing the params to the parent
-            // constructor to avoid errors.
-            let prop;
-            for (prop in localDefaults) {
-                if ((prop in params))
-                    delete params[prop];
-            }
-        }
-
-        this.actor = new Shell.GenericContainer(params);
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
-
-        this.actor._delegate = this;
-
-        this._child = null;
-
+var MyThumbnailsSlider = GObject.registerClass({
+    Properties: {
+        'side': GObject.ParamSpec.enum(
+            'side', 'side', 'side',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            St.Side, St.Side.RIGHT),
+        'slidex': GObject.ParamSpec.double(
+            'slidex', 'slidex', 'slidex',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT,
+            0, 1, 1),
+        'slideout-size': GObject.ParamSpec.double(
+            'slideout-size', 'slideout-size', 'slideout-size',
+            GObject.ParamFlags.READWRITE,
+            0, Infinity, 1),
+        'partial-slideout-size': GObject.ParamSpec.double(
+            'partial-slideout-size', 'partial-slideout-size', 'partial-slideout-size',
+            GObject.ParamFlags.READWRITE,
+            0, Infinity, DOCK_EDGE_VISIBLE_OVERVIEW_WIDTH + 1)
+    }
+}, class WorkspacesToDock_MyThumbnailsSlider extends St.Bin {
+    _init(params = {}) {
         // slide parameter: 1 = visible, 0 = hidden.
-        this._slidex = localParams.initialSlideValue;
-        this._side = localParams.side;
-        this._slideoutSize = localParams.initialSlideoutSize; // minimum size when slid out
-        this._partialSlideoutSize = initialTriggerWidth + DOCK_EDGE_VISIBLE_OVERVIEW_WIDTH;
-    },
+        this._side = params.side;
+        this._slidex = params.slidex;
+        this._slideoutSize = 1;
+        this._partialSlideoutSize = DOCK_EDGE_VISIBLE_OVERVIEW_WIDTH + 1;
 
-    destroy: function() {
+        super._init(params);
+    }
 
-    },
+    vfunc_allocate(box, flags) {
+        this.set_allocation(box, flags);
 
-    _allocate: function(actor, box, flags) {
-        if (this._child == null)
+        if (this.child == null)
             return;
 
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
         let [minChildWidth, minChildHeight, natChildWidth, natChildHeight] =
-            this._child.get_preferred_size();
+            this.child.get_preferred_size();
 
         let childWidth = natChildWidth;
         let childHeight = natChildHeight;
@@ -170,95 +153,88 @@ var ThumbnailsSlider = new Lang.Class({
             childBox.x2 = slideoutSize + this._slidex * (childWidth - slideoutSize);
             childBox.y1 = 0;
             childBox.y2 = childBox.y1 + childHeight;
-        } else if (this._side ==  St.Side.RIGHT
-                 || this._side ==  St.Side.BOTTOM) {
+        } else if ((this._side == St.Side.RIGHT) || (this._side == St.Side.BOTTOM)) {
             childBox.x1 = 0;
             childBox.x2 = childWidth;
             childBox.y1 = 0;
             childBox.y2 = childBox.y1 + childHeight;
-        } else if (this._side ==  St.Side.TOP) {
+        } else if (this._side == St.Side.TOP) {
             childBox.x1 = 0;
             childBox.x2 = childWidth;
             childBox.y1 = (this._slidex -1) * (childHeight - slideoutSize);
             childBox.y2 = slideoutSize + this._slidex * (childHeight - slideoutSize);
         }
 
-        this._child.allocate(childBox, flags);
-        this._child.set_clip(-childBox.x1, -childBox.y1,
-                             -childBox.x1+availWidth,-childBox.y1 + availHeight);
-    },
+        this.child.allocate(childBox, flags);
+        this.child.set_clip(-childBox.x1, -childBox.y1,
+                            -childBox.x1+availWidth, -childBox.y1 + availHeight);
+    }
 
     // Just the child width but taking into account the slided out part
-    _getPreferredWidth: function(actor, forHeight, alloc) {
+    vfunc_get_preferred_width(forHeight) {
         let slideoutSize = this._slideoutSize;
-        let [minWidth, natWidth ] = this._child.get_preferred_width(forHeight);
-        if (this._side ==  St.Side.LEFT
-          || this._side == St.Side.RIGHT) {
-            minWidth = (minWidth - slideoutSize)*this._slidex + slideoutSize;
-            natWidth = (natWidth - slideoutSize)*this._slidex + slideoutSize;
+        let [minWidth, natWidth] = this.child.get_preferred_width(forHeight);
+        if (this._side == St.Side.LEFT || this._side == St.Side.RIGHT) {
+            minWidth = (minWidth) * this._slidex + slideoutSize;
+            natWidth = (natWidth) * this._slidex + slideoutSize;
         }
 
-        alloc.min_size = minWidth;
-        alloc.natural_size = natWidth;
-    },
+        return [minWidth, natWidth];
+    }
 
     // Just the child height but taking into account the slided out part
-    _getPreferredHeight: function(actor, forWidth, alloc) {
+    vfunc_get_preferred_height(forWidth) {
         let slideoutSize = this._slideoutSize;
-        let [minHeight, natHeight] = this._child.get_preferred_height(forWidth);
-        if (this._side ==  St.Side.TOP
-          || this._side ==  St.Side.BOTTOM) {
-            minHeight = (minHeight - slideoutSize)*this._slidex + slideoutSize;
-            natHeight = (natHeight - slideoutSize)*this._slidex + slideoutSize;
+        let [minHeight, natHeight] = this.child.get_preferred_height(forWidth);
+        if (this._side == St.Side.TOP || this._side == St.Side.BOTTOM) {
+            minHeight = (minHeight) * this._slidex + slideoutSize;
+            natHeight = (natHeight) * this._slidex + slideoutSize;
         }
 
-        alloc.min_size = minHeight;
-        alloc.natural_size = natHeight;
-    },
-
-    // I was expecting it to be a virtual function... stil I don't understand
-    // how things work.
-    add_child: function(actor) {
-
-        // I'm supposed to have only one child
-        if(this._child !== null) {
-            this.actor.remove_child(actor);
-        }
-
-        this._child = actor;
-        this.actor.add_child(actor);
-    },
+        return [minHeight, natHeight];
+    }
 
     set slidex(value) {
+        if (this._slidex == value)
+            return;
+
         this._slidex = value;
-        this._child.queue_relayout();
-    },
+        this.notify('slidex');
+
+        this.queue_relayout();
+    }
 
     get slidex() {
         return this._slidex;
-    },
+    }
 
     set slideoutSize(value) {
+        if (this._slideoutSize == value)
+            return;
+
         this._slideoutSize = value;
-    },
+        this.notify('slideout-size');
+    }
 
     get slideoutSize() {
         return this._slideoutSize;
-    },
+    }
 
     set partialSlideoutSize(value) {
+        if (this._partialSlideoutSize == value)
+            return;
+
         this._partialSlideoutSize = value;
-    },
+        this.notify('partial-slideout-size');
+    }
 
     get partialSlideoutSize() {
         return this._partialSlideoutSize;
     }
 });
 
-var DockedWorkspaces = new Lang.Class({
-    Name: 'workspacestodockDockedWorkspaces',
-
-    _init: function() {
+var DockedWorkspaces = class WorkspacesToDock_DockedWorkspaces {
+    constructor() {
         this._gsCurrentVersion = Config.PACKAGE_VERSION.split('.');
         this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
         this._signalHandler = new Convenience.globalSignalHandler();
@@ -310,17 +286,18 @@ var DockedWorkspaces = new Lang.Class({
         this._monitor = Main.layoutManager.primaryMonitor;
 
         // Create a new thumbnailsbox object
-        this._thumbnailsBox = new MyWorkspaceThumbnail.myThumbnailsBox(this);
+        this._workspaceAdjustment = Main.overview._overview._controls._workspaceAdjustment;
+        this._thumbnailsBox = new MyWorkspaceThumbnail.MyThumbnailsBox(this._workspaceAdjustment, this);
 
         // Create a shortcuts panel object
         this._shortcutsPanel = new ShortcutsPanel.ShortcutsPanel(this);
-        this._shortcutsPanel.connect("update-favorite-apps", Lang.bind(this, this._onShortcutsPanelUpdated));
-        this._shortcutsPanel.connect("update-running-apps", Lang.bind(this, this._onShortcutsPanelUpdated));
+        this._shortcutsPanel.connect("update-favorite-apps", this._onShortcutsPanelUpdated.bind(this));
+        this._shortcutsPanel.connect("update-running-apps", this._onShortcutsPanelUpdated.bind(this));
 
-        // Create custom workspace switcher popup
+        // Create custom workspace switcher
         this._workspaceSwitcher = null;
         if (this._isHorizontal && this._settings.get_boolean('horizontal-workspace-switching'))
-            this._workspaceSwitcher = new MyWorkspaceSwitcherPopup.WorkspaceSwitcher();
+            this._workspaceSwitcher = new MyWorkspaceSwitcher.WorkspaceSwitcher();
 
         // Create position styles for dock container
         let positionStyleClass = ['top', 'right', 'bottom', 'left'];
@@ -371,10 +348,10 @@ var DockedWorkspaces = new Lang.Class({
         let packStart;
         let packVertical = this._isHorizontal? true : false;
         if (this._position == St.Side.TOP || this._position == St.Side.LEFT) {
-            align = St.Align.START;
+            align = Clutter.ActorAlign.START;
             packStart = true;
         } else {
-            align = St.Align.END;
+            align = Clutter.ActorAlign.END;
             packStart = false;
         }
 
@@ -392,7 +369,7 @@ var DockedWorkspaces = new Lang.Class({
             name: 'workspacestodockDockContainer',
             reactive: false,
             track_hover: false,
-            vertical: !packVertical
+            vertical: packVertical
         });
 
         // Create the panels and container
@@ -401,7 +378,9 @@ var DockedWorkspaces = new Lang.Class({
             reactive: false,
             track_hover: false,
             vertical: packVertical,
-            pack_start: !packStart
+            pack_start: !packStart,
+            x_align: (this._centerContainer) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START,
+            y_align: (this._centerContainer) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START
         });
 
         this._panelsContainer = new St.BoxLayout({
@@ -409,14 +388,13 @@ var DockedWorkspaces = new Lang.Class({
             reactive: false,
             track_hover: false,
             vertical: packVertical,
-            pack_start: packStart
+            pack_start: packStart,
+            x_align: (this._centerContainer) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START,
+            y_align: (this._centerContainer) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START
         });
 
-        // To center the panels on the extended dock, we expand the panels box to fit the
-        // dock container and align it in the middle
-        let expandContainer = this._centerContainer ? true : false;
         this._panels.add_actor(this._panelsContainer);
-        this._dockContainer.add(this._panels,{x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, expand: expandContainer});
+        this._dockContainer.add_actor(this._panels);
 
         // Initialize keyboard toggle timeout
         this._toggleWithKeyboardTimeoutId = 0;
@@ -424,99 +402,110 @@ var DockedWorkspaces = new Lang.Class({
         // Connect the _dock hover, scroll and button release events
         this._checkHoverStatusId = 0;
         this._scrollWorkspaceSwitchDeadTimeId = 0;
-        this._dock.connect("notify::hover", Lang.bind(this, this._hoverChanged));
-        this._dock.connect("scroll-event", Lang.bind(this, this._onScrollEvent));
-        this._dock.connect("button-release-event", Lang.bind(this, this._onDockClicked));
+        this._dock.connect("notify::hover", this._hoverChanged.bind(this));
+        this._dock.connect("scroll-event", this._onScrollEvent.bind(this));
+        this._dock.connect("button-release-event", this._onDockClicked.bind(this));
 
         // Add workspaces, and shortcuts panel to dock container based on dock position
         // and shortcuts panel orientation
         if (shortcutsPanelOrientation == 1) {
-            if (this._centerContainer && this._centerPanelsIndependently) {
-                this._panelsContainer.add(this._shortcutsPanel.actor,{x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE});
-                this._panelsContainer.add(this._thumbnailsBox.actor,{x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE});
-            } else {
-                this._panelsContainer.add_actor(this._shortcutsPanel.actor);
-                this._panelsContainer.add_actor(this._thumbnailsBox.actor);
-            }
+            this._panelsContainer.add_actor(this._shortcutsPanel.actor);
+            this._panelsContainer.add_actor(this._thumbnailsBox);
         } else {
-            if (this._centerContainer && this._centerPanelsIndependently) {
-                this._panelsContainer.add(this._thumbnailsBox.actor,{x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE});
-                this._panelsContainer.add(this._shortcutsPanel.actor,{x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE});
-            } else {
-                this._panelsContainer.add_actor(this._thumbnailsBox.actor);
-                this._panelsContainer.add_actor(this._shortcutsPanel.actor);
-            }
+            this._panelsContainer.add_actor(this._thumbnailsBox);
+            this._panelsContainer.add_actor(this._shortcutsPanel.actor);
         }
 
         // Create the sliding actor whose allocation is to be tracked for input regions
-        let slideoutSize = this._settings.get_boolean('dock-edge-visible') ? this._triggerWidth + DOCK_EDGE_VISIBLE_WIDTH : this._triggerWidth;
-        this._slider = new ThumbnailsSlider({side: this._position, initialSlideoutSize: slideoutSize});
+        //let slideoutSize = this._settings.get_boolean('dock-edge-visible') ? this._triggerWidth + DOCK_EDGE_VISIBLE_WIDTH : this._triggerWidth;
+        //this._slider = new MyThumbnailsSlider({side: this._position, slideout-size: slideoutSize});
+
+        // Slider alignment
+        let xAlign, yAlign;
+        if (this._isHorizontal) {
+            xAlign = Clutter.ActorAlign.CENTER;
+            if (this._position == St.Side.TOP) {
+                yAlign = Clutter.ActorAlign.START;
+            } else {
+                yAlign = Clutter.ActorAlign.END;
+            }
+        } else {
+            if (this._position == St.Side.LEFT) {
+                xAlign = Clutter.ActorAlign.START;
+            } else {
+                xAlign = Clutter.ActorAlign.END;
+            }
+            yAlign = Clutter.ActorAlign.CENTER;
+        }
+        this._slider = new MyThumbnailsSlider({
+            side: this._position,
+            x_align: xAlign,
+            y_align: yAlign,
+        });
+
 
         // Create the dock main actor
-        this.actor = new St.Bin({ name: 'workspacestodockMainActor',
+        this.actor = new St.Bin({
+            name: 'workspacestodockMainActor',
             reactive: false,
             x_align: align,
             y_align: align
         });
         this.actor._delegate = this;
-        this._realizeId = this.actor.connect("realize", Lang.bind(this, this._initialize));
+        this._showId = this.actor.connect('show', this._initialize.bind(this));
 
         // Add the dock to slider and then to the main container actor
         this._dock.add_actor(this._dockContainer);
-        this._slider.add_child(this._dock);
-        this.actor.set_child(this._slider.actor);
+        this._slider.set_child(this._dock);
+        this.actor.set_child(this._slider);
 
         // Connect global signals
+        let workspaceManager = global.workspace_manager;
         this._signalHandler.push(
             [
-                this._thumbnailsBox.actor,
+                this._thumbnailsBox,
                 'notify::width',
-                Lang.bind(this, this._thumbnailsBoxResized)
+                this._thumbnailsBoxResized.bind(this)
             ],
             [
-                this._thumbnailsBox.actor,
+                this._thumbnailsBox,
                 'notify::height',
-                Lang.bind(this, this._thumbnailsBoxResized)
+                this._thumbnailsBoxResized.bind(this)
             ],
             [
                 Main.layoutManager,
                 'monitors-changed',
-                Lang.bind(this, this._onMonitorsChanged)
+                this._onMonitorsChanged.bind(this)
             ],
             [
                 St.ThemeContext.get_for_stage(global.stage),
                 'changed',
-                Lang.bind(this, this._onThemeChanged)
+                this._onThemeChanged.bind(this)
             ],
             [
-                IconTheme.get_default(),
-                'changed',
-                Lang.bind(this, this._onIconsChanged)
-            ],
-            [
-                ExtensionSystem._signals,
+                Main.extensionManager,
                 'extension-state-changed',
-                Lang.bind(this, this._onExtensionSystemStateChanged)
+                this._onExtensionSystemStateChanged.bind(this)
             ],
             [
                 Main.overview.viewSelector,
                 'notify::y',
-                Lang.bind(this, this._updateYPosition)
+                this._updateYPosition.bind(this)
             ],
             [
-                global.screen,
+                global.display,
                 'in-fullscreen-changed',
-                Lang.bind(this, this._updateBarrier)
+                this._updateBarrier.bind(this)
             ],
             [
-                global.screen,
+                workspaceManager,
                 'workspace-added',
-                Lang.bind(this, this._onWorkspaceAdded)
+                this._onWorkspaceAdded.bind(this)
             ],
             [
-                global.screen,
+                workspaceManager,
                 'workspace-removed',
-                Lang.bind(this, this._onWorkspaceRemoved)
+                this._onWorkspaceRemoved.bind(this)
             ]
         );
 
@@ -526,9 +515,9 @@ var DockedWorkspaces = new Lang.Class({
 
         // Connect DashToDock hover signal if the extension is already loaded and enabled
         this._hoveringDash = false;
-        DashToDockExtension = ExtensionUtils.extensions[DashToDock_UUID];
+        DashToDockExtension = Main.extensionManager.lookup(DashToDock_UUID);
         if (DashToDockExtension) {
-            if (DashToDockExtension.state == ExtensionSystem.ExtensionState.ENABLED) {
+            if (DashToDockExtension.state == ExtensionUtils.ExtensionState.ENABLED) {
                 DashToDock = DashToDockExtension.imports.extension;
                 if (DashToDock) {
                     DashToDockExtension.hasDockPositionKey = false;
@@ -559,7 +548,7 @@ var DockedWorkspaces = new Lang.Class({
         // the allocation change of the parent container (slide in and slideout) doesn't trigger
         // anymore an update of the input regions. Force the update manually.
         this.actor.connect('notify::allocation',
-                                              Lang.bind(Main.layoutManager, Main.layoutManager._queueUpdateRegions));
+                                              Main.layoutManager._queueUpdateRegions.bind(Main.layoutManager));
 
         // Create struts actor for tracking workspace region of fixed dock or partially fixed dock
         this._struts = new St.Bin({ reactive: false });
@@ -579,20 +568,20 @@ var DockedWorkspaces = new Lang.Class({
         Main.layoutManager.uiGroup.set_child_below_sibling(this.actor, Main.layoutManager.modalDialogGroup);
         if (this._settings.get_boolean('dock-fixed')
             || (this._settings.get_boolean('intellihide') && this._settings.get_enum('intellihide-action') == IntellihideAction.SHOW_PARTIAL_FIXED)) {
-                Main.layoutManager._trackActor(this._slider.actor, {trackFullscreen: true});
+                Main.layoutManager._trackActor(this._slider, {trackFullscreen: true});
         } else {
             if (this._settings.get_boolean('autohide-in-fullscreen')) {
-                Main.layoutManager._trackActor(this._slider.actor);
+                Main.layoutManager._trackActor(this._slider);
             } else {
-                Main.layoutManager._trackActor(this._slider.actor, {trackFullscreen: true});
+                Main.layoutManager._trackActor(this._slider, {trackFullscreen: true});
             }
         }
-    },
+    }
 
-    _initialize: function() {
-        if(this._realizeId > 0){
-            this.actor.disconnect(this._realizeId);
-            this._realizeId = 0;
+    _initialize() {
+        if(this._showId > 0){
+            this.actor.disconnect(this._showId);
+            this._showId = 0;
         }
 
         // Show the thumbnailsBox.  We need it to calculate the width of the dock.
@@ -621,25 +610,24 @@ var DockedWorkspaces = new Lang.Class({
 
         // NOTE: GS3.14+ thumbnailsBox width signal triggers ealier so now we need this.
         this._redisplay();
-    },
+    }
 
-    destroy: function() {
-        // Destroy thumbnailsBox & global signals
-        this._thumbnailsBox._destroyThumbnails();
+    destroy() {
+        // Disconnect global signals first to prevent calls to functions during
+        // the destroy process
+        this._signalHandler.disconnect();
+
+        // Restore normal Gnome Shell functions
+        this._restoreGnomeShellFunctions();
 
         this._shortcutsPanel.destroy();
 
         if (this._workspaceSwitcher)
             this._workspaceSwitcher.destroy();
 
-        // Disconnect global signals
-        this._signalHandler.disconnect();
-
-        // Disconnect GSettings signals
-        this._settings.run_dispose();
-
         // Unbind keyboard shortcuts
-        this._unbindDockKeyboardShortcut();
+        if (this._settings.get_boolean('toggle-dock-with-keyboard-shortcut'))
+            this._unbindDockKeyboardShortcut();
 
         // Remove existing barrier
         this._removeBarrier();
@@ -647,6 +635,9 @@ var DockedWorkspaces = new Lang.Class({
             this._pressureBarrier.destroy();
             this._pressureBarrier = null;
         }
+
+        // Destroy thumbnailsBox
+        this._thumbnailsBox.destroy();
 
         this._slider.destroy();
 
@@ -658,33 +649,37 @@ var DockedWorkspaces = new Lang.Class({
         // When you destroy a container, its children will be destroyed as well.
         this.actor.destroy();
 
-        // Restore normal Gnome Shell functions
-        this._restoreGnomeShellFunctions();
-    },
+        // Disconnect GSettings signals
+        // We wait until after _restoreGnomeShellFunctions because we needed
+        // settings to determine how to restore the dash
+        this._settings.run_dispose();
+        this._settings = null;
+    }
 
     // function called during init to override gnome shell 3.4/3.6/3.8
-    _overrideGnomeShellFunctions: function() {
+    _overrideGnomeShellFunctions() {
         let self = this;
 
         // Hide normal Dash
         if (this._settings.get_boolean('hide-dash')) {
             // Hide normal dash
-            Main.overview._controls.dash.actor.hide();
-            Main.overview._controls.dash.actor.set_width(1);
+            Main.overview.dash.hide();
+            Main.overview.dash.set_width(1);
         }
 
         // Change source of swarm animation to shortcuts panel apps button
-        GSFunctions['Overview_getShowAppsButton'] = Overview.Overview.prototype.getShowAppsButton;
-        Overview.Overview.prototype.getShowAppsButton = function() {
-            if (self._settings.get_boolean('show-shortcuts-panel') && self._settings.get_boolean('shortcuts-panel-appsbutton-animation')) {
-                return self._shortcutsPanel._appsButton.actor;
-            } else {
-                return this._dash.showAppsButton;
-            }
-        };
+        if (self._settings.get_boolean('show-shortcuts-panel') && self._settings.get_boolean('shortcuts-panel-appsbutton-animation')) {
+            GSFunctions['BaseAppView_doSpringAnimation'] = AppDisplay.BaseAppView.prototype._doSpringAnimation;
+            AppDisplay.BaseAppView.prototype._doSpringAnimation = function(animationDirection){
+                this._grid.opacity = 255;
+                this._grid.animateSpring(
+                    animationDirection,
+                    self._shortcutsPanel._appsButton);
+            };
+        }
 
         // Hide normal workspaces thumbnailsBox
-        Main.overview._controls._thumbnailsSlider.actor.opacity = 0;
+        Main.overview._overview._controls._thumbnailsSlider.opacity = 0;
 
         // Override WorkspaceSwitcherPopup _show function to prevent popup from showing when disabled
         GSFunctions['WorkspaceSwitcherPopup_show'] = WorkspaceSwitcherPopup.WorkspaceSwitcherPopup.prototype._show;
@@ -709,7 +704,8 @@ var DockedWorkspaces = new Lang.Class({
             // SANITY CHECK:
             if (self._refreshThumbnailsOnRegionUpdate) {
                 self._refreshThumbnailsOnRegionUpdate = false;
-                self._refreshThumbnails();
+                if (this._settings)
+                    self._refreshThumbnails();
             } else {
                 if (self._workAreaWidth) {
                     let widthTolerance = workArea.width * .01;
@@ -724,7 +720,6 @@ var DockedWorkspaces = new Lang.Class({
                 }
             }
             return ret;
-
         };
 
         // Override geometry calculations of activities overview to use workspaces-to-dock instead of the default thumbnailsbox.
@@ -735,12 +730,12 @@ var DockedWorkspaces = new Lang.Class({
             if (!this._workspacesViews.length)
                 return;
 
-            let [x, y] = this.actor.get_transformed_position();
-            let allocation = this.actor.allocation;
+            let [x, y] = this.get_transformed_position();
+            let allocation = this.allocation;
             let width = allocation.x2 - allocation.x1;
             let height = allocation.y2 - allocation.y1;
 
-            let spacing = Main.overview._controls.actor.get_theme_node().get_length('spacing');
+            let spacing = Main.overview._overview._controls.get_theme_node().get_length('spacing');
             let monitors = Main.layoutManager.monitors;
 
             // Get Dash monitor index
@@ -764,6 +759,7 @@ var DockedWorkspaces = new Lang.Class({
 
             // Iterate through monitors
             for (let i = 0; i < monitors.length; i++) {
+
                 let geometry = { x: monitors[i].x, y: monitors[i].y, width: monitors[i].width, height: monitors[i].height };
 
                 // Adjust index to point to correct dock
@@ -814,7 +810,7 @@ var DockedWorkspaces = new Lang.Class({
                 } else {
                     if (!self._settings.get_boolean('hide-dash') &&
                         i == this._primaryIndex) {
-                        dashWidth = Main.overview._controls._dashSlider.getVisibleWidth() + spacing;
+                        dashWidth = Main.overview._overview._controls._dashSlider.getVisibleWidth() + spacing;
                     }
                 }
 
@@ -903,7 +899,7 @@ var DockedWorkspaces = new Lang.Class({
                         }
                     }
                 } else {
-                    if (this.actor.get_text_direction() == Clutter.TextDirection.LTR) {
+                    if (this.get_text_direction() == Clutter.TextDirection.LTR) {
                         if (monitorHasThumbnailsDock && self._position == St.Side.LEFT) {
                             controlsWidth = Math.max(dashWidth, thumbnailsWidth);
                             geometry.x += controlsWidth;
@@ -923,8 +919,10 @@ var DockedWorkspaces = new Lang.Class({
                 // Adjust y and height for workspacesView geometry for primary monitor (top panel, etc.)
                 if (i == this._primaryIndex) {
                     geometry.y = y;
-                    geometry.height = height;
+                    if (height > 0)
+                        geometry.height = height;
                 }
+
 
                 // What if dash and thumbnailsBox are not on the primary monitor?
                 let controlsHeight = dashHeight + thumbnailsHeight;
@@ -973,7 +971,6 @@ var DockedWorkspaces = new Lang.Class({
                 }
                 geometry.height -= controlsHeight;
 
-
                 this._workspacesViews[i].setMyActualGeometry(geometry);
             }
         };
@@ -996,31 +993,33 @@ var DockedWorkspaces = new Lang.Class({
         };
 
         this._overrideComplete = true;
-    },
+    }
 
     // function called during destroy to restore gnome shell 3.4/3.6/3.8
-    _restoreGnomeShellFunctions: function() {
+    _restoreGnomeShellFunctions() {
         // Restore normal Dash
-        if (this._settings.get_boolean('hide-dash') &&
-            (!DashToDock || !DashToDock.dock)) {
+        if (this._settings.get_boolean('hide-dash')) {
+            if (!DashToDock) {
                 // Show normal dash (if no dash-to-dock)
-                Main.overview._controls.dash.actor.show();
-                Main.overview._controls.dash.actor.set_width(-1);
+                Main.overview.dash.show();
+                Main.overview.dash.set_width(-1);
                 // This forces the recalculation of the icon size
-                Main.overview._controls.dash._maxHeight = -1;
+                Main.overview.dash._maxHeight = -1;
+            }
         }
 
         // Restore source of swarm animation to normal apps button
-        Overview.Overview.prototype.getShowAppsButton = GSFunctions['Overview_getShowAppsButton'];
+        if (GSFunctions['BaseAppView_doSpringAnimation']) {
+            AppDisplay.BaseAppView.prototype._doSpringAnimation = GSFunctions['BaseAppView_doSpringAnimation'];
+        }
 
         // Show normal workspaces thumbnailsBox
-        Main.overview._controls._thumbnailsSlider.actor.opacity = 255;
+        Main.overview._overview._controls._thumbnailsSlider.opacity = 255;
 
         // Restore normal WorkspaceSwitcherPopup_show function
         WorkspaceSwitcherPopup.WorkspaceSwitcherPopup.prototype._show = GSFunctions['WorkspaceSwitcherPopup_show'];
 
         // Restore normal LayoutManager _updateRegions function
-        // Layout.LayoutManager.prototype._queueUpdateRegions = GSFunctions['LayoutManager_queueUpdateRegions'];
         Layout.LayoutManager.prototype._updateRegions = GSFunctions['LayoutManager_updateRegions'];
 
         // Restore normal WorkspacesDisplay _updateworksapgesActualGeometray function
@@ -1029,38 +1028,38 @@ var DockedWorkspaces = new Lang.Class({
         // Restore normal WorkspacesView _setActualGeometry function
         WorkspacesView.WorkspacesViewBase.prototype.setActualGeometry = GSFunctions['WorkspacesViewBase_setActualGeometry'];
         WorkspacesView.WorkspacesViewBase.prototype.setMyActualGeometry = null;
-    },
+    }
 
     // handler for when shortcuts panel is updated
-    _onShortcutsPanelUpdated: function() {
+    _onShortcutsPanelUpdated() {
         this._updateSize();
         this._redisplay();
-    },
+    }
 
     // handler for when thumbnailsBox is resized
-    _thumbnailsBoxResized: function() {
+    _thumbnailsBoxResized() {
         this._updateSize();
         this._redisplay();
-    },
+    }
 
     // handler for when dock y position is updated
-    _updateYPosition: function() {
+    _updateYPosition() {
         this._updateSize();
-    },
+    }
 
     // handler for when workspaces are added
-    _onWorkspaceAdded: function() {
+    _onWorkspaceAdded() {
         this._updateSize();
         this._redisplay();
-    },
+    }
 
     // handler for when workspaces are removed
-    _onWorkspaceRemoved: function() {
+    _onWorkspaceRemoved() {
         this._updateSize();
         this._redisplay();
-    },
+    }
 
-    _updateTriggerWidth: function(force) {
+    _updateTriggerWidth(force) {
         // Calculate and set triggerWidth
         let previousTriggerWidth = this._triggerWidth;
         if (this._settings.get_boolean('dock-fixed')) {
@@ -1088,53 +1087,53 @@ var DockedWorkspaces = new Lang.Class({
 
         if (!this._disableRedisplay)
             this._updateSize();
-    },
+    }
 
     // handler for when dock height is updated
-    _updateHeight: function() {
+    _updateHeight() {
         this._updateSize();
-    },
+    }
 
     // handler to bind settings when preferences changed
-    _bindSettingsChanges: function() {
-        this._settings.connect('changed::opaque-background', Lang.bind(this, function() {
+    _bindSettingsChanges() {
+        this._settings.connect('changed::opaque-background', () => {
             this._updateBackgroundOpacity();
-        }));
+        });
 
-        this._settings.connect('changed::background-opacity', Lang.bind(this, function() {
+        this._settings.connect('changed::background-opacity', () => {
             this._updateBackgroundOpacity();
-        }));
+        });
 
-        this._settings.connect('changed::straight-corners', Lang.bind(this, function() {
+        this._settings.connect('changed::straight-corners', () => {
             this._updateStraightCorners();
-        }));
+        });
 
-        this._settings.connect('changed::autohide', Lang.bind(this, function() {
+        this._settings.connect('changed::autohide', () => {
             this.emit('box-changed');
             this._updateBarrier();
-        }));
+        });
 
-        this._settings.connect('changed::preferred-monitor', Lang.bind(this, function() {
+        this._settings.connect('changed::preferred-monitor', () => {
             this._resetPosition();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::hide-dash', Lang.bind(this, function() {
+        this._settings.connect('changed::hide-dash', () => {
             if (this._settings.get_boolean('hide-dash')) {
-                Main.overview._controls.dash.actor.hide();
-                Main.overview._controls.dash.actor.set_width(1);
+                Main.overview.dash.hide();
+                Main.overview.dash.set_width(1);
             } else {
                 if (!DashToDock) {
                     // Show normal dash (if no dash-to-dock)
-                    Main.overview._controls.dash.actor.show();
-                    Main.overview._controls.dash.actor.set_width(-1);
+                    Main.overview.dash.show();
+                    Main.overview.dash.set_width(-1);
                     // This forces the recalculation of the icon size
-                    Main.overview._controls.dash._maxHeight = -1;
+                    Main.overview.dash._maxHeight = -1;
                 }
             }
-        }));
+        });
 
-        this._settings.connect('changed::show-shortcuts-panel', Lang.bind(this, function() {
+        this._settings.connect('changed::show-shortcuts-panel', () => {
             let shortcutsPanelOrientation = this._settings.get_enum('shortcuts-panel-orientation');
             if (this._settings.get_boolean('show-shortcuts-panel')) {
                 if (shortcutsPanelOrientation == 1) {
@@ -1149,101 +1148,101 @@ var DockedWorkspaces = new Lang.Class({
             }
             this._updateSize();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::shortcuts-panel-icon-size', Lang.bind(this, function() {
+        this._settings.connect('changed::shortcuts-panel-icon-size', () => {
             this._shortcutsPanel.refresh();
             this._updateSize();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::shortcuts-panel-show-running', Lang.bind(this, function() {
+        this._settings.connect('changed::shortcuts-panel-show-running', () => {
             this._shortcutsPanel.refresh();
             this._updateSize();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::shortcuts-panel-show-places', Lang.bind(this, function() {
+        this._settings.connect('changed::shortcuts-panel-show-places', () => {
             this._shortcutsPanel.refresh();
             this._updateSize();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::dock-edge-visible', Lang.bind(this, function() {
+        this._settings.connect('changed::dock-edge-visible', () => {
             this._updateTriggerWidth(true);
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::require-pressure-to-show', Lang.bind(this, function() {
+        this._settings.connect('changed::require-pressure-to-show', () => {
             this._updateTriggerWidth(true);
             this._redisplay();
-        }));
-        this._settings.connect('changed::pressure-threshold', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::pressure-threshold', () => {
             this._updatePressureBarrier();
             this._updateBarrier();
-        }));
+        });
 
-        this._settings.connect('changed::use-pressure-speed-limit', Lang.bind(this, function() {
+        this._settings.connect('changed::use-pressure-speed-limit', () => {
             this._updatePressureBarrier();
             this._updateBarrier();
-        }));
-        this._settings.connect('changed::pressure-speed-limit', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::pressure-speed-limit', () => {
             this._updatePressureBarrier();
             this._updateBarrier();
-        }));
+        });
 
-        this._settings.connect('changed::disable-scroll', Lang.bind(this, function() {
+        this._settings.connect('changed::disable-scroll', () => {
             this._updateTriggerWidth(true);
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::screen-edge-padding', Lang.bind(this, function() {
+        this._settings.connect('changed::screen-edge-padding', () => {
             this._updateSize();
             this._redisplay();
-        }));
+        });
 
-        this._settings.connect('changed::customize-thumbnail', Lang.bind(this, function() {
+        this._settings.connect('changed::customize-thumbnail', () => {
             // hide and show thumbnailsBox to resize thumbnails
             this._refreshThumbnails();
-        }));
+        });
 
-        this._settings.connect('changed::thumbnail-size', Lang.bind(this, function() {
+        this._settings.connect('changed::thumbnail-size', () => {
             // hide and show thumbnailsBox to resize thumbnails
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::customize-thumbnail-visible-width', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::customize-thumbnail-visible-width', () => {
             this._updateTriggerWidth(true);
             this._redisplay();
-        }));
-        this._settings.connect('changed::thumbnail-visible-width', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::thumbnail-visible-width', () => {
             this._updateTriggerWidth(true);
             this._redisplay();
-        }));
-        this._settings.connect('changed::workspace-captions', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-captions', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::workspace-caption-position', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-caption-position', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::workspace-caption-height', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-caption-height', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::workspace-caption-items', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-caption-items', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::workspace-caption-windowcount-image', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-caption-windowcount-image', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::workspace-caption-taskbar-icon-size', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::workspace-caption-taskbar-icon-size', () => {
             // hide and show thumbnailsBox to reset workspace apps in caption
             this._refreshThumbnails();
-        }));
-        this._settings.connect('changed::top-margin', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::top-margin', () => {
             // Add or remove addtional style class when workspace is fixed and set to full height
             if (this._settings.get_boolean('customize-height') && this._settings.get_int('customize-height-option') == 1) {
                 if (this._settings.get_double('top-margin') == 0 || this._settings.get_double('bottom-margin') == 0) {
@@ -1255,8 +1254,8 @@ var DockedWorkspaces = new Lang.Class({
                 this._dock.remove_style_class_name('fullheight');
             }
             this._updateSize();
-        }));
-        this._settings.connect('changed::bottom-margin', Lang.bind(this, function() {
+        });
+        this._settings.connect('changed::bottom-margin', () => {
             // Add or remove addtional style class when workspace is fixed and set to full height
             if (this._settings.get_boolean('customize-height') && this._settings.get_int('customize-height-option') == 1) {
                 if (this._settings.get_double('top-margin') == 0 || this._settings.get_double('bottom-margin') == 0) {
@@ -1268,16 +1267,16 @@ var DockedWorkspaces = new Lang.Class({
                 this._dock.remove_style_class_name('fullheight');
             }
             this._updateSize();
-        }));
-        this._settings.connect('changed::toggle-dock-with-keyboard-shortcut', Lang.bind(this, function(){
+        });
+        this._settings.connect('changed::toggle-dock-with-keyboard-shortcut', () =>{
             if (this._settings.get_boolean('toggle-dock-with-keyboard-shortcut'))
                 this._bindDockKeyboardShortcut();
             else
                 this._unbindDockKeyboardShortcut();
-        }));
-    },
+        });
+    }
 
-    _updatePressureBarrier: function() {
+    _updatePressureBarrier() {
         let self = this;
         this._canUsePressure = global.display.supports_extended_barriers();
         let pressureThreshold = this._settings.get_double('pressure-threshold');
@@ -1294,7 +1293,7 @@ var DockedWorkspaces = new Lang.Class({
 
         // Create new pressure barrier based on pressure threshold setting
         if (this._canUsePressure) {
-            this._pressureBarrier = new MyPressureBarrier.myPressureBarrier(pressureThreshold, speedLimit, PRESSURE_TIMEOUT,
+            this._pressureBarrier = new MyPressureBarrier.MyPressureBarrier(pressureThreshold, speedLimit, PRESSURE_TIMEOUT,
                                 Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
             this._pressureBarrier.connect('trigger', function(barrier){
                 self._onPressureSensed();
@@ -1303,32 +1302,30 @@ var DockedWorkspaces = new Lang.Class({
                 self._onSpeedExceeded();
             });
         }
-    },
+    }
 
-    _bindDockKeyboardShortcut: function() {
-        Main.wm.addKeybinding('dock-keyboard-shortcut', this._settings, Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
-            Lang.bind(this, function() {
-                if (this._autohideStatus) {
-                    if (this._dockState == DockState.HIDDEN || this._dockState == DockState.HIDING) {
-                        this._toggleWithKeyboard(true);
-                    } else {
-                        this._toggleWithKeyboard(false);
-                    }
+    _bindDockKeyboardShortcut() {
+        Main.wm.addKeybinding('dock-keyboard-shortcut', this._settings, Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL, () => {
+            if (this._autohideStatus) {
+                if (this._dockState == DockState.HIDDEN || this._dockState == DockState.HIDING) {
+                    this._toggleWithKeyboard(true);
                 } else {
-                    if (this._dockState == DockState.SHOWN || this._dockState == DockState.SHOWING) {
-                        this._toggleWithKeyboard(false);
-                    } else {
-                        this._toggleWithKeyboard(true);
-                    }
+                    this._toggleWithKeyboard(false);
                 }
-            })
-        );
-    },
+            } else {
+                if (this._dockState == DockState.SHOWN || this._dockState == DockState.SHOWING) {
+                    this._toggleWithKeyboard(false);
+                } else {
+                    this._toggleWithKeyboard(true);
+                }
+            }
+        });
+    }
 
-    _toggleWithKeyboard: function(show) {
+    _toggleWithKeyboard(show) {
         // Clear keyboard toggle timeout
         if (this._toggleWithKeyboardTimeoutId > 0) {
-            Mainloop.source_remove(this._toggleWithKeyboardTimeoutId);
+            GLib.source_remove(this._toggleWithKeyboardTimeoutId);
             this._toggleWithKeyboardTimeoutId = 0;
         }
 
@@ -1336,29 +1333,29 @@ var DockedWorkspaces = new Lang.Class({
         if (show) {
             this._show();
             let timeout = this._settings.get_double('keyboard-toggle-timeout') * 1000;
-            this._toggleWithKeyboardTimeoutId = Mainloop.timeout_add(timeout, Lang.bind(this, function(){
+            this._toggleWithKeyboardTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, timeout, () => {
                 this._toggleWithKeyboard(false);
-            }));
+            });
         } else {
             this._hide();
         }
-    },
+    }
 
-    _unbindDockKeyboardShortcut: function() {
+    _unbindDockKeyboardShortcut() {
         Main.wm.removeKeybinding('dock-keyboard-shortcut');
-    },
+    }
 
     // Determine if mouse is hovering dock container
-    _isHovering: function() {
+    _isHovering() {
         if (this._dock.hover) {
             return true;
         } else {
             return false;
         }
-    },
+    }
 
     // handler for mouse hover events
-    _hoverChanged: function() {
+    _hoverChanged() {
         if (this._settings.get_boolean('dock-fixed')) {
             return;
         }
@@ -1372,9 +1369,20 @@ var DockedWorkspaces = new Lang.Class({
             }
         }
 
+        if (this._dockState == DockState.SHOWING) {
+            // Prevent dock from getting stuck animated in when mouse is no longer hovering
+            if (this._checkHoverStatusId > 0) {
+                GLib.source_remove(this._checkHoverStatusId);
+                this._checkHoverStatusId = 0;
+            }
+            this._checkHoverStatusId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, this._checkHoverStatus.bind(this));
+            return;
+        }
+
         if (this._settings.get_boolean('require-click-to-show')) {
             // check if metaWin is maximized
-            let activeWorkspace = global.screen.get_active_workspace();
+            let workspaceManager = global.workspace_manager;
+            let activeWorkspace = workspaceManager.get_active_workspace();
             let maximized = false;
             let windows = global.get_window_actors();
             for (let i = windows.length-1; i >= 0; i--) {
@@ -1412,11 +1420,11 @@ var DockedWorkspaces = new Lang.Class({
         } else {
             this._hide();
         }
-    },
+    }
 
-    _checkHoverStatus: function() {
+    _checkHoverStatus() {
         if (this._checkHoverStatusId > 0) {
-            Mainloop.source_remove(this._checkHoverStatusId);
+            GLib.source_remove(this._checkHoverStatusId);
             this._checkHoverStatusId = 0;
         }
         if (Extension.intellihide._toggledOverviewOnDrag == false) {
@@ -1424,10 +1432,10 @@ var DockedWorkspaces = new Lang.Class({
                 this._hoverChanged();
             }
         }
-    },
+    }
 
     // handler for mouse click events - works in conjuction with hover event to show dock for maxmized windows
-    _onDockClicked: function(actor, event) {
+    _onDockClicked(actor, event) {
 
         // Show overview if button is right click
         if (this._settings.get_boolean('toggle-overview')) {
@@ -1457,9 +1465,9 @@ var DockedWorkspaces = new Lang.Class({
             }
         }
         return Clutter.EVENT_STOP;
-    },
+    }
 
-    _onSpeedExceeded: function() {
+    _onSpeedExceeded() {
         // FIX ISSUE: #23
         // Remove barrier so that mouse pointer can access monitors on other side of dock quickly
         // --------------
@@ -1477,22 +1485,22 @@ var DockedWorkspaces = new Lang.Class({
 
                 // Restore barrier after short timeout
                 if (this._restoreBarrierTimeoutId > 0) {
-                    Mainloop.source_remove(this._restoreBarrierTimeoutId);
+                    GLib.source_remove(this._restoreBarrierTimeoutId);
                     this._restoreBarrierTimeoutId = 0;
                 }
-                this._restoreBarrierTimeoutId = Mainloop.timeout_add(500, Lang.bind(this, this._updateBarrier));
+                this._restoreBarrierTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, this._updateBarrier.bind(this));
             }
         }
-    },
+    }
 
     // handler for mouse pressure sensed (GS38+ only)
-    _onPressureSensed: function() {
+    _onPressureSensed() {
         this._pressureSensed = true;
         this._updateTriggerWidth();
         this._hoverChanged();
-    },
+    }
 
-    _onDashToDockShowing: function() {
+    _onDashToDockShowing() {
         //Skip if dock is not in dashtodock hover mode
         if (this._settings.get_boolean('dashtodock-hover')) {
             if (DashToDock && Main.overview.visible == false) {
@@ -1509,9 +1517,9 @@ var DockedWorkspaces = new Lang.Class({
                 }
             }
         }
-    },
+    }
 
-    _onDashToDockHiding: function() {
+    _onDashToDockHiding() {
         //Skip if dock is not in dashtodock hover mode
         if (this._settings.get_boolean('dashtodock-hover')) {
             if (DashToDock) {
@@ -1519,16 +1527,16 @@ var DockedWorkspaces = new Lang.Class({
                 this._hide();
             }
         }
-    },
+    }
 
-    _onDashToDockLeave: function() {
+    _onDashToDockLeave() {
         // NOTE: Causing workspaces-to-dock to hide when switching workspaces in Gnome 3.14.
         // Remove until a workaround can be found.
         // this._hoveringDash = false;
-    },
+    }
 
     // handler for DashToDock hover events
-    _onDashToDockHoverChanged: function() {
+    _onDashToDockHoverChanged() {
         //Skip if dock is not in dashtodock hover mode
         if (this._settings.get_boolean('dashtodock-hover')) {
             if (DashToDock) {
@@ -1555,82 +1563,90 @@ var DockedWorkspaces = new Lang.Class({
                 }
             }
         }
-    },
+    }
 
-    _onDashToDockToggled: function() {
-        this._signalHandler.disconnectWithLabel('DashToDockHoverSignal');
+    _onDashToDockToggled() {
         this._hoveringDash = false;
+        this._disconnectDashToDockSignals();
         this._connectDashToDockSignals();
-    },
+    }
 
-    _connectDashToDockSignals: function() {
+    _onDashToDockBoxDestroy() {
+        this._hoveringDash = false;
+        this._disconnectDashToDockSignals();
+
+        // Restore dock if still enabled
+        if (this._checkDashToDockStatusId > 0) {
+            GLib.source_remove(this._checkDashToDockStatusId);
+            this._checkDashToDockStatusId = 0;
+        }
+        this._checkDashToDockStatusId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, this._checkDashToDockStatus.bind(this));
+    }
+
+    _checkDashToDockStatus() {
+        if (DashToDock)
+            this._connectDashToDockSignals();
+
+        this._checkDashToDockStatusId = 0;
+    }
+
+    _disconnectDashToDockSignals() {
+        this._signalHandler.disconnectWithLabel('DashToDockBoxHoverSignal');
+        this._signalHandler.disconnectWithLabel('DashToDockManagerSignal');
+    }
+
+    _connectDashToDockSignals() {
         if (DashToDock) {
             // Connect DashToDock hover signal
             if (DashToDock.dockManager) {
                 if (DashToDock.dockManager._allDocks[0]) {
                     this._signalHandler.pushWithLabel(
-                        'DashToDockHoverSignal',
+                        'DashToDockBoxHoverSignal',
+                        [
+                            DashToDock.dockManager._allDocks[0]._box,
+                            'destroy',
+                            this._onDashToDockBoxDestroy.bind(this)
+                        ],
                         [
                             DashToDock.dockManager._allDocks[0]._box,
                             'notify::hover',
-                            Lang.bind(this, this._onDashToDockHoverChanged)
+                            this._onDashToDockHoverChanged.bind(this)
                         ],
                         [
                             DashToDock.dockManager._allDocks[0]._box,
                             'leave-event',
-                            Lang.bind(this, this._onDashToDockLeave)
-                        ],
+                            this._onDashToDockLeave.bind(this)
+                        ]
+                    );
+                    this._signalHandler.pushWithLabel(
+                        'DashToDockManagerSignal',
                         [
                             DashToDock.dockManager._allDocks[0],
                             'showing',
-                            Lang.bind(this, this._onDashToDockShowing)
+                            this._onDashToDockShowing.bind(this)
                         ],
                         [
                             DashToDock.dockManager._allDocks[0],
                             'hiding',
-                            Lang.bind(this, this._onDashToDockHiding)
+                            this._onDashToDockHiding.bind(this)
                         ],
                         [
                             DashToDock.dockManager,
                             'toggled',
-                            Lang.bind(this, this._onDashToDockToggled)
+                            this._onDashToDockToggled.bind(this)
                         ]
                     );
                 }
-            } else {
-                this._signalHandler.pushWithLabel(
-                    'DashToDockHoverSignal',
-                    [
-                        DashToDock.dock._box,
-                        'notify::hover',
-                        Lang.bind(this, this._onDashToDockHoverChanged)
-                    ],
-                    [
-                        DashToDock.dock._box,
-                        'leave-event',
-                        Lang.bind(this, this._onDashToDockLeave)
-                    ],
-                    [
-                        DashToDock.dock,
-                        'showing',
-                        Lang.bind(this, this._onDashToDockShowing)
-                    ],
-                    [
-                        DashToDock.dock,
-                        'hiding',
-                        Lang.bind(this, this._onDashToDockHiding)
-                    ]
-                );
             }
         }
-    },
+    }
 
     // handler for extensionSystem state changes
-    _onExtensionSystemStateChanged: function(source, extension) {
+    _onExtensionSystemStateChanged(source, extension) {
         // Only looking for DashToDock state changes
         if (extension.uuid == DashToDock_UUID) {
             DashToDockExtension = extension;
-            if (DashToDockExtension.state == ExtensionSystem.ExtensionState.ENABLED) {
+            if (DashToDockExtension.state == ExtensionUtils.ExtensionState.ENABLED) {
                 DashToDock = DashToDockExtension.imports.extension;
                 if (DashToDock) {
                     DashToDockExtension.hasDockPositionKey = false;
@@ -1644,25 +1660,26 @@ var DockedWorkspaces = new Lang.Class({
                     }
                     this._connectDashToDockSignals();
                 }
-            } else if (extension.state == ExtensionSystem.ExtensionState.DISABLED || extension.state == ExtensionSystem.ExtensionState.UNINSTALLED) {
+            } else if (extension.state == ExtensionUtils.ExtensionState.DISABLED || extension.state == ExtensionUtils.ExtensionState.UNINSTALLED) {
                 DashToDock = null;
-                this._signalHandler.disconnectWithLabel('DashToDockHoverSignal');
                 this._hoveringDash = false;
+                this._disconnectDashToDockSignals();
             }
         }
-    },
+    }
 
     // handler for mouse scroll events
     // Switches workspace by scrolling over the dock
     // This comes from desktop-scroller@obsidien.github.com
-    _onScrollEvent: function (actor, event) {
+    _onScrollEvent(actor, event) {
         if (this._settings.get_boolean('disable-scroll') &&
             this._autohideStatus &&
             this._slider.slidex == 0 && // Need to check the slidex for partially showing dock
             (this._dockState == DockState.HIDDEN || this._dockState == DockState.HIDING))
                 return Clutter.EVENT_STOP;
 
-        let activeWs = global.screen.get_active_workspace();
+        let workspaceManager = global.workspace_manager;
+        let activeWs = workspaceManager.get_active_workspace();
         let direction;
         switch (event.get_scroll_direction()) {
         case Clutter.ScrollDirection.UP:
@@ -1703,27 +1720,21 @@ var DockedWorkspaces = new Lang.Class({
                     return false;
                 else {
                     this._scrollWorkspaceSwitchDeadTimeId =
-                        Mainloop.timeout_add(250,
-                            Lang.bind(this, function() {
+                        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
                                 this._scrollWorkspaceSwitchDeadTimeId = 0;
-                            }
-                    ));
+                        });
                 }
             }
 
             let ws = activeWs.get_neighbor(direction);
 
             if (Main.wm._workspaceSwitcherPopup == null) {
-                if (this._isHorizontal && this._settings.get_boolean('horizontal-workspace-switching')) {
-                    Main.wm._workspaceSwitcherPopup = new MyWorkspaceSwitcherPopup.myWorkspaceSwitcherPopup();
-                } else {
-                    Main.wm._workspaceSwitcherPopup = new WorkspaceSwitcherPopup.WorkspaceSwitcherPopup();
-                }
+                Main.wm._workspaceSwitcherPopup = new WorkspaceSwitcherPopup.WorkspaceSwitcherPopup();
             }
 
             // Set the workspaceSwitcherPopup actor to non reactive,
             // to prevent it from grabbing focus away from the dock
-            Main.wm._workspaceSwitcherPopup.actor.reactive = false;
+            Main.wm._workspaceSwitcherPopup.reactive = false;
             Main.wm._workspaceSwitcherPopup.connect('destroy', function() {
                 Main.wm._workspaceSwitcherPopup = null;
             });
@@ -1736,10 +1747,10 @@ var DockedWorkspaces = new Lang.Class({
         }
 
         return Clutter.EVENT_STOP;
-    },
+    }
 
     // autohide function to show dock
-    _show: function() {
+    _show() {
         // Only show if dock hidden, is hiding, or is partially shown/hidden
         if (this._dockState == DockState.HIDDEN || this._dockState == DockState.HIDING || this._slider.slidex < 1) {
             this._removeAnimations();
@@ -1752,10 +1763,10 @@ var DockedWorkspaces = new Lang.Class({
 
             this._animateIn(this._settings.get_double('animation-time'), delay, true);
         }
-    },
+    }
 
     // autohide function to hide dock
-    _hide: function() {
+    _hide() {
         this._updateTriggerWidth();
         if (this._settings.get_boolean('dock-fixed')) {
             return;
@@ -1791,9 +1802,9 @@ var DockedWorkspaces = new Lang.Class({
                 this._animateOut(this._settings.get_double('animation-time'), delay, this._autohideStatus);
             }
         }
-    },
+    }
 
-    setPopupMenuFlag: function(showing) {
+    setPopupMenuFlag(showing) {
         this._popupMenuShowing = showing;
         if (!showing) {
             if (this._isHovering()) {
@@ -1802,10 +1813,10 @@ var DockedWorkspaces = new Lang.Class({
                 this._hide();
             }
         }
-    },
+    }
 
     // autohide function to animate the show dock process
-    _animateIn: function(time, delay, force) {
+    _animateIn(time, delay, force) {
         let sliderVariable = 1;
         let fixedPosition = this._settings.get_boolean('dock-fixed')
         let overviewAction = this._settings.get_enum('overview-action');
@@ -1836,12 +1847,11 @@ var DockedWorkspaces = new Lang.Class({
             this._dockState = DockState.SHOWING;
         }
 
-        Tweener.addTween(this._slider, {
-            slidex: sliderVariable,
-            time: time,
-            delay: delay,
-            transition: 'easeOutQuad',
-            onComplete: Lang.bind(this, function() {
+        this._slider.ease_property('slidex', sliderVariable, {
+            duration: time * 1000,
+            delay: delay * 1000,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => {
                 if (!force && !fixedPosition) {
                     if ((Main.overview._shown && overviewAction == OverviewAction.SHOW_PARTIAL)
                         || (!Main.overview._shown && (intellihideAction == IntellihideAction.SHOW_PARTIAL || intellihideAction == IntellihideAction.SHOW_PARTIAL_FIXED))) {
@@ -1853,10 +1863,10 @@ var DockedWorkspaces = new Lang.Class({
                         // NOTE: Delay needed to keep mouse from moving past dock and re-hiding dock immediately. This
                         // gives users an opportunity to hover over the dock
                         if (this._removeBarrierTimeoutId > 0) {
-                            Mainloop.source_remove(this._removeBarrierTimeoutId);
+                            GLib.source_remove(this._removeBarrierTimeoutId);
                             this._removeBarrierTimeoutId = 0;
                         }
-                        this._removeBarrierTimeoutId = Mainloop.timeout_add(100, Lang.bind(this, this._removeBarrier));
+                        this._removeBarrierTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, this._removeBarrier.bind(this));
                         this._updateTriggerWidth();
                     }
                 } else {
@@ -1866,26 +1876,25 @@ var DockedWorkspaces = new Lang.Class({
                     // NOTE: Delay needed to keep mouse from moving past dock and re-hiding dock immediately. This
                     // gives users an opportunity to hover over the dock
                     if (this._removeBarrierTimeoutId > 0) {
-                        Mainloop.source_remove(this._removeBarrierTimeoutId);
+                        GLib.source_remove(this._removeBarrierTimeoutId);
                         this._removeBarrierTimeoutId = 0;
                     }
-                    this._removeBarrierTimeoutId = Mainloop.timeout_add(100, Lang.bind(this, this._removeBarrier));
+                    this._removeBarrierTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, this._removeBarrier.bind(this));
                     this._updateTriggerWidth();
                 }
 
                 // Prevent dock from getting stuck animated in when mouse is no longer hovering
                 if (this._checkHoverStatusId > 0) {
-                    Mainloop.source_remove(this._checkHoverStatusId);
+                    GLib.source_remove(this._checkHoverStatusId);
                     this._checkHoverStatusId = 0;
                 }
-                this._checkHoverStatusId = Mainloop.timeout_add(100, Lang.bind(this, this._checkHoverStatus));
-
-            })
+                this._checkHoverStatusId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, this._checkHoverStatus.bind(this));
+            }
         });
-    },
+    }
 
     // autohide function to animate the hide dock process
-    _animateOut: function(time, delay, force) {
+    _animateOut(time, delay, force) {
         if (this._popupMenuShowing)
             return;
 
@@ -1917,27 +1926,26 @@ var DockedWorkspaces = new Lang.Class({
             }
         }
 
-        Tweener.addTween(this._slider, {
-            slidex: sliderVariable,
-            time: time,
-            delay: delay,
-            transition: 'easeOutQuad',
-            onComplete: Lang.bind(this, function() {
+        this._slider.ease_property('slidex', sliderVariable, {
+            duration: time * 1000,
+            delay: delay * 1000,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => {
                 this._dockState = DockState.HIDDEN;
                 this._updateBarrier();
-            })
+            }
         });
-    },
+    }
 
     // autohide function to remove show-hide animations
-    _removeAnimations: function() {
-        Tweener.removeTweens(this._slider);
-    },
+    _removeAnimations() {
+        this._slider.remove_all_transitions();
+    }
 
     // autohide function to fade out opaque background
-    _fadeOutBackground: function(time, delay) {
+    _fadeOutBackground(time, delay) {
         // CSS time is in ms
-        this._thumbnailsBox.actor.set_style('transition-duration:' + time*1000 + ';' +
+        this._thumbnailsBox.set_style('transition-duration:' + time*1000 + ';' +
             'transition-delay:' + delay*1000 + ';' +
             'background-color: rgba(0,0,0,0);' +
             'border-color:' + this._defaultBorder);
@@ -1951,12 +1959,12 @@ var DockedWorkspaces = new Lang.Class({
             'transition-delay:' + delay*1000 + ';' +
             'background-color:' + this._defaultBackground + ';' +
             'border-color:' + this._defaultBorder);
-    },
+    }
 
     // autohide function to fade in opaque background
-    _fadeInBackground: function(time, delay) {
+    _fadeInBackground(time, delay) {
         // CSS time is in ms
-        this._thumbnailsBox.actor.set_style('transition-duration:' + time*1000 + ';' +
+        this._thumbnailsBox.set_style('transition-duration:' + time*1000 + ';' +
             'transition-delay:' + delay*1000 + ';' +
             'background-color: rgba(0,0,0,0);' +
             'border-color:' + this._customBorder);
@@ -1970,11 +1978,11 @@ var DockedWorkspaces = new Lang.Class({
             'transition-delay:' + delay*1000 + ';' +
             'background-color:' + this._customBackground + ';' +
             'border-color:' + this._customBorder);
-    },
+    }
 
     // This function handles hiding the dock when dock is in stationary-fixed
     // position but overlapped by gnome panel menus or meta popup windows
-    fadeOutDock: function(time, delay) {
+    fadeOutDock(time, delay) {
         if (Main.layoutManager._inOverview) {
             // Hide fixed dock when in overviewmode applications view
             this.actor.opacity = 0;
@@ -1985,48 +1993,48 @@ var DockedWorkspaces = new Lang.Class({
         // Fixed dock has opacity set to 0 but is still reactive.
         this._dock.reactive = false;
         this._shortcutsPanel.setReactiveState(false);
-        this._thumbnailsBox.actor.reactive = false;
+        this._thumbnailsBox.reactive = false;
         for (let i = 0; i < this._thumbnailsBox._thumbnails.length; i++) {
             let thumbnail = this._thumbnailsBox._thumbnails[i];
             thumbnail.setCaptionReactiveState(false);
             thumbnail.setWindowClonesReactiveState(false);
         }
-    },
+    }
 
     // This function handles showing the dock when dock is stationary-fixed
     // position but overlapped by gnome panel menus or meta popup windows
-    fadeInDock: function(time, delay) {
+    fadeInDock(time, delay) {
         this.actor.opacity = 255;
 
         // Return thumbnail windowclones to reactive state
         this._dock.reactive = true;
         this._shortcutsPanel.setReactiveState(true);
-        this._thumbnailsBox.actor.reactive = true;
+        this._thumbnailsBox.reactive = true;
         for (let i = 0; i < this._thumbnailsBox._thumbnails.length; i++) {
             let thumbnail = this._thumbnailsBox._thumbnails[i];
             thumbnail.setCaptionReactiveState(true);
             thumbnail.setWindowClonesReactiveState(true);
         }
 
-        if (!this._workAreaHeight || !this._workAreaWidth) {
-            this._refreshThumbnailsOnRegionUpdate = true;
-            Main.layoutManager._queueUpdateRegions();
-        }
-    },
+        // if (!this._workAreaHeight || !this._workAreaWidth) {
+        //     this._refreshThumbnailsOnRegionUpdate = true;
+        //     Main.layoutManager._queueUpdateRegions();
+        // }
+    }
 
     // retrieve default background color
-    _getBackgroundColor: function() {
+    _getBackgroundColor() {
         // Remove custom style
-        let oldStyle = this._thumbnailsBox.actor.get_style();
-        this._thumbnailsBox.actor.set_style(null);
+        let oldStyle = this._thumbnailsBox.get_style();
+        this._thumbnailsBox.set_style(null);
 
         // Prevent shell crash if the actor is not on the stage
         // It happens enabling/disabling repeatedly the extension
-        if (!this._thumbnailsBox.actor.get_stage())
+        if (!this._thumbnailsBox.get_stage())
             return null;
 
-        let themeNode = this._thumbnailsBox.actor.get_theme_node();
-        this._thumbnailsBox.actor.set_style(oldStyle);
+        let themeNode = this._thumbnailsBox.get_theme_node();
+        this._thumbnailsBox.set_style(oldStyle);
 
         // Just in case the theme has different border colors ..
         // We want to find the inside border-color of the dock because it is
@@ -2040,23 +2048,23 @@ var DockedWorkspaces = new Lang.Class({
         let borderColor = themeNode.get_border_color(side);
 
         return [backgroundColor, borderColor];
-    },
+    }
 
-    _updateAppearancePreferences: function() {
+    _updateAppearancePreferences() {
         this._updateStraightCorners();
         this._updateBackgroundOpacity();
-    },
+    }
 
-    _updateStraightCorners: function() {
+    _updateStraightCorners() {
         if (this._settings.get_boolean('straight-corners')) {
             this._dock.add_style_class_name('straight-corners');
         } else {
             this._dock.remove_style_class_name('straight-corners');
         }
-    },
+    }
 
     // update background opacity based on preferences
-    _updateBackgroundOpacity: function() {
+    _updateBackgroundOpacity() {
         let [backgroundColor, borderColor] = this._getBackgroundColor();
         if (backgroundColor) {
             // We check the background alpha for a minimum of .001 to prevent
@@ -2081,17 +2089,17 @@ var DockedWorkspaces = new Lang.Class({
                 this._fadeOutBackground(this._settings.get_double('animation-time'), 0);
             }
         }
-    },
+    }
 
     // handler for theme changes
-    _onThemeChanged: function() {
+    _onThemeChanged() {
         this._changeStylesheet();
         if (!this._disableRedisplay)
             this._updateAppearancePreferences();
-    },
+    }
 
     // function to change stylesheets
-    _changeStylesheet: function() {
+    _changeStylesheet() {
         // Get css filename
         let filename = "workspaces-to-dock.css";
 
@@ -2157,18 +2165,10 @@ var DockedWorkspaces = new Lang.Class({
         }
 
         return true;
-    },
-
-    // handler for icon changes
-    _onIconsChanged: function() {
-        if (this._disableRedisplay)
-            return
-
-        this._refreshThumbnails();
-    },
+    }
 
     // resdiplay dock called if size-position changed due to dock resizing
-    _redisplay: function() {
+    _redisplay() {
         if (this._disableRedisplay)
             return
 
@@ -2204,10 +2204,10 @@ var DockedWorkspaces = new Lang.Class({
 
         this._updateAppearancePreferences();
         this._updateBarrier();
-    },
+    }
 
     // update the dock size and position
-    _updateSize: function() {
+    _updateSize() {
 
         // Accommodate shortcuts panel in calculations
         let shortcutsPanelThickness = 0;
@@ -2224,8 +2224,11 @@ var DockedWorkspaces = new Lang.Class({
         // that may affect width and height calculations
         let workArea = Main.layoutManager.getWorkAreaForMonitor(this._monitor.index);
 
-        // Get screen edge padding from preferences
-        let screenEdgePadding = this._settings.get_double('screen-edge-padding');
+        // get the scale factor
+        let scale_factor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+
+        // Get screen edge padding from preferences and multiply it by scale_factor for HiDPI monitors
+        let screenEdgePadding = this._settings.get_double('screen-edge-padding') * scale_factor;
 
         let x, y, width, height, anchorPoint;
         if (this._isHorizontal) {
@@ -2271,8 +2274,8 @@ var DockedWorkspaces = new Lang.Class({
 
             } else {
                 let controlsTop = 45;
-                y = this._monitor.y + Main.panel.actor.height + controlsTop + Main.overview._searchEntryBin.height;
-                height = this._monitor.height - (y + Main.overview._searchEntryBin.height);
+                y = this._monitor.y + Main.panel.height + controlsTop + Main.overview.searchEntry.height;
+                height = this._monitor.height - (y + Main.overview.searchEntry.height);
             }
         }
 
@@ -2291,7 +2294,7 @@ var DockedWorkspaces = new Lang.Class({
         // allows us to control the trigger space for showing/hiding and scrolling
         if (this._isHorizontal) {
             if (this._settings.get_boolean('customize-height')) {
-                let [minThumbnailsBoxWidth, minThumbnailsBoxHeight, natThumbnailsBoxWidth, natThumbnailsBoxHeight] = this._thumbnailsBox.actor.get_preferred_size();
+                let [minThumbnailsBoxWidth, minThumbnailsBoxHeight, natThumbnailsBoxWidth, natThumbnailsBoxHeight] = this._thumbnailsBox.get_preferred_size();
                 let minShortcutsPanelWidth = 0, minShortcutsPanelHeight = 0, natShortcutsPanelWidth = 0, natShortcutsPanelHeight = 0;
                 if (this._settings.get_boolean('show-shortcuts-panel')) {
                     [minShortcutsPanelWidth, minShortcutsPanelHeight, natShortcutsPanelWidth, natShortcutsPanelHeight] = this._shortcutsPanel.actor.get_preferred_size();
@@ -2326,7 +2329,7 @@ var DockedWorkspaces = new Lang.Class({
             }
         } else {
             if (this._settings.get_boolean('customize-height')) {
-                let [minThumbnailsBoxWidth, minThumbnailsBoxHeight, natThumbnailsBoxWidth, natThumbnailsBoxHeight] = this._thumbnailsBox.actor.get_preferred_size();
+                let [minThumbnailsBoxWidth, minThumbnailsBoxHeight, natThumbnailsBoxWidth, natThumbnailsBoxHeight] = this._thumbnailsBox.get_preferred_size();
                 let minShortcutsPanelWidth = 0, minShortcutsPanelHeight = 0, natShortcutsPanelWidth = 0, natShortcutsPanelHeight = 0;
                 if (this._settings.get_boolean('show-shortcuts-panel')) {
                     [minShortcutsPanelWidth, minShortcutsPanelHeight, natShortcutsPanelWidth, natShortcutsPanelHeight] = this._shortcutsPanel.actor.get_preferred_size();
@@ -2384,7 +2387,7 @@ var DockedWorkspaces = new Lang.Class({
             if (this._settings.get_boolean('customize-thumbnail-visible-width')) {
                 slidePartialVisibleWidth = this._settings.get_double('thumbnail-visible-width');
             } else {
-                let themeVisibleWidth = this._thumbnailsBox.actor.get_theme_node().get_length('visible-width');
+                let themeVisibleWidth = this._thumbnailsBox.get_theme_node().get_length('visible-width');
                 if (themeVisibleWidth > 0)
                     slidePartialVisibleWidth = themeVisibleWidth;
             }
@@ -2403,28 +2406,28 @@ var DockedWorkspaces = new Lang.Class({
             this._struts.set_size(this.actor.width, this.actor.height);
         }
 
-    },
+    }
 
     // 'Hard' reset dock positon: called on start and when monitor changes
-    _resetPosition: function() {
+    _resetPosition() {
         this._monitor = this._getMonitor();
 
         this._updateSize();
 
         this._updateAppearancePreferences();
         this._updateBarrier();
-    },
+    }
 
-    _onMonitorsChanged: function() {
+    _onMonitorsChanged() {
 
         // Reset the dock position and redisplay
         this._resetPosition();
         this._redisplay();
-        this._refreshThumbnailsOnRegionUpdate = true;
-        Main.layoutManager._queueUpdateRegions();
-    },
+        // this._refreshThumbnailsOnRegionUpdate = true;
+        // Main.layoutManager._queueUpdateRegions();
+    }
 
-    _refreshThumbnails: function() {
+    _refreshThumbnails() {
         let workArea = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
         this._workAreaWidth = workArea.width;
         this._workAreaHeight = workArea.height;
@@ -2437,10 +2440,10 @@ var DockedWorkspaces = new Lang.Class({
         // under the shell's top bar. Resetting the position after a thumbnail refresh (during Region Updates)
         // fixes this issue.
         this._resetPosition();
-    },
+    }
 
     // Retrieve the preferred monitor
-    _getMonitor: function() {
+    _getMonitor() {
         // We are using Gdk in settings prefs which sets the primary monitor to 0
         // The shell can assign a different number (Main.layoutManager.primaryMonitor)
         // This ensures that the indexing in the settings (Gdk) and in the shell are matched,
@@ -2450,10 +2453,10 @@ var DockedWorkspaces = new Lang.Class({
         let monitor = Main.layoutManager.monitors[monitorIndex];
 
         return monitor;
-    },
+    }
 
     // Remove pressure barrier (GS38+ only)
-    _removeBarrier: function() {
+    _removeBarrier() {
         if (this._barrier) {
             if (this._pressureBarrier) {
                 this._pressureBarrier.removeBarrier(this._barrier);
@@ -2464,14 +2467,14 @@ var DockedWorkspaces = new Lang.Class({
 
         // Remove barrier timeout
         if (this._removeBarrierTimeoutId > 0) {
-            Mainloop.source_remove(this._removeBarrierTimeoutId);
+            GLib.source_remove(this._removeBarrierTimeoutId);
             this._removeBarrierTimeoutId = 0;
         }
         return false;
-    },
+    }
 
     // Update pressure barrier size (GS38+ only)
-    _updateBarrier: function() {
+    _updateBarrier() {
         // Remove existing barrier
         this._removeBarrier();
 
@@ -2531,10 +2534,10 @@ var DockedWorkspaces = new Lang.Class({
             this._pressureSensed = false;
             this._updateTriggerWidth();
         }
-    },
+    }
 
     // Disable autohide effect, thus show workspaces
-    disableAutoHide: function(force) {
+    disableAutoHide(force) {
         // NOTE: default functionality is to not force complete animateIn
         this._autohideStatus = false;
         if (this._dockState == DockState.HIDING || this._dockState == DockState.HIDDEN) {
@@ -2545,10 +2548,10 @@ var DockedWorkspaces = new Lang.Class({
                 this._animateIn(this._settings.get_double('animation-time'), 0);
             }
         }
-    },
+    }
 
     // Enable autohide effect, hide workspaces
-    enableAutoHide: function(dontforce) {
+    enableAutoHide(dontforce) {
         // NOTE: default functionality is to force complete animateOut
         // autohide status shouldn't change if not completely animating out
         if (dontforce) {
@@ -2592,5 +2595,5 @@ var DockedWorkspaces = new Lang.Class({
         }
     }
 
-});
+};
 Signals.addSignalMethods(DockedWorkspaces.prototype);

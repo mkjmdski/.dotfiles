@@ -1,13 +1,13 @@
 
-const IconTheme = imports.gi.Gtk.IconTheme;
+const Graphene = imports.gi.Graphene;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
-const Mainloop = imports.mainloop;
 const Lang = imports.lang;
 const Signals = imports.signals;
 const Params = imports.misc.params;
@@ -23,9 +23,8 @@ const DND = imports.ui.dnd;
 const IconGrid = imports.ui.iconGrid;
 
 const Util = imports.misc.util;
-const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Me = ExtensionUtils.getCurrentExtension();
 
 const PlaceDisplay = Me.imports.placeDisplay;
 const Convenience = Me.imports.convenience;
@@ -44,9 +43,14 @@ const ShortcutsPanelOrientation = {
     INSIDE: 1
 };
 
+let recentlyClickedAppLoopId = 0;
+let recentlyClickedApp = null;
+let recentlyClickedAppWindows = null;
+let recentlyClickedAppIndex = 0;
+
 // Filter out unnecessary windows, for instance nautilus desktop window.
 function getInterestingWindows(app) {
-    return app.get_windows().filter(function(w) {
+    return app.get_windows().filter((w) => {
         return !w.skip_taskbar;
     });
 }
@@ -68,7 +72,7 @@ function getAppFromSource(source) {
         return source.app;
     } else if (source instanceof ShortcutButton) {
         if (source._type == ApplicationType.APPLICATION)
-            return source._app;
+            return source.app;
         else
             return null;
     } else {
@@ -76,362 +80,402 @@ function getAppFromSource(source) {
     }
 }
 
-var DragPlaceholderItem = new Lang.Class({
-    Name: 'workspacestodock_shortcutsPanel_DragPlaceholderItem',
+function _getViewFromIcon(icon) {
+    for (let parent = icon.get_parent(); parent; parent = parent.get_parent()) {
+        if (parent instanceof ShortcutsPanel)
+            return parent;
+    }
+    return null;
+}
 
-    _init: function(source) {
+var MyDragPlaceholderItem = GObject.registerClass(
+class WorkspacesToDock_MyDragPlaceholderItem extends St.Widget {
+    _init() {
+        super._init({ style_class: 'placeholder',
+                      opacity: 0,
+                      x_expand: true,
+                      y_expand: true,
+                      x_align: Clutter.ActorAlign.CENTER,
+                      y_align: Clutter.ActorAlign.CENTER });
+
         this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
-        this.actor = new St.Bin({ style_class: 'placeholder' });
-
         let iconSize = this._settings.get_double('shortcuts-panel-icon-size');
-        this.actor.set_size(iconSize, iconSize);
-    },
-
-    destroy: function() {
-        this.actor.destroy();
+        this.set_size(iconSize, iconSize);
     }
 });
 
-var ShortcutButtonMenu = new Lang.Class({
-    Name: 'workspacestodock_shortcutButtonMenu',
-    Extends: PopupMenu.PopupMenu,
-
-    _init: function(source) {
-        this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
-        let side = getPosition(this._settings);
-
-        this.parent(source.actor, 0.5, side);
-
-        // We want to keep the item hovered while the menu is up
-        this.blockSourceEvents = true;
-
-        this._source = source;
-
-        this.actor.add_style_class_name('app-well-menu');
-
-        // Chain our visibility and lifecycle to that of the source
-        source.actor.connect('notify::mapped', Lang.bind(this, function () {
-            if (!source.actor.mapped)
-                this.close();
-        }));
-        source.actor.connect('destroy', Lang.bind(this, function () { this.actor.destroy(); }));
-
-        Main.uiGroup.add_actor(this.actor);
+var ShortcutButton = GObject.registerClass({
+    Signals: {
+        'menu-state-changed': { param_types: [GObject.TYPE_BOOLEAN] },
+        'sync-tooltip': {},
     },
-
-    _redisplay: function() {
-        this.removeAll();
-
-        // passingthru67: appsbutton menu to show extension preferences
-        if (this._source._type == ApplicationType.APPSBUTTON) {
-            let item = this._appendMenuItem(_("Extension Preferences"));
-            item.connect('activate', Lang.bind(this, function () {
-                // passingthru67: Should we use commandline or argv?
-                // Util.trySpawnCommandLine("gnome-shell-extension-prefs " + Me.metadata.uuid);
-                Util.spawn(["gnome-shell-extension-prefs", Me.metadata.uuid]);
-            }));
-            return;
-        }
-
-        let windows = this._source._app.get_windows().filter(function(w) {
-            return !w.skip_taskbar;
+}, class WorkspacesToDock_ShortcutButton extends St.Button {
+    _init(app, appType, panel) {
+        super._init({
+            style_class: 'app-well-app workspacestodock-shortcut-button',
+            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            reactive: true,
+            button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
+            can_focus: true,
         });
 
-        // Display the app windows menu items and the separator between windows
-        // of the current desktop and other windows.
-        let activeWorkspace = global.screen.get_active_workspace();
-        let separatorShown = windows.length > 0 && windows[0].get_workspace() != activeWorkspace;
-
-        for (let i = 0; i < windows.length; i++) {
-            let window = windows[i];
-            if (!separatorShown && window.get_workspace() != activeWorkspace) {
-                this._appendSeparator();
-                separatorShown = true;
-            }
-            let item = this._appendMenuItem(window.title);
-            item.connect('activate', Lang.bind(this, function() {
-                this.emit('activate-window', window);
-            }));
-        }
-
-        if (!this._source._app.is_window_backed()) {
-            this._appendSeparator();
-
-            let appInfo = this._source._app.get_app_info();
-            let actions = appInfo.list_actions();
-            if (this._source._app.can_open_new_window() &&
-                actions.indexOf('new-window') == -1) {
-                this._newWindowMenuItem = this._appendMenuItem(_("New Window"));
-                this._newWindowMenuItem.connect('activate', Lang.bind(this, function() {
-                    this._source._app.open_new_window(-1);
-                    this.emit('activate-window', null);
-                }));
-                this._appendSeparator();
-            }
-
-            for (let i = 0; i < actions.length; i++) {
-                let action = actions[i];
-                let item = this._appendMenuItem(appInfo.get_action_name(action));
-                item.connect('activate', Lang.bind(this, function(emitter, event) {
-                    this._source._app.launch_action(action, event.get_time(), -1);
-                    this.emit('activate-window', null);
-                }));
-            }
-
-            let canFavorite = global.settings.is_writable('favorite-apps');
-
-            if (canFavorite) {
-                this._appendSeparator();
-
-                let isFavorite = AppFavorites.getAppFavorites().isFavorite(this._source._app.get_id());
-
-                if (isFavorite) {
-                    let item = this._appendMenuItem(_("Remove from Favorites"));
-                    item.connect('activate', Lang.bind(this, function() {
-                        let favs = AppFavorites.getAppFavorites();
-                        favs.removeFavorite(this._source._app.get_id());
-                    }));
-                } else {
-                    let item = this._appendMenuItem(_("Add to Favorites"));
-                    item.connect('activate', Lang.bind(this, function() {
-                        let favs = AppFavorites.getAppFavorites();
-                        favs.addFavorite(this._source._app.get_id());
-                    }));
-                }
-            }
-
-            if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
-                this._appendSeparator();
-                let item = this._appendMenuItem(_("Show Details"));
-                item.connect('activate', Lang.bind(this, function() {
-                    let id = this._source._app.get_id();
-                    let args = GLib.Variant.new('(ss)', [id, '']);
-                    Gio.DBus.get(Gio.BusType.SESSION, null,
-                        function(o, res) {
-                            let bus = Gio.DBus.get_finish(res);
-                            bus.call('org.gnome.Software',
-                                     '/org/gnome/Software',
-                                     'org.gtk.Actions', 'Activate',
-                                     GLib.Variant.new('(sava{sv})',
-                                                      ['details', [args], null]),
-                                     null, 0, -1, null, null);
-                            Main.overview.hide();
-                        });
-                }));
-            }
-        }
-    },
-
-    _appendSeparator: function () {
-        let separator = new PopupMenu.PopupSeparatorMenuItem();
-        this.addMenuItem(separator);
-    },
-
-    _appendMenuItem: function(labelText) {
-        let item = new PopupMenu.PopupMenuItem(labelText);
-        this.addMenuItem(item);
-        return item;
-    },
-
-    popup: function(activatingButton) {
-        this._redisplay();
-
-        if (this._settings.get_boolean('shortcuts-panel-popupmenu-arrow-at-top')) {
-            this._arrowAlignment = 0.0;
-        } else {
-            this._arrowAlignment = 0.5;
-        }
-
-        this.open();
-    }
-});
-Signals.addSignalMethods(ShortcutButtonMenu.prototype);
-
-let recentlyClickedAppLoopId = 0;
-let recentlyClickedApp = null;
-let recentlyClickedAppWindows = null;
-let recentlyClickedAppIndex = 0;
-
-var ShortcutButton = new Lang.Class({
-    Name: 'workspacestodock.ShortcutButton',
-
-    _init: function (app, appType, panel) {
-        this._app = app;
+        this.app = app;
+        //this.id = app.get_id();
+        //this.name = app.get_name();
         this._type = appType;
         this._panel = panel;
+
         this._stateChangedId = 0;
         this._countChangedId = 0;
         this._maxN = 4;
         this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
         this._gDesktopInterfaceSettings = Convenience.getSettings('org.gnome.desktop.interface');
 
-        this.actor = new St.Button({ style_class: 'app-well-app workspacestodock-shortcut-button',
-                                     reactive: true,
-                                     button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
-                                     can_focus: true,
-                                     x_fill: true,
-                                     y_fill: true,
-                                     x_expand: false,
-                                     y_expand: false });
-
-        this.actor._delegate = this;
-
-        this._iconSize = this._settings.get_double('shortcuts-panel-icon-size');
-        let iconParams = {setSizeManually: true, showLabel: false};
-
-        if (appType == ApplicationType.APPLICATION) {
-            iconParams['createIcon'] = Lang.bind(this, function(iconSize){ return app.create_icon_texture(iconSize);});
-        } else if (appType == ApplicationType.PLACE) {
-            // Adjust 'places' symbolic icons by reducing their size
-            // and setting a special class for button padding
-            this._iconSize -= 4;
-            this.actor.add_style_class_name('workspacestodock-shortcut-button-symbolic');
-            iconParams['createIcon'] = Lang.bind(this, function(iconSize){ return new St.Icon({gicon: app.icon, icon_size: iconSize});});
-        } else if (appType == ApplicationType.RECENT) {
-            let gicon = Gio.content_type_get_icon(app.mime);
-            iconParams['createIcon'] = Lang.bind(this, function(iconSize){ return new St.Icon({gicon: gicon, icon_size: iconSize});});
-        } else if (appType == ApplicationType.APPSBUTTON) {
-            iconParams['createIcon'] = Lang.bind(this, function(iconSize){ return new St.Icon({icon_name: 'view-grid-symbolic', icon_size: iconSize});});
-        }
-
-        this._dot = new St.Widget({ style_class: 'app-well-app-running-dot',
-                                    layout_manager: new Clutter.BinLayout(),
-                                    x_expand: true, y_expand: true,
-                                    x_align: Clutter.ActorAlign.CENTER,
-                                    y_align: Clutter.ActorAlign.END });
-
-        // NOTE: _iconContainer y_expand:false prevents button from growing
-        // vertically when _dot is shown and hid
         this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
                                               x_expand: true, y_expand: true });
 
-        this.actor.set_child(this._iconContainer);
+        this.set_child(this._iconContainer);
+
+        this._delegate = this;
+
+        this._hasDndHover = false;
+        this._folderPreviewId = 0;
+
+        let iconParams = {
+            setSizeManually: true,
+            showLabel: false
+        };
+        iconParams['createIcon'] = this._createIcon.bind(this);
+
+        this.icon = new IconGrid.BaseIcon(null, iconParams);
+        this._iconSize = this._settings.get_double('shortcuts-panel-icon-size');
+        this.icon.setIconSize(this._iconSize);
+        this.icon.add_style_class_name('workspacestodock-shortcut-button-icon');
+        if (this._type == ApplicationType.PLACE) {
+            this.icon.add_style_class_name('workspacestodock-shortcut-button-symbolic-icon');
+        }
+        this._iconContainer.add_child(this.icon);
+
+        this._dot = new St.Widget({
+            style_class: 'app-well-app-running-dot',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.END,
+        });
         this._iconContainer.add_child(this._dot);
 
-        this._icon = new IconGrid.BaseIcon(null, iconParams);
-        this._icon.actor.add_style_class_name('workspacestodock-shortcut-button-icon');
-        if (appType == ApplicationType.PLACE) {
-            this._icon.actor.add_style_class_name('workspacestodock-shortcut-button-symbolic-icon');
-        }
-        this._icon.setIconSize(this._iconSize);
-
-        this._iconContainer.add_child(this._icon.actor);
+        this.label_actor = this.icon.label;
 
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
+
+        if (this._type != ApplicationType.APPSBUTTON) {
+            this._draggable = DND.makeDraggable(this);
+            this._draggable.connect('drag-begin', () => {
+                this._dragging = true;
+                this.scaleAndFade();
+                this._removeMenuTimeout();
+                Main.overview.beginItemDrag(this);
+            });
+            this._draggable.connect('drag-cancelled', () => {
+                this._dragging = false;
+                Main.overview.cancelledItemDrag(this);
+            });
+            this._draggable.connect('drag-end', () => {
+                this._dragging = false;
+                this.undoScaleAndFade();
+                Main.overview.endItemDrag(this);
+            });
+        }
+
+        this._dragMonitor = null;
+        this._itemDragBeginId = Main.overview.connect(
+            'item-drag-begin', this._onDragBegin.bind(this));
+        this._itemDragEndId = Main.overview.connect(
+            'item-drag-end', this._onDragEnd.bind(this));
+
         this._menuTimeoutId = 0;
-
-        // Connect button signals
-        this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
-        this.actor.connect('enter-event', Lang.bind(this, this._onButtonEnter));
-        this.actor.connect('leave-event', Lang.bind(this, this._onButtonLeave));
-        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
-        this.actor.connect('clicked', Lang.bind(this, this._onClicked));
-
-        if (appType == ApplicationType.APPSBUTTON) {
-            this._stateChangedId = Main.overview.viewSelector._showAppsButton.connect('notify::checked', Lang.bind(this, this._onStateChanged));
-        } else if (appType == ApplicationType.APPLICATION) {
-            this._stateChangedId = this._app.connect('notify::state', Lang.bind(this, this._onStateChanged));
-            this._countChangedId = this._app.connect('windows-changed', Lang.bind(this, this._onCountChanged));
+        this._stateChangedId = 0;
+        if (this._type == ApplicationType.APPSBUTTON) {
+            this._stateChangedId = Main.overview.viewSelector._showAppsButton.connect('notify::checked', () => {
+                this._onStateChanged.bind(this);
+            });
+        } else if (this._type == ApplicationType.APPLICATION) {
+            this._stateChangedId = this.app.connect('notify::state', () => {
+                this._onStateChanged();
+            });
+            this._countChangedId = this.app.connect('windows-changed', () => {
+                this._onCountChanged.bind(this);
+            });
         }
 
-        // Connect drag-n-drop signals
-        if (appType != ApplicationType.APPSBUTTON) {
-            this._draggable = DND.makeDraggable(this.actor);
-            this._draggable.connect('drag-begin', Lang.bind(this,
-                function () {
-                    this._removeMenuTimeout();
-                    Main.overview.beginItemDrag(this);
-                }));
-            this._draggable.connect('drag-cancelled', Lang.bind(this,
-                function () {
-                    Main.overview.cancelledItemDrag(this);
-                }));
-            this._draggable.connect('drag-end', Lang.bind(this,
-                function () {
-                   Main.overview.endItemDrag(this);
-                }));
-        }
-
-        // Check if running state
         this._dot.opacity = 0;
         this._onStateChanged();
-    },
 
-    _onDestroy: function() {
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        Main.overview.disconnect(this._itemDragBeginId);
+        Main.overview.disconnect(this._itemDragEndId);
+
         if (this._stateChangedId > 0) {
             if (this._type == ApplicationType.APPSBUTTON) {
                 Main.overview.viewSelector._showAppsButton.disconnect(this._stateChangedId);
             } else {
-                this._app.disconnect(this._stateChangedId);
+                this.app.disconnect(this._stateChangedId);
             }
         }
         this._stateChangedId = 0;
 
         if (this._countChangedId > 0) {
             if (this._type == ApplicationType.APPLICATION) {
-                this._app.disconnect(this._countChangedId);
+                this.app.disconnect(this._countChangedId);
             }
         }
         this._countChangedId = 0;
 
+        if (this._dragMonitor) {
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
+
+        if (this._draggable) {
+            if (this._dragging)
+                Main.overview.endItemDrag(this);
+            this._draggable = null;
+        }
+
         this._removeMenuTimeout();
-    },
+    }
 
-    _onButtonEnter: function(actor, event) {
-    },
+    _createIcon(iconSize) {
+        if (this._type == ApplicationType.APPLICATION) {
+            return this.app.create_icon_texture(iconSize);
+        } else if (this._type == ApplicationType.PLACE) {
+            // Adjust 'places' symbolic icons by reducing their size
+            // and setting a special class for button padding
+            this._iconSize -= 4;
+            this.actor.add_style_class_name('workspacestodock-shortcut-button-symbolic');
+            return new St.Icon({gicon: this.app.icon, icon_size: iconSize});
+        } else if (this._type == ApplicationType.RECENT) {
+            let gicon = Gio.content_type_get_icon(this.app.mime);
+            return new St.Icon({gicon: gicon, icon_size: iconSize});
+        } else if (this._type == ApplicationType.APPSBUTTON) {
+            return new St.Icon({icon_name: 'view-app-grid-symbolic', icon_size: iconSize});
+        }
+    }
 
-    _onButtonLeave: function(actor, event) {
-    },
+    _removeMenuTimeout() {
+        if (this._menuTimeoutId > 0) {
+            GLib.source_remove(this._menuTimeoutId);
+            this._menuTimeoutId = 0;
+        }
+    }
 
-    _onButtonPress: function(actor, event) {
+    _onStateChanged() {
+        if (this._type == ApplicationType.APPSBUTTON) {
+            if (Main.overview.viewSelector._showAppsButton.checked) {
+                this.add_style_pseudo_class('checked');
+            } else {
+                this.remove_style_pseudo_class('checked');
+            }
+        } else if (this._type == ApplicationType.APPLICATION) {
+            if (this.app.state != Shell.AppState.STOPPED) {
+                if (!this._settings.get_boolean('shortcuts-panel-show-window-count-indicators')) {
+                    this._dot.opacity = 255;
+                }
+                this._onCountChanged();
+            } else {
+                this._dot.opacity = 0;
+                this._onCountChanged();
+            }
+        }
+    }
+
+    _onCountChanged() {
+        if (!this._settings.get_boolean('shortcuts-panel-show-window-count-indicators'))
+            return;
+
+        let appWindows = this.app.get_windows().filter((w) => {
+            return !w.skip_taskbar;
+        });
+
+        let n = appWindows.length;
+        if (n > this._maxN)
+             n = this._maxN;
+
+        for (let i = 1; i <= this._maxN; i++) {
+            let className = 'workspacestodock-shortcut-button-windowcount-image-'+i;
+            if (i != n) {
+                this.remove_style_class_name(className);
+            } else {
+                this.add_style_class_name(className);
+            }
+        }
+    }
+
+    _setPopupTimeout() {
+        this._removeMenuTimeout();
+        this._menuTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MENU_POPUP_TIMEOUT, () => {
+            this._menuTimeoutId = 0;
+            this.popupMenu();
+            return GLib.SOURCE_REMOVE;
+        });
+        GLib.Source.set_name_by_id(this._menuTimeoutId, '[gnome-shell] this.popupMenu');
+    }
+
+    vfunc_leave_event(crossingEvent) {
+        let ret = super.vfunc_leave_event(crossingEvent);
+
+        this.fake_release();
+        this._removeMenuTimeout();
+        return ret;
+    }
+
+    vfunc_button_press_event(buttonEvent) {
+        super.vfunc_button_press_event(buttonEvent);
         if (this._type == ApplicationType.APPSBUTTON || this._type == ApplicationType.APPLICATION) {
-            let button = event.get_button();
-            if (button == 1) {
-                this._removeMenuTimeout();
-                this._menuTimeoutId = Mainloop.timeout_add(MENU_POPUP_TIMEOUT,
-                    Lang.bind(this, function() {
-                        this._menuTimeoutId = 0;
-                        return GLib.SOURCE_REMOVE;
-                    }));
-            } else if (button == 3) {
+            if (buttonEvent.button == 1) {
+                this._setPopupTimeout();
+            } else if (buttonEvent.button == 3) {
                 this.popupMenu();
                 return Clutter.EVENT_STOP;
             }
         }
         return Clutter.EVENT_PROPAGATE;
-    },
+    }
 
-    _onClicked: function(actor, button) {
-        //let event = Clutter.get_current_event();
-        let tracker = Shell.WindowTracker.get_default();
+    vfunc_touch_event(touchEvent) {
+        super.vfunc_touch_event(touchEvent);
+        if (touchEvent.type == Clutter.EventType.TOUCH_BEGIN)
+            this._setPopupTimeout();
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    vfunc_clicked(button) {
         this._removeMenuTimeout();
+        this.activate(button);
+    }
 
-        if (button == 1) {
+    _onKeyboardPopupMenu() {
+        this.popupMenu();
+        this._menu.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+    }
+
+    getId() {
+        return this.app.get_id();
+    }
+
+    popupMenu() {
+        if (this._type != ApplicationType.APPSBUTTON && this._type != ApplicationType.APPLICATION)
+             return false;
+
+        this._removeMenuTimeout();
+        this.fake_release();
+
+        if (this._draggable)
+            this._draggable.fakeRelease();
+
+        if (!this._menu) {
+            this._menu = new ShortcutButtonMenu(this);
+            this._menu.connect('activate-window', (menu, window) => {
+                this.activateWindow(window);
+            });
+            this._menu.connect('open-state-changed', (menu, isPoppedUp) => {
+                if (!isPoppedUp)
+                    this._onMenuPoppedDown();
+            });
+            let id = Main.overview.connect('hiding', () => {
+                this._menu.close();
+            });
+            this.connect('destroy', () => {
+                Main.overview.disconnect(id);
+            });
+
+            this._menuManager.addMenu(this._menu);
+        }
+
+        this.emit('menu-state-changed', true);
+
+        this._panel.setPopupMenuFlag(true);
+        this._panel.hideThumbnails();
+
+        this.set_hover(true);
+        this._menu.popup();
+        this._menuManager.ignoreRelease();
+        this.emit('sync-tooltip');
+
+        return false;
+    }
+
+    activateWindow(metaWindow) {
+        if (metaWindow)
+            Main.activateWindow(metaWindow);
+        else
+            Main.overview.hide();
+    }
+
+    _onMenuPoppedDown() {
+        this.sync_hover();
+        this.emit('menu-state-changed', false);
+
+        this._panel.setPopupMenuFlag(false);
+        this._panel.showThumbnails();
+    }
+
+    activate(button) {
+        let event = Clutter.get_current_event();
+        let modifiers = event ? event.get_state() : 0;
+        let isPrimaryButton = button && button == Clutter.BUTTON_PRIMARY;
+        let isMiddleButton = button && button == Clutter.BUTTON_MIDDLE;
+        let isCtrlPressed = (modifiers & Clutter.ModifierType.CONTROL_MASK) != 0;
+
+        let openNewWindow = false;
+        if (this._type == ApplicationType.APPLICATION) {
+            openNewWindow = this.app.can_open_new_window() &&
+                                this.app.state == Shell.AppState.RUNNING &&
+                                (isCtrlPressed || isMiddleButton);
+        }
+
+        if (isPrimaryButton) {
             if (this._type == ApplicationType.APPLICATION) {
-                if (this._app.state == Shell.AppState.RUNNING) {
-                    if (this._app == tracker.focus_app && !Main.overview._shown) {
-                        this._cycleThroughWindows();
-                    } else {
-                        // If we activate the app (this._app.activate), all app
-                        // windows will come to the foreground. We only want to
-                        // activate one window at a time
-                        let windows = getInterestingWindows(this._app);
-                        let w = windows[0];
-                        Main.activateWindow(w);
-                    }
-                } else {
-                    this._app.open_new_window(-1);
-                }
+                // let tracker = Shell.WindowTracker.get_default();
+                // if (this.app.state == Shell.AppState.RUNNING) {
+                //     if (this.app == tracker.focus_app && !Main.overview._shown) {
+                //         this._cycleThroughWindows();
+                //     } else {
+                //         // If we activate the app (this.app.activate), all app
+                //         // windows will come to the foreground. We only want to
+                //         // activate one window at a time
+                //         let windows = getInterestingWindows(this.app);
+                //         let w = windows[0];
+                //         Main.activateWindow(w);
+                //     }
+                // } else {
+                //     this.app.open_new_window(-1);
+                // }
+                if (this.app.state == Shell.AppState.STOPPED || openNewWindow)
+                    this.animateLaunch();
+
+                if (openNewWindow)
+                    this.app.open_new_window(-1);
+                else
+                    this.app.activate();
+
+                Main.overview.hide();
             } else if (this._type == ApplicationType.PLACE) {
-                this._app.launch(global.get_current_time());
+                this.app.launch(global.get_current_time());
             } else if (this._type == ApplicationType.RECENT) {
-                Gio.app_info_launch_default_for_uri(this._app.uri, global.create_app_launch_context());
+                Gio.app_info_launch_default_for_uri(this.app.uri, global.create_app_launch_context());
             } else if (this._type == ApplicationType.APPSBUTTON) {
                 if (Main.overview.visible) {
                     if (Main.overview.viewSelector._showAppsButton.checked) {
-                        Main.overview.viewSelector._showAppsButton.checked = false;
                         Main.overview.hide();
+                        Main.overview.viewSelector._showAppsButton.checked = false;
                     } else {
                         Main.overview.viewSelector._showAppsButton.checked = true;
                     }
@@ -451,34 +495,34 @@ var ShortcutButton = new Lang.Class({
                     }
                 }
             }
-        } else if (button == 2) {
+        } else if (isMiddleButton) {
             if (this._type == ApplicationType.APPLICATION) {
-                this._app.open_new_window(-1);
+                this.app.open_new_window(-1);
             }
         }
         return Clutter.EVENT_PROPAGATE;
-    },
+    }
 
-    _cycleThroughWindows: function() {
+    _cycleThroughWindows() {
         // Store for a little amount of time last time app was clicked
         // since the order changes upon window interaction
         let MEMORY_TIME = 3000;
 
-        let appWindows = getInterestingWindows(this._app);
+        let appWindows = getInterestingWindows(this.app);
 
         if(recentlyClickedAppLoopId>0)
-            Mainloop.source_remove(recentlyClickedAppLoopId);
+            GLib.source_remove(recentlyClickedAppLoopId);
 
-        recentlyClickedAppLoopId = Mainloop.timeout_add(MEMORY_TIME, this._resetClickedApp);
+        recentlyClickedAppLoopId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MEMORY_TIME, this._resetClickedApp);
 
         // If there isn't already a list of windows for the current app,
         // or the stored list is outdated, use the current windows list.
         if (!recentlyClickedApp ||
-            recentlyClickedApp.get_id() != this._app.get_id() ||
+            recentlyClickedApp.get_id() != this.app.get_id() ||
             recentlyClickedAppWindows.length != appWindows.length
           ) {
 
-            recentlyClickedApp = this._app;
+            recentlyClickedApp = this.app;
             recentlyClickedAppWindows = appWindows;
             recentlyClickedAppIndex = 0;
         }
@@ -487,11 +531,11 @@ var ShortcutButton = new Lang.Class({
         let index = recentlyClickedAppIndex % recentlyClickedAppWindows.length;
         let window = recentlyClickedAppWindows[index];
         Main.activateWindow(window);
-    },
+    }
 
-    _resetClickedApp: function() {
+    _resetClickedApp() {
         if(recentlyClickedAppLoopId>0)
-            Mainloop.source_remove(recentlyClickedAppLoopId);
+            GLib.source_remove(recentlyClickedAppLoopId);
 
         recentlyClickedAppLoopId=0;
         recentlyClickedApp =null;
@@ -499,135 +543,42 @@ var ShortcutButton = new Lang.Class({
         recentlyClickedAppIndex = 0;
 
         return false;
-    },
+    }
 
-    _removeMenuTimeout: function() {
-        if (this._menuTimeoutId > 0) {
-            Mainloop.source_remove(this._menuTimeoutId);
-            this._menuTimeoutId = 0;
-        }
-    },
+    animateLaunch() {
+        this.icon.animateZoomOut();
+    }
 
-    popupMenu: function() {
-        if (this._type != ApplicationType.APPSBUTTON && this._type != ApplicationType.APPLICATION)
-             return false;
+    animateLaunchAtPos(x, y) {
+        this.icon.animateZoomOutAtPos(x, y);
+    }
 
-        this._removeMenuTimeout();
-        this.actor.fake_release();
-        if (this._draggable)
-            this._draggable.fakeRelease();
+    scaleIn() {
+        this.scale_x = 0;
+        this.scale_y = 0;
 
-        if (!this._menu) {
-            this._menu = new ShortcutButtonMenu(this);
-            this._menu.connect('activate-window', Lang.bind(this, function (menu, window) {
-                this._activateWindowFromMenu(window);
-            }));
-            this._menu.connect('open-state-changed', Lang.bind(this, function (menu, isPoppedUp) {
-                if (!isPoppedUp)
-                    this._onMenuPoppedDown();
-            }));
-            Main.overview.connect('hiding', Lang.bind(this, function () { this._menu.close(); }));
-
-            this._menuManager.addMenu(this._menu);
-        }
-
-        this.emit('menu-state-changed', true);
-
-        this._panel.setPopupMenuFlag(true);
-        this._panel.hideThumbnails();
-        this.actor.set_hover(true);
-        this._menu.popup(this);
-        this._menuManager.ignoreRelease();
-
-        return false;
-    },
-
-    _onMenuPoppedDown: function() {
-        this.actor.sync_hover();
-        this.emit('menu-state-changed', false);
-        this._panel.setPopupMenuFlag(false);
-        this._panel.showThumbnails();
-    },
-
-    _activateWindowFromMenu: function(metaWindow) {
-        if (metaWindow) {
-            Main.activateWindow(metaWindow);
-        }
-    },
-
-    _onStateChanged: function() {
-        if (this._type == ApplicationType.APPSBUTTON) {
-            if (Main.overview.viewSelector._showAppsButton.checked) {
-                this.actor.add_style_pseudo_class('checked');
-            } else {
-                this.actor.remove_style_pseudo_class('checked');
-            }
-        } else if (this._type == ApplicationType.APPLICATION) {
-            if (this._app.state != Shell.AppState.STOPPED) {
-                if (!this._settings.get_boolean('shortcuts-panel-show-window-count-indicators')) {
-                    this._dot.opacity = 255;
-                }
-                this._onCountChanged();
-            } else {
-                this._dot.opacity = 0;
-                this._onCountChanged();
-            }
-        }
-    },
-
-    _onCountChanged: function() {
-        if (!this._settings.get_boolean('shortcuts-panel-show-window-count-indicators'))
-            return;
-
-        let appWindows = this._app.get_windows().filter(function(w) {
-            return !w.skip_taskbar;
+        this.ease({
+            scale_x: 1,
+            scale_y: 1,
+            duration: APP_ICON_SCALE_IN_TIME,
+            delay: APP_ICON_SCALE_IN_DELAY,
+            mode: Clutter.AnimationMode.EASE_OUT_QUINT,
         });
+    }
 
-        let n = appWindows.length;
-        if (n > this._maxN)
-             n = this._maxN;
+    shellWorkspaceLaunch(params) {
+        let { stack } = new Error();
+        log('shellWorkspaceLaunch is deprecated, use app.open_new_window() instead\n%s'.format(stack));
 
-        for (let i = 1; i <= this._maxN; i++) {
-            let className = 'workspacestodock-shortcut-button-windowcount-image-'+i;
-            if (i != n) {
-                this.actor.remove_style_class_name(className);
-            } else {
-                this.actor.add_style_class_name(className);
-            }
-        }
-    },
-
-    getDragActor: function() {
-        let appIcon;
-        if (this._type == ApplicationType.APPLICATION) {
-            appIcon = this._app.create_icon_texture(this._iconSize);
-        } else if (this._type == ApplicationType.PLACE) {
-            appIcon = new St.Icon({gicon: this._app.icon, icon_size: this._iconSize});
-        } else if (this._type == ApplicationType.RECENT) {
-            let gicon = Gio.content_type_get_icon(this._app.mime);
-            appIcon = new St.Icon({gicon: gicon, icon_size: this._iconSize});
-        } else if (this._type == ApplicationType.APPSBUTTON) {
-            appIcon = new St.Icon({icon_name: 'view-grid-symbolic', icon_size: iconSize});
-        }
-        return appIcon;
-    },
-
-    // Returns the original actor that should align with the actor
-    // we show as the item is being dragged.
-    getDragActorSource: function() {
-        return this._icon.actor;
-    },
-
-    shellWorkspaceLaunch : function(params) {
         params = Params.parse(params, { workspace: -1,
                                         timestamp: 0 });
 
         if (this._type == ApplicationType.APPLICATION) {
-            this._app.open_new_window(params.workspace);
+            this.app.open_new_window(params.workspace);
         } else if (this._type == ApplicationType.PLACE) {
-            this._app.launch(global.get_current_time(), params.workspace);
+            this.app.launch(global.get_current_time(), params.workspace);
         } else if (this._type == ApplicationType.RECENT) {
-            Gio.app_info_launch_default_for_uri(this._app.uri, global.create_app_launch_context());
+            Gio.app_info_launch_default_for_uri(this.app.uri, global.create_app_launch_context());
         } else if (this._type == ApplicationType.APPSBUTTON) {
             if (Main.overview.visible) {
                 if (Main.overview.viewSelector._showAppsButton.checked) {
@@ -642,13 +593,304 @@ var ShortcutButton = new Lang.Class({
             }
         }
     }
+
+    getDragActor() {
+        let appIcon;
+        if (this._type == ApplicationType.APPLICATION) {
+            appIcon = this.app.create_icon_texture(this._iconSize);
+        } else if (this._type == ApplicationType.PLACE) {
+            appIcon = new St.Icon({gicon: this.app.icon, icon_size: this._iconSize});
+        } else if (this._type == ApplicationType.RECENT) {
+            let gicon = Gio.content_type_get_icon(this.app.mime);
+            appIcon = new St.Icon({gicon: gicon, icon_size: this._iconSize});
+        } else if (this._type == ApplicationType.APPSBUTTON) {
+            appIcon = new St.Icon({icon_name: 'view-app-grid-symbolic', icon_size: iconSize});
+        }
+        return appIcon;
+    }
+
+    // Returns the original actor that should align with the actor
+    // we show as the item is being dragged.
+    getDragActorSource() {
+        return this.icon.icon;
+    }
+
+    shouldShowTooltip() {
+        return this.hover && (!this._menu || !this._menu.isOpen);
+    }
+
+    scaleAndFade() {
+        this.reactive = false;
+        this.ease({
+            scale_x: 0.75,
+            scale_y: 0.75,
+            opacity: 128,
+        });
+    }
+
+    undoScaleAndFade() {
+        this.reactive = true;
+        this.ease({
+            scale_x: 1.0,
+            scale_y: 1.0,
+            opacity: 255,
+        });
+    }
+
+    _canAccept(source) {
+        return false;
+
+        // let view = _getViewFromIcon(source);
+        //
+        // return source != this &&
+        //        (source instanceof this.constructor) &&
+        //        (view instanceof AllView);
+    }
+
+    _setHoveringByDnd(hovering) {
+        // if (hovering) {
+        //     if (this._folderPreviewId > 0)
+        //         return;
+        //
+        //     this._folderPreviewId =
+        //         GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+        //             this.add_style_pseudo_class('drop');
+        //             this._showFolderPreview();
+        //             this._folderPreviewId = 0;
+        //             return GLib.SOURCE_REMOVE;
+        //         });
+        // } else {
+        //     if (this._folderPreviewId > 0) {
+        //         GLib.source_remove(this._folderPreviewId);
+        //         this._folderPreviewId = 0;
+        //     }
+        //     this._hideFolderPreview();
+        //     this.remove_style_pseudo_class('drop');
+        // }
+    }
+
+    _onDragBegin() {
+        this._dragMonitor = {
+            dragMotion: this._onDragMotion.bind(this),
+        };
+        DND.addDragMonitor(this._dragMonitor);
+    }
+
+    _onDragMotion(dragEvent) {
+        let target = dragEvent.targetActor;
+        let isHovering = target == this || this.contains(target);
+        let canDrop = this._canAccept(dragEvent.source);
+        let hasDndHover = isHovering && canDrop;
+
+        if (this._hasDndHover != hasDndHover) {
+            // this._setHoveringByDnd(hasDndHover);
+            this._hasDndHover = hasDndHover;
+        }
+
+        return DND.DragMotionResult.CONTINUE;
+    }
+
+    _onDragEnd() {
+        this.remove_style_pseudo_class('drop');
+        DND.removeDragMonitor(this._dragMonitor);
+    }
+
+    handleDragOver(source) {
+        if (source == this)
+            return DND.DragMotionResult.NO_DROP;
+
+        if (!this._canAccept(source))
+            return DND.DragMotionResult.CONTINUE;
+
+        return DND.DragMotionResult.MOVE_DROP;
+    }
+
+    acceptDrop(source) {
+        // this._setHoveringByDnd(false);
+
+        if (!this._canAccept(source))
+            return false;
+
+        let view = _getViewFromIcon(this);
+        let apps = [this.id, source.id];
+
+        return view.createFolder(apps);
+    }
 });
-Signals.addSignalMethods(ShortcutButton.prototype);
 
-var ShortcutsPanel = new Lang.Class({
-    Name: 'workspacestodock.ShortcutsPanel',
+var ShortcutButtonMenu = class WorkspacesToDock_ShortcutButtonMenu extends PopupMenu.PopupMenu {
+    constructor(source) {
+        let settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
+        let side = getPosition(settings);
 
-    _init: function (dock) {
+        super(source, 0.5, side);
+        this._settings = settings;
+
+        // We want to keep the item hovered while the menu is up
+        this.blockSourceEvents = true;
+
+        this._source = source;
+
+        this.actor.add_style_class_name('app-well-menu');
+
+        // Chain our visibility and lifecycle to that of the source
+        this._sourceMappedId = source.connect('notify::mapped', () => {
+            if (!source.mapped)
+                this.close();
+        });
+        source.connect('destroy', () => {
+            source.disconnect(this._sourceMappedId);
+            this.destroy();
+        });
+
+        Main.uiGroup.add_actor(this.actor);
+    }
+
+    _redisplay() {
+        this.removeAll();
+
+        // passingthru67: appsbutton menu to show extension preferences
+        if (this._source._type == ApplicationType.APPSBUTTON) {
+            let item = this._appendMenuItem(_("Extension Preferences"));
+            item.connect('activate', () => {
+                if (typeof ExtensionUtils.openPrefs === 'function') {
+                    ExtensionUtils.openPrefs();
+                } else {
+                    Util.spawn(["gnome-shell-extension-prefs", Me.metadata.uuid]);
+                }
+            });
+            return;
+        }
+
+        let windows = this._source.app.get_windows().filter(
+            w => !w.skip_taskbar
+        );
+
+        if (windows.length > 0) {
+            this.addMenuItem(
+                /* Translators: This is the heading of a list of open windows */
+                new PopupMenu.PopupSeparatorMenuItem(_("Open Windows"))
+            );
+        }
+
+        windows.forEach(window => {
+            let title = window.title
+                ? window.title : this._source.app.get_name();
+            let item = this._appendMenuItem(title);
+            item.connect('activate', () => {
+                this.emit('activate-window', window);
+            });
+        });
+
+        if (!this._source.app.is_window_backed()) {
+            this._appendSeparator();
+
+            let appInfo = this._source.app.get_app_info();
+            let actions = appInfo.list_actions();
+            if (this._source.app.can_open_new_window() &&
+                !actions.includes('new-window')) {
+                this._newWindowMenuItem = this._appendMenuItem(_("New Window"));
+                this._newWindowMenuItem.connect('activate', () => {
+                    this._source.animateLaunch();
+                    this._source.app.open_new_window(-1);
+                    this.emit('activate-window', null);
+                });
+                this._appendSeparator();
+            }
+
+            // if (discreteGpuAvailable &&
+            //     this._source.app.state == Shell.AppState.STOPPED) {
+            //     this._onDiscreteGpuMenuItem = this._appendMenuItem(_("Launch using Dedicated Graphics Card"));
+            //     this._onDiscreteGpuMenuItem.connect('activate', () => {
+            //         this._source.animateLaunch();
+            //         this._source.app.launch(0, -1, true);
+            //         this.emit('activate-window', null);
+            //     });
+            // }
+
+            for (let i = 0; i < actions.length; i++) {
+                let action = actions[i];
+                let item = this._appendMenuItem(appInfo.get_action_name(action));
+                item.connect('activate', (emitter, event) => {
+                    if (action == 'new-window')
+                        this._source.animateLaunch();
+
+                    this._source.app.launch_action(action, event.get_time(), -1);
+                    this.emit('activate-window', null);
+                });
+            }
+
+            let canFavorite = global.settings.is_writable('favorite-apps');
+
+            if (canFavorite) {
+                this._appendSeparator();
+
+                let isFavorite = AppFavorites.getAppFavorites().isFavorite(this._source.app.get_id());
+
+                if (isFavorite) {
+                    let item = this._appendMenuItem(_("Remove from Favorites"));
+                    item.connect('activate', () => {
+                        let favs = AppFavorites.getAppFavorites();
+                        favs.removeFavorite(this._source.app.get_id());
+                    });
+                } else {
+                    let item = this._appendMenuItem(_("Add to Favorites"));
+                    item.connect('activate', () => {
+                        let favs = AppFavorites.getAppFavorites();
+                        favs.addFavorite(this._source.app.get_id());
+                    });
+                }
+            }
+
+            if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
+                this._appendSeparator();
+                let item = this._appendMenuItem(_("Show Details"));
+                item.connect('activate', () => {
+                    let id = this._source.app.get_id();
+                    let args = GLib.Variant.new('(ss)', [id, '']);
+                    Gio.DBus.get(Gio.BusType.SESSION, null, (o, res) => {
+                        let bus = Gio.DBus.get_finish(res);
+                        bus.call('org.gnome.Software',
+                                 '/org/gnome/Software',
+                                 'org.gtk.Actions', 'Activate',
+                                 GLib.Variant.new('(sava{sv})',
+                                                  ['details', [args], null]),
+                                 null, 0, -1, null, null);
+                        Main.overview.hide();
+                    });
+                });
+            }
+        }
+    }
+
+    _appendSeparator() {
+        let separator = new PopupMenu.PopupSeparatorMenuItem();
+        this.addMenuItem(separator);
+    }
+
+    _appendMenuItem(labelText) {
+        // FIXME: app-well-menu-item style
+        let item = new PopupMenu.PopupMenuItem(labelText);
+        this.addMenuItem(item);
+        return item;
+    }
+
+    popup(_activatingButton) {
+        this._redisplay();
+
+        if (this._settings.get_boolean('shortcuts-panel-popupmenu-arrow-at-top')) {
+            this._arrowAlignment = 0.0;
+        } else {
+            this._arrowAlignment = 0.5;
+        }
+
+        this.open();
+    }
+};
+Signals.addSignalMethods(ShortcutButtonMenu.prototype);
+
+var ShortcutsPanel = class WorkspacesToDock_ShortcutsPanel {
+    constructor(dock) {
         this._dock = dock;
         this._settings = Convenience.getSettings('org.gnome.shell.extensions.workspaces-to-dock');
         this._position = getPosition(this._settings);
@@ -659,91 +901,116 @@ var ShortcutsPanel = new Lang.Class({
         if (this._isHorizontal)
             packVertical = false;
 
-        this.actor = new St.BoxLayout({ style_class: 'workspace-thumbnails workspacestodock-shortcuts-panel', vertical: packVertical, clip_to_allocation: true });
+        // Set _centerContainer property
+        if (this._settings.get_boolean('customize-height') && this._settings.get_boolean('center-thumbnails-on-dock')) {
+            this._centerContainer = true;
+        } else {
+            this._centerContainer = false;
+        }
+
+        // Set _centerPanelsIndependently property
+        if (this._centerContainer && this._settings.get_int('center-thumbnails-option') == 0) {
+            this._centerPanelsIndependently = true;
+        } else {
+            this._centerPanelsIndependently = false;
+        }
+
+        this.actor = new St.BoxLayout({
+            style_class: 'workspace-thumbnails workspacestodock-shortcuts-panel',
+            vertical: packVertical,
+            clip_to_allocation: true,
+            x_align: (this._centerContainer && this._centerPanelsIndependently) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START,
+            y_align: (this._centerContainer && this._centerPanelsIndependently) ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START
+        });
         this.actor._delegate = this;
 
         this._appSystem = Shell.AppSystem.get_default();
         this._appFavorites = AppFavorites.getAppFavorites();
 
-        this._installedChangedId = this._appSystem.connect('installed-changed', Lang.bind(this, function() {
+        this._installedChangedId = this._appSystem.connect('installed-changed', () =>  {
             this._appFavorites.reload();
             this.refresh();
-        }));
+        });
 
         // Connect to AppSystem and listen for app state changes
-        this._appStateChangedId = this._appSystem.connect('app-state-changed', Lang.bind(this, this._updateRunningApps));
+        this._appStateChangedId = this._appSystem.connect('app-state-changed', this._updateRunningApps.bind(this));
 
         // Connect to AppFavorites and listen for favorites changes
-        this._favoritesChangedId = this._appFavorites.connect('changed', Lang.bind(this, this._queueUpdateFavoriteApps));
+        this._favoritesChangedId = this._appFavorites.connect('changed', this._queueUpdateFavoriteApps.bind(this));
 
         // Connect to item drag signals
         this._dragPlaceholder = null;
         this._dragPlaceholderPos = -1;
-        Main.overview.connect('item-drag-begin', Lang.bind(this, this._onDragBegin));
-        Main.overview.connect('item-drag-end', Lang.bind(this, this._onDragEnd));
-        Main.overview.connect('item-drag-cancelled', Lang.bind(this, this._onDragCancelled));
+        this._itemDragBeginId = Main.overview.connect('item-drag-begin', this._onDragBegin.bind(this));
+        this._itemDragEndId = Main.overview.connect('item-drag-end', this._onDragEnd.bind(this));
+        this._itemDragCancelId = Main.overview.connect('item-drag-cancelled', this._onDragCancelled.bind(this));
 
         // Bind Preference Settings
         this._bindSettingsChanges();
 
         // Populate panel
         this._populate();
-    },
+    }
 
-    destroy: function() {
+    destroy() {
+
         // Disconnect global signals
+        if (this._itemDragBeginId > 0) Main.overview.disconnect(this._itemDragBeginId);
+        if (this._itemDragEndId > 0) Main.overview.disconnect(this._itemDragEndId);
+        if (this._itemDragCancelId > 0) Main.overview.disconnect(this._itemDragCancelId);
         if (this._installedChangedId > 0) this._appSystem.disconnect(this._installedChangedId);
         if (this._appStateChangedId > 0) this._appSystem.disconnect(this._appStateChangedId);
         if (this._favoritesChangedId > 0) this._appFavorites.disconnect(this._favoritesChangedId);
 
+        // Destroy main clutter actor
+        this.actor.destroy_all_children();
+        this.actor.destroy();
+
         // Disconnect GSettings signals
         this._settings.run_dispose();
+    }
 
-        // Destroy main clutter actor
-        this.actor.destroy();
-    },
+    _bindSettingsChanges() {
+        this._settings.connect('changed::shortcuts-panel-show-running', () =>  {
+            this.refresh();
+        });
+        this._settings.connect('changed::shortcuts-panel-show-places', () =>  {
+            this.refresh();
+        });
+        this._settings.connect('changed::shortcuts-panel-show-window-count-indicators', () =>  {
+            this.refresh();
+        });
+        this._settings.connect('changed::shortcuts-panel-appsbutton-at-bottom', () =>  {
+            this.refresh();
+        });
+    }
 
-    _bindSettingsChanges: function() {
-        this._settings.connect('changed::shortcuts-panel-show-running', Lang.bind(this, function() {
-            this.refresh();
-        }));
-        this._settings.connect('changed::shortcuts-panel-show-places', Lang.bind(this, function() {
-            this.refresh();
-        }));
-        this._settings.connect('changed::shortcuts-panel-show-window-count-indicators', Lang.bind(this, function() {
-            this.refresh();
-        }));
-        this._settings.connect('changed::shortcuts-panel-appsbutton-at-bottom', Lang.bind(this, function() {
-            this.refresh();
-        }));
-    },
-
-    _onDragBegin: function() {
+    _onDragBegin() {
         this._dragCancelled = false;
         this._dragMonitor = {
-            dragMotion: Lang.bind(this, this._onDragMotion)
+            dragMotion: this._onDragMotion.bind(this)
         };
         DND.addDragMonitor(this._dragMonitor);
-    },
+    }
 
-    _onDragCancelled: function() {
+    _onDragCancelled() {
         this._dragCancelled = true;
         this._endDrag();
-    },
+    }
 
-    _onDragEnd: function() {
+    _onDragEnd() {
         if (this._dragCancelled)
             return;
 
         this._endDrag();
-    },
+    }
 
-    _endDrag: function() {
+    _endDrag() {
         this._clearDragPlaceholder();
         DND.removeDragMonitor(this._dragMonitor);
-    },
+    }
 
-    _onDragMotion: function(dragEvent) {
+    _onDragMotion(dragEvent) {
         let app = getAppFromSource(dragEvent.source);
         if (app == null)
             return DND.DragMotionResult.CONTINUE;
@@ -752,17 +1019,17 @@ var ShortcutsPanel = new Lang.Class({
             this._clearDragPlaceholder();
 
         return DND.DragMotionResult.CONTINUE;
-    },
+    }
 
-    _clearDragPlaceholder: function() {
+    _clearDragPlaceholder() {
         if (this._dragPlaceholder) {
             this._dragPlaceholder.destroy();
             this._dragPlaceholder = null;
         }
         this._dragPlaceholderPos = -1;
-    },
+    }
 
-    handleDragOver : function(source, actor, x, y, time) {
+    handleDragOver(source, actor, x, y, time) {
         let app = getAppFromSource(source);
 
         // Don't allow favoriting of transient apps
@@ -794,9 +1061,9 @@ var ShortcutsPanel = new Lang.Class({
         // need to do the same adjustment there.
         if (this._dragPlaceholder) {
             if (this._isHorizontal) {
-                boxH -= this._dragPlaceholder.actor.width;
+                boxH -= this._dragPlaceholder.width;
             } else {
-                boxH -= this._dragPlaceholder.actor.height;
+                boxH -= this._dragPlaceholder.height;
             }
             numChildren--;
         }
@@ -822,6 +1089,9 @@ var ShortcutsPanel = new Lang.Class({
             // If the placeholder already exists, we just move
             // it, but if we are adding it, expand its size in
             // an animation
+            // Passingthru67 TODO:
+            // Need to convert the dragPlaceholder to an St.Widget so that
+            // we can use the fadein animation
             let fadeIn;
             if (this._dragPlaceholder) {
                 this._dragPlaceholder.destroy();
@@ -830,10 +1100,11 @@ var ShortcutsPanel = new Lang.Class({
                 fadeIn = true;
             }
 
-            this._dragPlaceholder = new DragPlaceholderItem();
-            this._favoriteAppsBox.insert_child_at_index(this._dragPlaceholder.actor,
+            this._dragPlaceholder = new MyDragPlaceholderItem();
+            this._favoriteAppsBox.insert_child_at_index(this._dragPlaceholder,
                                             this._dragPlaceholderPos);
-            this._dragPlaceholder.actor.show(fadeIn);
+            // this._dragPlaceholder.show(fadeIn);
+            this._dragPlaceholder.show();
         }
 
         // Remove the drag placeholder if we are not in the
@@ -850,10 +1121,10 @@ var ShortcutsPanel = new Lang.Class({
         }
 
         return DND.DragMotionResult.COPY_DROP;
-    },
+    }
 
     // Draggable target interface
-    acceptDrop : function(source, actor, x, y, time) {
+    acceptDrop(source, actor, x, y, time) {
         let app = getAppFromSource(source);
 
         // Don't allow favoriting of transient apps
@@ -877,7 +1148,7 @@ var ShortcutsPanel = new Lang.Class({
                 children[i] == this._dragPlaceholder)
                 continue;
 
-            let childId = children[i]._delegate._app.get_id();
+            let childId = children[i]._delegate.app.get_id();
             if (childId == id) {
                 continue;
             }
@@ -891,25 +1162,24 @@ var ShortcutsPanel = new Lang.Class({
         if (!this._dragPlaceholder)
             return true;
 
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW, Lang.bind(this,
-            function () {
+        Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
                 let appFavorites = AppFavorites.getAppFavorites();
                 if (srcIsFavorite)
                     appFavorites.moveFavoriteToPos(id, favPos);
                 else
                     appFavorites.addFavoriteAtPos(id, favPos);
                 return false;
-            }));
+            });
 
         this._clearDragPlaceholder();
         return true;
-    },
+    }
 
-    setPopupMenuFlag: function(showing) {
+    setPopupMenuFlag(showing) {
         this._dock.setPopupMenuFlag(showing);
-    },
+    }
 
-    hideThumbnails: function() {
+    hideThumbnails() {
         if (this._settings.get_boolean('shortcuts-panel-popupmenu-hide-thumbnails')) {
             if (this._settings.get_enum('shortcuts-panel-orientation') == ShortcutsPanelOrientation.OUTSIDE) {
                 this._dock._thumbnailsBox.actor.opacity = 0;
@@ -921,9 +1191,9 @@ var ShortcutsPanel = new Lang.Class({
                 // this._dock._thumbnailsBox._indicator.opacity = 0;
             }
         }
-    },
+    }
 
-    showThumbnails: function() {
+    showThumbnails() {
         if (this._settings.get_boolean('shortcuts-panel-popupmenu-hide-thumbnails')) {
             this._dock._thumbnailsBox.actor.opacity = 255;
             this.actor.remove_style_class_name('workspacestodock-shortcuts-panel-popupmenu');
@@ -933,14 +1203,14 @@ var ShortcutsPanel = new Lang.Class({
             // }
             // this._dock._thumbnailsBox._indicator.opacity = 255;
         }
-    },
+    }
 
-    setReactiveState: function (state) {
+    setReactiveState(state) {
         if (state == null)
             return;
 
         // Deactive Apps button
-        this._appsButton.actor.reactive = state;
+        this._appsButton.reactive = state;
 
         // Deactivate favorites
         if (this._favoriteAppsBox) {
@@ -965,36 +1235,45 @@ var ShortcutsPanel = new Lang.Class({
                 children[i].reactive = state;
             }
         }
-    },
+    }
 
-    refresh: function() {
+    refresh() {
         this._clear();
         this._populate();
-    },
+    }
 
-    _clear: function() {
+    _clear() {
         this.actor.destroy_all_children();
-    },
+    }
 
-    _populate: function() {
+    _populate() {
         let packVertical = true;
         if (this._isHorizontal)
             packVertical = false;
 
         // Add Favorite Apps Box
-        this._favoriteAppsBox = new St.BoxLayout({ vertical: packVertical, style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-favorites' });
+        this._favoriteAppsBox = new St.BoxLayout({
+            vertical: packVertical,
+            style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-favorites'
+        });
         this.actor.add_actor(this._favoriteAppsBox);
-        this._favoriteAppsWorkId = Main.initializeDeferredWork(this._favoriteAppsBox, Lang.bind(this, this._updateFavoriteApps));
+        this._favoriteAppsWorkId = Main.initializeDeferredWork(this._favoriteAppsBox, this._updateFavoriteApps.bind(this));
 
         // Add Running Apps Box
         if (this._settings.get_boolean('shortcuts-panel-show-running')) {
-            this._runningAppsBox = new St.BoxLayout({ vertical: packVertical, style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-running' });
+            this._runningAppsBox = new St.BoxLayout({
+                vertical: packVertical,
+                style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-running'
+            });
             this.actor.add_actor(this._runningAppsBox);
             this._updateRunningApps();
         }
 
         if (this._settings.get_boolean('shortcuts-panel-show-places')) {
-            this._placesBox = new St.BoxLayout({ vertical: packVertical, style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-places' });
+            this._placesBox = new St.BoxLayout({
+                vertical: packVertical,
+                style_class: 'workspacestodock-shortcuts-panel workspacestodock-shortcuts-panel-places'
+            });
             this.actor.add_actor(this._placesBox);
 
             // Get places
@@ -1008,26 +1287,30 @@ var ShortcutsPanel = new Lang.Class({
             for (let i = 0; i < allPlaces.length; ++i) {
                 let app = allPlaces[i];
                 let shortcutButton = new ShortcutButton(app, ApplicationType.PLACE);
-                this._placesBox.add_actor(shortcutButton.actor);
+                this._placesBox.add_actor(shortcutButton);
             }
         }
 
         // Add Apps Button to top or bottom of shortcuts panel
         this._appsButton = new ShortcutButton(null, ApplicationType.APPSBUTTON, this);
         if (this._settings.get_boolean('shortcuts-panel-appsbutton-at-bottom')) {
-            let filler = new St.Widget({ style_class: 'popup-separator-menu-item workspacestodock-shortcut-panel-filler' });
-            this.actor.add(filler, { expand: true });
-            this.actor.add_actor(this._appsButton.actor);
+            let filler = new St.Widget({
+                style_class: 'popup-separator-menu-item workspacestodock-shortcut-panel-filler',
+                x_expand: true,
+                y_expand: true
+            });
+            this.actor.add_actor(filler);
+            this.actor.add_actor(this._appsButton);
         } else {
-            this.actor.insert_child_at_index(this._appsButton.actor, 0);
+            this.actor.insert_child_at_index(this._appsButton, 0);
         }
-    },
+    }
 
-    _queueUpdateFavoriteApps: function () {
+    _queueUpdateFavoriteApps () {
         Main.queueDeferredWork(this._favoriteAppsWorkId);
-    },
+    }
 
-    _updateFavoriteApps: function() {
+    _updateFavoriteApps() {
         if (!this._favoriteAppsBox)
             return;
 
@@ -1047,26 +1330,26 @@ var ShortcutsPanel = new Lang.Class({
         for (let i = 0; i < newApps.length; ++i) {
             let app = newApps[i];
             let shortcutButton = new ShortcutButton(app, ApplicationType.APPLICATION, this);
-            this._favoriteAppsBox.add_actor(shortcutButton.actor);
+            this._favoriteAppsBox.add_actor(shortcutButton);
         }
 
         this.emit('update-favorite-apps');
         this._updateRunningApps();
-    },
+    }
 
-    _updateRunningApps: function() {
+    _updateRunningApps() {
         if (!this._runningAppsBox)
             return;
 
-        let children = this._runningAppsBox.get_children().filter(function(actor) {
+        let children = this._runningAppsBox.get_children().filter((actor) => {
                 return actor &&
                       actor._delegate &&
-                      actor._delegate._app && actor._delegate._type == ApplicationType.APPLICATION;
+                      actor._delegate.app && actor._delegate._type == ApplicationType.APPLICATION;
             });
 
         // Apps currently in running apps box
         let oldApps = children.map(function(actor) {
-            return actor._delegate._app;
+            return actor._delegate.app;
         });
 
         // Apps supposed to be in the running apps box
@@ -1106,42 +1389,44 @@ var ShortcutsPanel = new Lang.Class({
         let newIndex = 0;
         let oldIndex = 0;
         while (newIndex < newApps.length || oldIndex < oldApps.length) {
+            let oldApp = oldApps.length > oldIndex ? oldApps[oldIndex] : null;
+            let newApp = newApps.length > newIndex ? newApps[newIndex] : null;
+
             // No change at oldIndex/newIndex
-            if (oldApps[oldIndex] == newApps[newIndex]) {
+            if (oldApp == newApp) {
                 oldIndex++;
                 newIndex++;
                 continue;
             }
 
             // App removed at oldIndex
-            if (oldApps[oldIndex] &&
-                newApps.indexOf(oldApps[oldIndex]) == -1) {
+            if (oldApp && newApps.indexOf(oldApp) == -1) {
                 removedActors.push(children[oldIndex]);
                 oldIndex++;
                 continue;
             }
 
             // App added at newIndex
-            if (newApps[newIndex] &&
-                oldApps.indexOf(newApps[newIndex]) == -1) {
-                addedItems.push({ app: newApps[newIndex],
-                                  item: this._createShortcutButton(newApps[newIndex], ApplicationType.APPLICATION),
+            if (newApp && oldApps.indexOf(newApp) == -1) {
+                addedItems.push({ app: newApp,
+                                  item: this._createShortcutButton(newApp, ApplicationType.APPLICATION),
                                   pos: newIndex });
                 newIndex++;
                 continue;
             }
 
             // App moved
-            let insertHere = newApps[newIndex + 1] &&
-                             newApps[newIndex + 1] == oldApps[oldIndex];
-            let alreadyRemoved = removedActors.reduce(function(result, actor) {
+            let nextApp = newApps.length > newIndex + 1 ? newApps[newIndex + 1]
+                                                        : null;
+            let insertHere = nextApp && nextApp == oldApp;
+            let alreadyRemoved = removedActors.reduce((result, actor) => {
                 let removedApp = actor.child._delegate.app;
-                return result || removedApp == newApps[newIndex];
+                return result || removedApp == newApp;
             }, false);
 
             if (insertHere || alreadyRemoved) {
-                let newItem = this._createShortcutButton(newApps[newIndex], shortcutType);
-                addedItems.push({ app: newApps[newIndex],
+                let newItem = this._createShortcutButton(newApp, shortcutType);
+                addedItems.push({ app: newApp,
                                   item: newItem,
                                   pos: newIndex + removedActors.length });
                 newIndex++;
@@ -1161,12 +1446,12 @@ var ShortcutsPanel = new Lang.Class({
         }
 
         this.emit('update-running-apps');
-    },
+    }
 
-    _createShortcutButton: function(app, appType) {
+    _createShortcutButton(app, appType) {
         let shortcutType = app ? appType : ApplicationType.APPSBUTTON;
         let shortcutButton = new ShortcutButton(app, shortcutType, this);
-        return shortcutButton.actor;
+        return shortcutButton;
     }
-});
+};
 Signals.addSignalMethods(ShortcutsPanel.prototype);
