@@ -165,7 +165,7 @@ function settfe {
     export TFE_TOKEN="$(cat ~/.terraformrc | grep $1 -A 1 | tail -n 1 | cut -d '=' -f 2 | tr -d '[:space:]' | tr -d '"')"
 }
 
-alias vpn='sudo openvpn "$(pwd | rev | cut -d/ -f1 | rev).conf"'
+alias vpn='sudo openvpn --config "$(pwd | rev | cut -d/ -f1 | rev).conf" --auth-user-pass /etc/openvpn/auth.txt'
 
 function socks {
     if [ "$1" = "--help" ]; then
