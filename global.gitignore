@@ -26,3 +26,4 @@ venv
 
 # random
 script.sh
+*.ignore
