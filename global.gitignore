@@ -27,3 +27,5 @@ venv
 # random
 script.sh
 *.ignore
+tfstate.json
+*.tfstate
