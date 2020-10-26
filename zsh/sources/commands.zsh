@@ -63,6 +63,19 @@ elif [[ $commands[terraform] ]]; then
     complete -o nospace -C $(which terraform) terraform
 fi
 
+if [[ $commands[terraform] ]]; then
+    function tplan {
+        terraform plan | tee tfplan.ignore
+        echo ">>> ADDRESSES <<<"
+        echo ">>> created"
+        for d in $(cat tfplan.ignore | grep 'created' | cut -d ' ' -f 4); do echo "'${d}'"; done
+        echo
+        echo ">>> destroyed"
+        echo
+        for d in $(cat tfplan.ignore | grep 'destroyed' | cut -d ' ' -f 4); do echo "'${d}'"; done
+    }
+fi
+
 if [[ $commands[pydf] ]]; then
     alias df="pydf"
 fi
