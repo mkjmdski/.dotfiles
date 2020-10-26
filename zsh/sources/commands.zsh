@@ -110,6 +110,10 @@ if [[ $commands[broot] ]]; then
     }
 fi
 
+if [[ $commands[bump] ]]; then
+    alias bump="bump --allow-dirty"
+fi
+
 # if [[ $commands[ns1] ]]; then
 #     eval "$(_NS1_COMPLETE=source ns1)"
 # fi
