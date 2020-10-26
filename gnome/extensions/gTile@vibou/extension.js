@@ -698,6 +698,8 @@ function destroyGrids() {
         let monitor = monitors[monitorIdx];
         let key = getMonitorKey(monitor);
         let grid = grids[key];
+        if (!grid)
+            continue;
         grid.hide(true);
         Main$1.layoutManager.removeChrome(grid.actor);
     }
