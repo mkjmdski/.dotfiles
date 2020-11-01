@@ -184,6 +184,13 @@ function settfe {
 
 alias vpn='sudo openvpn --config "$(pwd | rev | cut -d/ -f1 | rev).conf" --auth-user-pass /etc/openvpn/auth.txt'
 
+function ssh-d {
+    server="$1"
+    container="$2"
+    command="$3"
+    ssh -t $server docker exec -it $(ssh $server docker ps | grep $container | awk '{print $1}' | head -n 1) "${command:-/bin/sh}"
+}
+
 function socks {
     if [ "$1" = "--help" ]; then
         echo 'SETUP'
