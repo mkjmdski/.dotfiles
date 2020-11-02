@@ -367,6 +367,7 @@ const SETTINGS_SHOW_ICON = 'show-icon';
 const SETTINGS_GLOBAL_PRESETS = 'global-presets';
 const SETTINGS_MOVERESIZE_ENABLED = 'moveresize-enabled';
 const SETTINGS_WINDOW_MARGIN = 'window-margin';
+const SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED = 'window-margin-fullscreen-enabled';
 const SETTINGS_MAX_TIMEOUT = 'max-timeout';
 const SETTINGS_INSETS_PRIMARY = 'insets-primary';
 const SETTINGS_INSETS_PRIMARY_LEFT = 'insets-primary-left';
@@ -611,6 +612,7 @@ function initSettings() {
     getBoolSetting(SETTINGS_GLOBAL_PRESETS);
     getBoolSetting(SETTINGS_MOVERESIZE_ENABLED);
     gridSettings[SETTINGS_WINDOW_MARGIN] = getIntSetting(SETTINGS_WINDOW_MARGIN);
+    gridSettings[SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED] = getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
     gridSettings[SETTINGS_INSETS_PRIMARY] =
         { top: getIntSetting(SETTINGS_INSETS_PRIMARY_TOP),
             bottom: getIntSetting(SETTINGS_INSETS_PRIMARY_BOTTOM),
@@ -651,12 +653,18 @@ function enable() {
     if (gridSettings[SETTINGS_MOVERESIZE_ENABLED]) {
         bind(key_binding_global_resizes);
     }
+    Main$1.layoutManager.connect('monitors-changed', () => {
+        log("Reinitializing grids on monitors-changed");
+        destroyGrids();
+        initGrids();
+    });
     enabled = true;
     log("Extention Enabled!");
 }
 function disable() {
     log("Extension start disabling");
     enabled = false;
+    Main$1.layoutManager.disconnect('monitors-changed');
     unbind(keyBindings);
     unbind(key_bindings_presets);
     unbind(key_binding_global_resizes);
@@ -664,9 +672,9 @@ function disable() {
         unbind(key_bindings_tiling);
         keyControlBound = false;
     }
-    destroyGrids();
     launcher.destroy();
     launcher = null;
+    destroyGrids();
     resetFocusMetaWindow();
     log("Extention Disabled!");
 }
@@ -693,23 +701,19 @@ function initGrids() {
     log("Init grid done");
 }
 function destroyGrids() {
-    const monitors = activeMonitors();
-    for (let monitorIdx = 0; monitorIdx < monitors.length; monitorIdx++) {
-        let monitor = monitors[monitorIdx];
-        let key = getMonitorKey(monitor);
-        let grid = grids[key];
-        if (!grid)
-            continue;
+    log("destroyGrids");
+    for (let grid of grids) {
         grid.hide(true);
         Main$1.layoutManager.removeChrome(grid.actor);
     }
+    log("destroyGrids done");
 }
 function refreshGrids() {
     log("refreshGrids");
-    for (var gridIdx in grids) {
-        let grid = grids[gridIdx];
+    for (let grid of grids) {
         grid.refresh();
     }
+    log("refreshGrids done");
 }
 function moveGrids() {
     log("moveGrids");
@@ -1920,7 +1924,7 @@ GridElementDelegate.prototype = {
             reset_window(focusMetaWindow);
             let areaWidth, areaHeight, areaX, areaY;
             [areaX, areaY, areaWidth, areaHeight] = this._computeAreaPositionSize(this.first, gridElement);
-            if (this._allSelected()) {
+            if (this._allSelected() && gridSettings[SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED] === false) {
                 move_maximize_window(focusMetaWindow, areaX, areaY);
             }
             else {
