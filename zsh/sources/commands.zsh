@@ -191,6 +191,38 @@ function ssh-d {
     ssh -t $server docker exec -it $(ssh $server docker ps | grep $container | awk '{print $1}' | head -n 1) "${command:-/bin/sh}"
 }
 
+function ssh-d-cp {
+    server="$1"
+    project="$2"
+    src="$3"
+    dest="$4"
+    tmp_backend="$(echo "/tmp/$project/$src" | sed 's|//|/|g')"
+    echo ">> Making directory $tmp_backend"
+    ssh $server mkdir -p "$tmp_backend"
+    echo ">> Copy ${src} to $tmp_backend on $server"
+    ssh -t $server docker cp "$(ssh $server docker ps | grep $project | awk '{print $1}' | head -n 1):/${src}" "$tmp_backend"
+    echo ">> Making tar archive from $tmp_backend on $server to $dest on local machine"
+    ssh $server tar czf - "$tmp_backend" > "$dest"
+    echo ">> Cleaning up $tmp_backend on $server"
+    ssh $server rm -rf "$tmp_backend"
+}
+
+
+function project-copy {
+    server="$1"
+    project="$2"
+    download_dir="$HOME/Downloads/${project}/${server}"
+    mkdir -p "$download_dir"
+    echo ">> Copying backend"
+    ssh-d-cp $server $project /app/backend "$download_dir/backend.tgz"
+    echo ">> Making dump by dumper"
+    ssh-d $server $project "dumper --dump all"
+    echo ">> Copying dump"
+    ssh-d-cp $server $project /dump "$download_dir/dump.tgz"
+    echo ">> Cleanup dump"
+    ssh-d $server $project "rm -rf /dump"
+}
+
 function socks {
     if [ "$1" = "--help" ]; then
         echo 'SETUP'
