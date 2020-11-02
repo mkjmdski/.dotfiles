@@ -196,13 +196,31 @@ function ssh-d-cp {
     project="$2"
     src="$3"
     dest="$4"
+
+    type="$(ssh-d $server $project env | grep -i backend | cut -d '=' -f 2)"
     tmp_backend="$(echo "/tmp/$project/$src" | sed 's|//|/|g')"
+
     echo ">> Making directory $tmp_backend"
     ssh $server mkdir -p "$tmp_backend"
+
     echo ">> Copy ${src} to $tmp_backend on $server"
     ssh -t $server docker cp "$(ssh $server docker ps | grep $project | awk '{print $1}' | head -n 1):/${src}" "$tmp_backend"
+
+    if [ "$src" = "/app/backend" ]; then
+        if [ "$type" = "WORDPRESS" ]; then
+            for dir in "wp-content/uploads/"; do
+                ssh $server "rm -rf $tmp_backend/$dir/"
+            done
+        elif [ "$type" = "PRESTA" ]; then
+            for dir in "img/" "var/" "/download"; do
+                ssh $server "rm -rf $tmp_backend/$dir/"
+            done
+        fi
+    fi
+
     echo ">> Making tar archive from $tmp_backend on $server to $dest on local machine"
     ssh $server tar czf - "$tmp_backend" > "$dest"
+
     echo ">> Cleaning up $tmp_backend on $server"
     ssh $server rm -rf "$tmp_backend"
 }
@@ -216,7 +234,7 @@ function project-copy {
     echo ">> Copying backend"
     ssh-d-cp $server $project /app/backend "$download_dir/backend.tgz"
     echo ">> Making dump by dumper"
-    ssh-d $server $project "dumper --dump all"
+    ssh-d $server $project "dumper --dump app"
     echo ">> Copying dump"
     ssh-d-cp $server $project /dump "$download_dir/dump.tgz"
     echo ">> Cleanup dump"
