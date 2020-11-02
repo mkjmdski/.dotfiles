@@ -209,11 +209,11 @@ function ssh-d-cp {
     if [ "$src" = "/app/backend" ]; then
         if [ "$type" = "WORDPRESS" ]; then
             for dir in "wp-content/uploads/"; do
-                ssh $server "rm -rf $tmp_backend/$dir/"
+                ssh $server "rm -rf $tmp_backend/backend/$dir/"
             done
         elif [ "$type" = "PRESTA" ]; then
             for dir in "img/" "var/" "/download"; do
-                ssh $server "rm -rf $tmp_backend/$dir/"
+                ssh $server "rm -rf $tmp_backend/backend/$dir/"
             done
         fi
     fi
