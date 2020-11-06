@@ -229,14 +229,24 @@ function ssh-d-cp {
 function project-copy {
     server="$1"
     project="$2"
-    download_dir="$HOME/Downloads/${project}/${server}"
-    mkdir -p "$download_dir"
     echo ">> Copying backend"
-    ssh-d-cp $server $project /app/backend "$download_dir/backend.tgz"
+    ssh-d-cp $server $project /app/backend "./backend.tgz"
+    mkdir tmp
+    (
+        cd tmp
+        x ../backend.tgz
+    )
+    rm backend.tgz
+    # take latest directory from backend/**/* and move it
     echo ">> Making dump by dumper"
     ssh-d $server $project "dumper --dump app"
     echo ">> Copying dump"
-    ssh-d-cp $server $project /dump "$download_dir/dump.tgz"
+    ssh-d-cp $server $project /dump "./dump.tgz"
+    (
+        cd tmp
+        x ../dump.tgz
+    )
+    rm dump.tgz
     echo ">> Cleanup dump"
     ssh-d $server $project "rm -rf /dump"
 }
