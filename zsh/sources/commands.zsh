@@ -33,6 +33,10 @@ function gca {
     gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
 }
 
+function jcode {
+    code "$(s $1)"
+}
+
 if [[ $commands[trash] ]]; then
     alias rm=trash
     alias "rm-ls"=trash-list
