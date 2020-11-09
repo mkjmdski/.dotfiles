@@ -78,11 +78,23 @@ if [[ $commands[terraform] ]]; then
         terraform plan | tee tfplan.ignore
         echo ">>> ADDRESSES <<<"
         echo ">>> created"
-        for d in $(cat tfplan.ignore | grep 'created' | cut -d ' ' -f 4); do echo "'${d}'"; done
+        for d in $(cat tfplan.ignore | grep 'created' | cut -d ' ' -f 4); do echo "'${d}'"; done | tee plan.ignore
         echo
         echo ">>> destroyed"
         echo
-        for d in $(cat tfplan.ignore | grep 'destroyed' | cut -d ' ' -f 4); do echo "'${d}'"; done
+        for d in $(cat tfplan.ignore | grep 'destroyed' | cut -d ' ' -f 4); do echo "'${d}'"; done | tee -a plan.ignore
+    }
+    function tsort {
+        file="${1-plan.ignore}"
+        final_file="${2-script.sh}"
+        echo '#!/bin/bash' > $final_file
+        resources=$(for line in $(cat $file); do
+            line="$(echo $line | cut -d'.' -f 1)"
+            echo "${line}"
+        done | grep google | sort | uniq | sed "s|'||g")
+        while IFS= read -r resource; do
+            cat $file | grep $resource >> $final_file
+        done <<< "$resources"
     }
 fi
 
