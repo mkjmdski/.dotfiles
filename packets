@@ -1,16 +1,5 @@
 #!/bin/bash -eux
 
-function setup_gcloud {
-    export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-    if ! gcloud version
-    then
-        curl https://sdk.cloud.google.com | bash
-        gcloud components install kubectl
-    else
-        gcloud components update
-    fi
-}
-
 function setup_binary_env {
     repo=$1
     location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
@@ -97,13 +86,13 @@ function install_debian {
             if [ ! -f "$name.deb" ]; then
                 curl -L --output "$name.deb" "${packet}"
             fi
-            sudo dpkg -i "$name.deb"
+            sudo dpkg -i "$name.deb" || (sudo apt-get install -f -y && sudo dpkg -i "$name.deb")
             rm "$name.deb"
         done
     )
 
     # snap
-    for app in code whatsdesk telegram-desktop caprine; do
+    for app in code whatsdesk telegram-desktop caprine google-cloud-sdk kubectl; do
         if ! snap list | grep "${app}"
         then
             snap install --classic "${app}"
@@ -186,7 +175,6 @@ if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
 fi
 
 install_fonts
-setup_gcloud
 
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L git.io/trans -o ~/bin/trans
@@ -198,9 +186,7 @@ do
     setup_binary_env $repo
 done
 
-sudo git clone --depth 1 https://github.com/facebook/PathPicker.git /usr/local/path-picker
-sudo ln -s "/usr/local/path-picker/fpp" /usr/local/bin/fpp
-sudo chmod +x /usr/local/bin/fpp
+$HOME/.tfenv/bin/tfenv install
 
 (
   cd "$(mktemp -d)" &&
