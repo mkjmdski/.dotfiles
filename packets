@@ -202,3 +202,4 @@ for plugin in ctx ns cssh view-utilization view-secret; do
 done
 
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+wget -O - https://github.com/shvchk/fallout-grub-theme/raw/master/install.sh | bash
