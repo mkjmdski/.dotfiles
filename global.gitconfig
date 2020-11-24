@@ -86,7 +86,7 @@
 
 #### ALIASES
 [alias]
-	p = !git pull && git push
+	p = "!f(){ git push || (git pull && git push) ; }; f"
 	a = add --all
 	m = commit --message
 	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
