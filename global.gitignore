@@ -29,3 +29,4 @@ script.sh
 *.ignore
 tfstate.json
 *.tfstate
+.terraform.tfstate.lock.info
