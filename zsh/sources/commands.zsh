@@ -301,3 +301,16 @@ function socks {
         kill -9 $session
     fi
 }
+
+
+function parse-uber {
+    (
+        take invoices
+        find . -type f -exec rm {} \;
+        mv ../invoice-* .
+        for invoice in invoice-*; do
+            pdftk "${invoice}" cat 1 output "tmp-${invoice}"
+        done
+        pdftk tmp-invoice-* cat output uber.pdf
+    )
+}
