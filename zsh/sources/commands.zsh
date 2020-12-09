@@ -314,3 +314,7 @@ function parse-uber {
         pdftk tmp-invoice-* cat output uber.pdf
     )
 }
+
+function tf-syntax-fix {
+    docker run --rm -v $(pwd):/code -t pniemiec/terraform-clean-syntax-docker
+}
