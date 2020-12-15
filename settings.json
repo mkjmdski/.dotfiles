@@ -68,7 +68,7 @@
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
 "diffEditor.maxComputationTime": 0,
-"python.languageServer": "Microsoft",
+"python.languageServer": "Pylance",
 "jupyter.addGotoCodeLenses": false,
 "jupyter.allowImportFromNotebook": false,
 "jupyter.allowInput": false,
@@ -82,5 +82,6 @@
 "jupyter.enableCellCodeLens": false,
 "jupyter.enableGather": false,
 "jupyter.enablePlotViewer": false,
-"jupyter.enabled": false
+"jupyter.enabled": false,
+"python.analysis.completeFunctionParens": true
 }
