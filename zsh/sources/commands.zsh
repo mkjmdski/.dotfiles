@@ -314,3 +314,22 @@ function parse-uber {
         pdftk tmp-invoice-* cat output uber.pdf
     )
 }
+
+function tfopen {
+    if [ ! -f 'versions.tf' ]; then
+        echo 'there is no versions.tf file, search for `terraform {` block in workspace files and put all of them as one into versions.tf'
+        exit 1
+    fi
+    host=$(cat versions.tf | grep backend -A 5 | grep hostname | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+    workspace=$(cat versions.tf | grep workspaces -A 1 | grep name | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+    org=$(cat versions.tf | grep backend -A 5 | grep organization | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+    link="https://${host}/app/${org}/${workspace}"
+    if which xdg-open &> /dev/null; then
+        xdg-open $link
+    elif which open &> /dev/null; then
+        open $link
+    else
+        echo 'open this link in your browser'
+        echo $link
+    fi
+}
