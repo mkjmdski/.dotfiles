@@ -841,6 +841,7 @@ function move_resize_window_with_margins(metaWindow, x, y, width, height) {
     width = width - 2 * vBorderX;
     height = height - 2 * vBorderY;
     log("After margins and visible border window is " + x + ":" + y + " - " + width + ":" + height);
+    metaWindow.move_frame(true, x, y);
     metaWindow.move_resize_frame(true, x, y, width, height);
 }
 function getNotFocusedWindowsOfMonitor(monitor) {
