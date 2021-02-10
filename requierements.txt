@@ -23,4 +23,7 @@ pypyp
 ns1cli
 # https://github.com/docker/compose
 docker-compose
+# https://github.com/dmerejkowsky/tsrc
 tsrc
+# https://github.com/jarun/ddgr#from-a-package-manager
+ddgr
