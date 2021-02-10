@@ -105,6 +105,7 @@ fi
 if [[ $commands[apt-get] ]]; then
     alias apt-get="sudo apt-get"
     alias add-apt-repository="sudo add-apt-repository"
+    alias apt="sudo apt"
 fi
 
 if [[ $commands[dpkg] ]]; then
