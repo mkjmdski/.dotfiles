@@ -71,6 +71,7 @@ function install_debian {
         curl \
         gnupg-agent \
         software-properties-common \
+        w3m \
         pdftk
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository \

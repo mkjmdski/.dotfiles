@@ -184,6 +184,9 @@ function to-double-quote {
 alias git-cd='cd $(git root)'
 alias history='fc -il 1'
 
+alias barracudavpn='TERM=xterm barracudavpn'
+alias ddgr='BROWSER=w3m ddgr'
+
 function chpwd {
     if [ -d ".git" ] || [ -f ".git" ]; then
         if [ ! -f ".git/index.lock" ]; then
