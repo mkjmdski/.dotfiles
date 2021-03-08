@@ -83,5 +83,11 @@
 "jupyter.enableGather": false,
 "jupyter.enablePlotViewer": false,
 "jupyter.enabled": false,
-"python.analysis.completeFunctionParens": true
+"python.analysis.completeFunctionParens": true,
+"workbench.editorAssociations": [
+  {
+    "viewType": "jupyter.notebook.ipynb",
+    "filenamePattern": "*.ipynb"
+  }
+]
 }
