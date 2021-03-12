@@ -4,6 +4,11 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": true
   },
+	"[yaml]":  {
+		"editor.insertSpaces": true,
+		"editor.tabSize": 2,
+		"editor.autoIndent": false
+	},
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
   "editor.formatOnSaveTimeout": 10000,
