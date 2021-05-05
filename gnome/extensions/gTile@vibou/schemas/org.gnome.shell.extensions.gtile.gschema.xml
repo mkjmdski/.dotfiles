@@ -25,6 +25,10 @@
 			<default><![CDATA[['Down']]]></default>
 			<summary>Move window down.</summary>
 		</key>
+		<key type="as" name="move-next-monitor">
+			<default><![CDATA[['']]]></default>
+			<summary>Move window to next monitor.</summary>
+		</key>
 		<key type="as" name="resize-left">
 			<default><![CDATA[['<Shift>Left']]]></default>
 			<summary>Resize window - increase width.</summary>
@@ -260,6 +264,10 @@
 		<key type="as" name="action-move-down">
 			<default><![CDATA[['']]]></default>
 			<summary>Global move window down.</summary>
+		</key>
+		<key type="as" name="action-move-next-monitor">
+			<default><![CDATA[['']]]></default>
+			<summary>Global move window to next monitor.</summary>
 		</key>
 		<key type="as" name="autotile-main">
 			<default><![CDATA[['m']]]></default>
@@ -498,6 +506,10 @@
 		<key type = "i" name="insets-secondary-bottom">
 			<default>0</default>
 			<summary>Bottom gap around border of screen for secondary monitor</summary>
+		</key>
+		<key type = "s" name="main-window-sizes">
+            <default>'.5, .625, 3/4'</default>
+			<summary>"Autotile Main window sizes. (Ratio of the screen to take up. Can be a decimal or a ratio).</summary>
 		</key>
 		<key type = "b" name="debug">
 			<default>false</default>

@@ -26,7 +26,7 @@ if [[ $commands[bat] ]]; then
 fi
 
 if [[ $commands[docker] ]]; then
-    alias dcc="docker-compose"
+    alias dcc='if [ $(uname) = "Linux" ]; then DOCKER_HOST="host.docker.internal"; else DOCKER_HOST="docker.for.mac.host.internal"; fi; docker-compose'
 fi
 
 function gca {
