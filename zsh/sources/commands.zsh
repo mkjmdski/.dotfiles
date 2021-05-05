@@ -191,9 +191,9 @@ function chpwd {
     if [ -d ".git" ] || [ -f ".git" ]; then
         if [ ! -f ".git/index.lock" ]; then
             git pull &
-            if [ -f '.gitmodules' ]; then
-                git submodule update --recursive --remote --init &
-            fi
+            # if [ -f '.gitmodules' ]; then
+            #     git submodule update --recursive --remote --init &
+            # fi
         fi
     fi
     if [ -f "docker-compose.yaml" ] || [ -f "docker-compose.yml" ]; then
