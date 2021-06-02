@@ -1,26 +1,12 @@
 git+https://github.com/jeffkaufman/icdiff.git
 # https://github.com/nvbn/thefuck
 thefuck
-# https://github.com/nosarthur/gita
-gita
-# https://github.com/arc90/git-sweep
-git-sweep
 # https://github.com/drbild/json2yaml
 json2yaml
 # https://github.com/kislyuk/yq
 yq
-# https://github.com/shobrook/rebound
-rebound-cli
-# https://github.com/dbcli/mycli
-mycli
-# https://github.com/k4rtik/pydf-pypi
-pydf
 # linters
 black
-# python in shell
-pypyp
-# https://github.com/ns1/ns1-cli
-ns1cli
 # https://github.com/docker/compose
 docker-compose
 # https://github.com/dmerejkowsky/tsrc
