@@ -51,5 +51,7 @@
     ~/.config/terminator/config:
       path: terminator.config
       if: terminator --version
+    ~/.ssh/config:
+      path: ssh.config
 - shell:
   - for ext in $(gnome-extensions list); do gnome-extensions enable $ext; done || echo 'no gnome'
