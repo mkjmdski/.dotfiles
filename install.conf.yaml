@@ -19,10 +19,6 @@
 - link:
     ~/.config/broot/conf.toml:
       path: broot.toml
-    ~/.config/conky:
-      path: conky
-    ~/.local/share/applications/show-desktop.desktop:
-      path: applications/show-desktop.desktop
     ~/.peco/config.json:
       path: peco.json
     ~/.config/nvim/colors/molokai.vim:

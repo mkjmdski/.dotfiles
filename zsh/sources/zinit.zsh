@@ -69,34 +69,6 @@ if [ "$(uname | tolower)" = "darwin" ]; then
     zinit load MitMaro/git-interactive-rebase-tool
 fi
 
-# zinit ice from"gh-r" as"program" mv"docker* -> docker-compose"
-# zinit load docker/compose
-
-# function helm-plugins-install() {
-#     if ! helm plugin list | grep -q diff; then
-#         helm plugin install https://github.com/databus23/helm-diff --version master
-#     fi
-#     if ! helm plugin list | grep -vq diff; then
-#         helm plugin install https://github.com/futuresimple/helm-secrets
-#     fi
-#     if ! helm plugin list | grep -q gcs; then
-#         helm plugin install https://github.com/hayorov/helm-gcs
-#     fi
-# }
-
-# zinit id-as=helm as='monitor|program' extract \
-#     dlink="https://get.helm.sh/helm-%VERSION%-$(uname | tolower)-amd64.tar.gz" \
-#     pick"$(uname | tolower)-amd64/helm" \
-#     atload"helm-plugins-install" \
-#     is-snippet for https://github.com/helm/helm/releases/
-
-# zplugin id-as'sentinel' as'monitor|program' extract \
-#     dlink0'/sentinel/%VERSION%/' \
-#     dlink="/sentinel/%VERSION%/sentinel_%VERSION%_$(uname | tolower)_amd64.zip" \
-#     mv"sentinel* -> sentinel" \
-#     pick"sentinel/sentinel" for \
-#         http://releases.hashicorp.com/sentinel/
-
 zinit ice from"gh-r" as"program" mv"helmsman* -> helmsman"
 zinit load Praqma/helmsman
 
@@ -108,9 +80,6 @@ function terraformer-install() {
     echo 'provider "cloudflare" {}' >>init.tf
     terraform init
 }
-
-zinit ice as"program" atclone"terraformer-install" atpull'%atclone' pick"terraformer-{google,cloudflare}"
-zinit load GoogleCloudPlatform/terraformer
 
 zinit ice from"gh-r" as"program" mv"jq* -> jq"
 zinit load stedolan/jq

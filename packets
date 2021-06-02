@@ -14,26 +14,6 @@ function setup_binary_env {
     fi
 }
 
-function install_ergodox {
-    ergodox_kernel='''
-# Teensy rules for the Ergodox EZ Original / Shine / Glow
-ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
-ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789ABCD]?", MODE:="0666"
-KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", MODE:="0666"
-
-# STM32 rules for the Planck EZ Standard / Glow
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
-    MODE:="0666", \
-    SYMLINK+="stm32_dfu"
-'''
-    wally_kernel=/etc/udev/rules.d/50-wally.rules
-    sudo echo $ergodox_kernel > $wally_kernel
-    curl -L --output ~/bin/wally https://configure.ergodox-ez.com/wally/linux
-}
-
-
-
 function install_debian {
     sudo apt-get update
     sudo apt-get upgrade -y
@@ -55,13 +35,11 @@ function install_debian {
         gtk+3.0 \
         webkit2gtk-4.0 \
         libusb-dev \
-        inkscape \
         x11-apps \
         openvpn \
         docker \
         curl \
         xclip \
-        conky-all \
         xdotool \
         libgtop-2.0-11 \
         gir1.2-gtop-2.0 \
@@ -82,7 +60,7 @@ function install_debian {
         sudo apt-get install docker-ce docker-ce-cli containerd.io
     (
         cd /tmp
-        for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://zoom.us/client/latest/zoom_amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
+        for packet in https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.0-amd64.deb https://clockify-resources.s3.eu-central-1.amazonaws.com/downloads/Clockify_Setup.deb
         do
             name="$(echo $packet | rev | cut -d'/' -f 1 | rev)"
             if [ ! -f "$name.deb" ]; then
@@ -113,6 +91,11 @@ function install_debian {
         fi
     done
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
+    for repo in "syndbg/goenv" "tfutils/tfenv"
+    do
+        setup_binary_env $repo
+    done
+    $HOME/.tfenv/bin/tfenv install
 }
 
 function install_osx {
@@ -120,7 +103,12 @@ function install_osx {
     then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb zsh broot doctl
+    brew tap homebrew/cask-fonts
+    for p in spotify visual-studio-code google-cloud-sdk slack iterm2 font-hack-nerd-font
+    do
+        brew install --cask $p
+    done
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm
     do
         brew install $p
     done
@@ -182,13 +170,6 @@ curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
 curl -L git.io/trans -o ~/bin/trans
 
 sudo chmod -x ~/bin/*
-
-for repo in "syndbg/goenv" "tfutils/tfenv"
-do
-    setup_binary_env $repo
-done
-
-$HOME/.tfenv/bin/tfenv install
 
 (
   cd "$(mktemp -d)" &&
