@@ -1,15 +1,15 @@
-git+https://github.com/jeffkaufman/icdiff.git
+git+https://github.com/jeffkaufman/icdiff.git==1.9.4
 # https://github.com/nvbn/thefuck
-thefuck
+thefuck==3.30
 # https://github.com/drbild/json2yaml
-json2yaml
+json2yaml==1.1.1
 # https://github.com/kislyuk/yq
-yq
+yq==2.11.1
 # linters
-black
+black==20.8b1
 # https://github.com/docker/compose
-docker-compose
+docker-compose==1.27.4
 # https://github.com/dmerejkowsky/tsrc
-tsrc
+tsrc==2.2.0
 # https://github.com/jarun/ddgr#from-a-package-manager
-ddgr
+ddgr==1.9
