@@ -11,12 +11,6 @@ if [[ $commands[kubectl] ]]; then
     source <(kubectl completion zsh)
 fi
 
-if [[ $commands[envy] ]]; then
-    if [ -d "$HOME/repos/karhoo/k8s-manifests" ]; then
-        export K8S_MANIFESTS_DIR="$HOME/repos/karhoo/k8s-manifests"
-    fi
-fi
-
 if [[ $commands[jq] ]]; then
     alias json-minify="$(which jq) -Mrc . <"
     alias jq="jq -C"
@@ -79,11 +73,18 @@ elif [[ $commands[terraform] ]]; then
     complete -o nospace -C $(which terraform) terraform
 fi
 
+alias xD="echo 'xD'"
+alias xd="echo 'xd'"
+
 if [[ $commands[docker] ]] && [[ ! $commands[envy] ]]; then
-    ENVY_VERSION=1.26.10
-    export $ENVY_VERSION
+    export ENVY_VERSION=1.26.10
     alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:$ENVY_VERSION'
 fi
+
+if [[ ! -z "$(which envy)" ]] && [[ -d "$HOME/repos/karhoo/k8s-manifests" ]]; then
+    export K8S_MANIFESTS_DIR="$HOME/repos/karhoo/k8s-manifests"
+fi
+
 
 if [[ $commands[terraform] ]]; then
     function tplan {
