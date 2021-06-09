@@ -1,6 +1,6 @@
 fpath=($fpath $DOTFILES/zsh/fpath)
 if [ ! "$PATH_LOADED" = "true" ]; then
-    if [ -d "$HOME/repos/karhoo/k-tools"]; then
+    if [ -d "$HOME/repos/karhoo/k-tools" ]; then
         export PATH="$HOME/repos/karhoo/k-tools/bin:$PATH"
     fi
     # We want to extend path once
