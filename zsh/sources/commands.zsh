@@ -79,6 +79,12 @@ elif [[ $commands[terraform] ]]; then
     complete -o nospace -C $(which terraform) terraform
 fi
 
+if [[ $commands[docker] ]] && [[ ! $commands[envy] ]]; then
+    ENVY_VERSION=1.26.10
+    export $ENVY_VERSION
+    alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:$ENVY_VERSION'
+fi
+
 if [[ $commands[terraform] ]]; then
     function tplan {
         terraform plan | tee tfplan.ignore
