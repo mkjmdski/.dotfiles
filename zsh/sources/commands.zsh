@@ -346,8 +346,3 @@ function tfopen {
         echo $link
     fi
 }
-
-if [ "$(uname)" = "Darwin" ]; then
-    bindkey "^[^[[C" forward-word
-    bindkey "^[^[[D" backward-word
-fi
