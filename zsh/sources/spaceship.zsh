@@ -83,4 +83,4 @@ spaceship_gcloud() {
     "$SPACESHIP_GCLOUD_SUFFIX"
 }
 
-SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep jobs exit_code char)
+SPACESHIP_PROMPT_ORDER=(time dir git git_last_commit golang venv kubectl exec_time line_sep jobs exit_code char)
