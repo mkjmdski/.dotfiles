@@ -108,7 +108,7 @@ function install_osx {
     do
         brew install --cask $p
     done
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed 
     do
         brew install $p
     done
