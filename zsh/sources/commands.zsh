@@ -11,6 +11,12 @@ if [[ $commands[kubectl] ]]; then
     source <(kubectl completion zsh)
 fi
 
+if [[ $commands[envy] ]]; then
+    if [ -d "$HOME/repos/karhoo/k8s-manifests" ]; then
+        export K8S_MANIFESTS_DIR="$HOME/repos/karhoo/k8s-manifests"
+    fi
+fi
+
 if [[ $commands[jq] ]]; then
     alias json-minify="$(which jq) -Mrc . <"
     alias jq="jq -C"
