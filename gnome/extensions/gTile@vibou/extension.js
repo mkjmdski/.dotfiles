@@ -359,6 +359,13 @@ class TileSpec {
     get gridSize() {
         return new GridSize(this.gridWidth, this.gridHeight);
     }
+    viewSize() {
+        const sizeXY = this.rdc.minus(this.luc);
+        return new GridSize(sizeXY.x + 1, sizeXY.y + 1);
+    }
+    isFullscreen() {
+        return this.viewSize().equals(this.gridSize);
+    }
 }
 class GridSize {
     constructor(
@@ -371,6 +378,9 @@ class GridSize {
     }
     toString() {
         return `${this.width}x${this.height}`;
+    }
+    equals(other) {
+        return this.width === other.width && this.height == other.height;
     }
 }
 function parseGridSizesIgnoringErrors(s) {
@@ -764,20 +774,20 @@ const gridSettings = {
     [SETTINGS_SHOW_ICON]: null,
     [SETTINGS_GLOBAL_PRESETS]: null,
     [SETTINGS_MOVERESIZE_ENABLED]: null,
-    [SETTINGS_WINDOW_MARGIN]: null,
-    [SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED]: null,
+    [SETTINGS_WINDOW_MARGIN]: 0,
+    [SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED]: false,
     [SETTINGS_MAX_TIMEOUT]: null,
     [SETTINGS_MAIN_WINDOW_SIZES]: [],
-    [SETTINGS_INSETS_PRIMARY]: null,
-    [SETTINGS_INSETS_PRIMARY_LEFT]: null,
-    [SETTINGS_INSETS_PRIMARY_RIGHT]: null,
-    [SETTINGS_INSETS_PRIMARY_TOP]: null,
-    [SETTINGS_INSETS_PRIMARY_BOTTOM]: null,
-    [SETTINGS_INSETS_SECONDARY]: null,
-    [SETTINGS_INSETS_SECONDARY_LEFT]: null,
-    [SETTINGS_INSETS_SECONDARY_RIGHT]: null,
-    [SETTINGS_INSETS_SECONDARY_TOP]: null,
-    [SETTINGS_INSETS_SECONDARY_BOTTOM]: null,
+    [SETTINGS_INSETS_PRIMARY]: 0,
+    [SETTINGS_INSETS_PRIMARY_LEFT]: 0,
+    [SETTINGS_INSETS_PRIMARY_RIGHT]: 0,
+    [SETTINGS_INSETS_PRIMARY_TOP]: 0,
+    [SETTINGS_INSETS_PRIMARY_BOTTOM]: 0,
+    [SETTINGS_INSETS_SECONDARY]: 0,
+    [SETTINGS_INSETS_SECONDARY_LEFT]: 0,
+    [SETTINGS_INSETS_SECONDARY_RIGHT]: 0,
+    [SETTINGS_INSETS_SECONDARY_TOP]: 0,
+    [SETTINGS_INSETS_SECONDARY_BOTTOM]: 0,
     [SETTINGS_DEBUG]: null,
 };
 let launcher;
@@ -1290,10 +1300,10 @@ function getBoolSetting(settingName) {
     }
     return value;
 }
-function getIntSetting(settings_string) {
-    let iss = settings.get_int(settings_string);
+function getIntSetting(settingsValue) {
+    let iss = settings.get_int(settingsValue);
     if (iss === undefined) {
-        log("Undefined settings " + settings_string);
+        log("Undefined settings " + settingsValue);
         return 0;
     }
     else {
@@ -1312,20 +1322,6 @@ function initSettings() {
     getBoolSetting(SETTINGS_MOVERESIZE_ENABLED);
     gridSettings[SETTINGS_WINDOW_MARGIN] = getIntSetting(SETTINGS_WINDOW_MARGIN);
     gridSettings[SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED] = getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
-    gridSettings[SETTINGS_INSETS_PRIMARY] =
-        {
-            top: getIntSetting(SETTINGS_INSETS_PRIMARY_TOP),
-            bottom: getIntSetting(SETTINGS_INSETS_PRIMARY_BOTTOM),
-            left: getIntSetting(SETTINGS_INSETS_PRIMARY_LEFT),
-            right: getIntSetting(SETTINGS_INSETS_PRIMARY_RIGHT)
-        }; // Insets on primary monitor
-    gridSettings[SETTINGS_INSETS_SECONDARY] =
-        {
-            top: getIntSetting(SETTINGS_INSETS_SECONDARY_TOP),
-            bottom: getIntSetting(SETTINGS_INSETS_SECONDARY_BOTTOM),
-            left: getIntSetting(SETTINGS_INSETS_SECONDARY_LEFT),
-            right: getIntSetting(SETTINGS_INSETS_SECONDARY_RIGHT)
-        };
     gridSettings[SETTINGS_MAX_TIMEOUT] = getIntSetting(SETTINGS_MAX_TIMEOUT);
     // initialize these from settings, the first set of sizes
     if (nbCols == 0 || nbRows == 0) {
@@ -1349,6 +1345,29 @@ function initSettings() {
     }
     log(SETTINGS_MAIN_WINDOW_SIZES + " set to " + mainWindowSizes);
     log("Init complete, nbCols " + nbCols + " nbRows " + nbRows);
+}
+function getMonitorTier(monitor) {
+    return isPrimaryMonitor(monitor) ? 'primary' : 'secondary';
+}
+function getMonitorInsets(tier) {
+    switch (tier) {
+        case 'primary':
+            return {
+                top: getIntSetting(SETTINGS_INSETS_PRIMARY_TOP),
+                bottom: getIntSetting(SETTINGS_INSETS_PRIMARY_BOTTOM),
+                left: getIntSetting(SETTINGS_INSETS_PRIMARY_LEFT),
+                right: getIntSetting(SETTINGS_INSETS_PRIMARY_RIGHT)
+            }; // Insets on primary monitor
+        case 'secondary':
+            return {
+                top: getIntSetting(SETTINGS_INSETS_SECONDARY_TOP),
+                bottom: getIntSetting(SETTINGS_INSETS_SECONDARY_BOTTOM),
+                left: getIntSetting(SETTINGS_INSETS_SECONDARY_LEFT),
+                right: getIntSetting(SETTINGS_INSETS_SECONDARY_RIGHT)
+            };
+        default:
+            throw new Error(`unknown monitor name ${JSON.stringify(tier)}`);
+    }
 }
 function enable() {
     setLoggingEnabled(getBoolSetting(SETTINGS_DEBUG));
@@ -1466,15 +1485,6 @@ function getFocusWindow() {
     return WorkspaceManager$1.get_active_workspace().list_windows()
         .find(w => w.has_focus());
 }
-function workAreaRectByMonitorIndex(monitorIndex) {
-    const monitor = activeMonitors()[monitorIndex];
-    if (!monitor) {
-        return null;
-    }
-    const waLegacy = getWorkArea(monitor, monitorIndex);
-    const margin = new Size(gridSettings[SETTINGS_WINDOW_MARGIN], gridSettings[SETTINGS_WINDOW_MARGIN]);
-    return (new Rect(new XY(waLegacy.x, waLegacy.y), new Size(waLegacy.width, waLegacy.height))).inset(margin);
-}
 function activeMonitors() {
     return Main$1.layoutManager.monitors;
 }
@@ -1496,15 +1506,29 @@ function getWorkAreaByMonitor(monitor) {
     }
     return null;
 }
+/**
+ * @deprecated Use {@link workAreaRectByMonitorIndex} instead.
+ */
 function getWorkAreaByMonitorIdx(monitor_idx) {
     const monitors = activeMonitors();
     let monitor = monitors[monitor_idx];
     return getWorkArea(monitor, monitor_idx);
 }
+function workAreaRectByMonitorIndex(monitorIndex) {
+    const monitor = activeMonitors()[monitorIndex];
+    if (!monitor) {
+        return null;
+    }
+    const waLegacy = getWorkArea(monitor, monitorIndex);
+    return (new Rect(new XY(waLegacy.x, waLegacy.y), new Size(waLegacy.width, waLegacy.height)));
+}
+/**
+ * @deprecated Use {@link workAreaRectByMonitorIndex} instead.
+ */
 function getWorkArea(monitor, monitor_idx) {
     const wkspace = WorkspaceManager$1.get_active_workspace();
     const work_area = wkspace.get_work_area_for_monitor(monitor_idx);
-    const insets = (isPrimaryMonitor(monitor)) ? gridSettings[SETTINGS_INSETS_PRIMARY] : gridSettings[SETTINGS_INSETS_SECONDARY];
+    const insets = getMonitorInsets(getMonitorTier(monitor));
     return {
         x: work_area.x + insets.left,
         y: work_area.y + insets.top,
@@ -1817,7 +1841,11 @@ function presetResize(presetName, settingName) {
         log(`Failed to get active work area for window while performing preset ${presetName} ${JSON.stringify(presetString)}`);
         return;
     }
-    const rect = tileSpec.toFrameRect(workArea);
+    // The rectangle already incorporates insets, but it doesn't incorporate
+    // window margin.
+    const zeroMargins = tileSpec.isFullscreen() && !getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
+    const marginSize = new Size(zeroMargins ? 0 : gridSettings[SETTINGS_WINDOW_MARGIN], zeroMargins ? 0 : gridSettings[SETTINGS_WINDOW_MARGIN]);
+    const rect = tileSpec.toFrameRect(workArea).inset(marginSize);
     moveWindowToRect(window, rect);
     lastResizeInfo.presetName = presetName.toString();
     lastResizeInfo.windowTitle = window.get_title();
