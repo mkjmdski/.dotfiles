@@ -51,6 +51,9 @@
     ~/.config/terminator/config:
       path: terminator.config
       if: terminator --version
+    ~/Library/Preferences/com.googlecode.iterm2.plist:
+      path: com.googlecode.iterm2.plist
+      if: uname -a | grep -iq darwin
     ~/.ssh/config:
       path: ssh.config
 - shell:
