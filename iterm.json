@@ -168,6 +168,11 @@
       "Action" : 10,
       "Text" : "[1;5B"
     },
+    "0xf703-0x280000-0x0" : {
+      "Label" : "",
+      "Action" : 10,
+      "Text" : "f"
+    },
     "0xf70d-0x20000" : {
       "Action" : 10,
       "Text" : "[21;2~"
@@ -204,10 +209,6 @@
       "Action" : 10,
       "Text" : "[1;2D"
     },
-    "0xf703-0x280000" : {
-      "Action" : 11,
-      "Text" : "0x1b 0x1b 0x5b 0x43"
-    },
     "0xf700-0x240000" : {
       "Action" : 10,
       "Text" : "[1;5A"
@@ -236,10 +237,6 @@
       "Action" : 10,
       "Text" : "[1;6B"
     },
-    "0xf702-0x280000" : {
-      "Action" : 11,
-      "Text" : "0x1b 0x1b 0x5b 0x44"
-    },
     "0xf72b-0x20000" : {
       "Action" : 10,
       "Text" : "[1;2F"
@@ -259,6 +256,11 @@
     "0xf70b-0x20000" : {
       "Action" : 10,
       "Text" : "[19;2~"
+    },
+    "0xf702-0x280000-0x0" : {
+      "Label" : "",
+      "Action" : 10,
+      "Text" : "b"
     },
     "0xf702-0x240000" : {
       "Action" : 10,
@@ -328,7 +330,7 @@
   },
   "Normal Font" : "HackNerdFontCompleteM-Regular 16",
   "Custom Directory" : "No",
-  "Right Option Key Sends" : 0,
+  "Right Option Key Sends" : 2,
   "Ansi 6 Color" : {
     "Green Component" : 0.73333334922790527,
     "Blue Component" : 0.73333334922790527,
