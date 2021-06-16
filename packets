@@ -96,6 +96,12 @@ function install_debian {
         setup_binary_env $repo
     done
     $HOME/.tfenv/bin/tfenv install
+
+    # https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install gh
 }
 
 function install_osx {
@@ -108,7 +114,7 @@ function install_osx {
     do
         brew install --cask $p
     done
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed gh git-extras
     do
         brew install $p
     done
