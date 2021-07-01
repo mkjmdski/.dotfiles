@@ -201,6 +201,10 @@ alias history='fc -il 1'
 alias barracudavpn='TERM=xterm barracudavpn'
 alias ddgr='BROWSER=w3m ddgr'
 
+function dbase {
+    echo $1 | base64 -d
+}
+
 function chpwd {
     if [ -d ".git" ] || [ -f ".git" ]; then
         if [ ! -f ".git/index.lock" ]; then
