@@ -8,6 +8,7 @@ if [[ $commands[kubectl] ]]; then
     alias ket="ke -it"
     alias kgpf="kgp -o name | head -n 1"
     alias ketf='ket $(kgpf) -- /bin/sh'
+    alias kg='k get'
     source <(kubectl completion zsh)
 fi
 
