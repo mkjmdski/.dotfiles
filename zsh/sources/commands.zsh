@@ -205,6 +205,16 @@ function dbase {
     echo $1 | base64 -d
 }
 
+function password {
+    python3 <<EOF
+import secrets
+import string
+alphabet = string.ascii_letters + string.digits
+password = ''.join(secrets.choice(alphabet) for i in range(${1:-20}))
+print(password)
+EOF
+}
+
 function chpwd {
     if [ -d ".git" ] || [ -f ".git" ]; then
         if [ ! -f ".git/index.lock" ]; then
