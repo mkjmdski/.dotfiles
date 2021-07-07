@@ -13,3 +13,5 @@ docker-compose==1.27.4
 tsrc==2.2.0
 # https://github.com/jarun/ddgr#from-a-package-manager
 ddgr==1.9
+# https://github.com/kislyuk/yq
+yq==2.12.2
