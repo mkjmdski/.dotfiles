@@ -78,8 +78,8 @@ alias xD="echo 'xD'"
 alias xd="echo 'xd'"
 
 if [[ $commands[docker] ]] && [[ ! $commands[envy] ]]; then
-    export ENVY_VERSION=1.26.11
-    alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:$ENVY_VERSION'
+    # export ENVY_VERSION=1.26.11
+    alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest}'
 fi
 
 if [[ ! -z "$(which envy)" ]] && [[ -d "$HOME/repos/karhoo/k8s-manifests" ]]; then
