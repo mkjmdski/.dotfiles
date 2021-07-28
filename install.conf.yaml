@@ -17,8 +17,6 @@
   - git config --global core.excludesfile "$PWD/global.gitignore"
   - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
-    ~/.config/broot/conf.toml:
-      path: broot.toml
     ~/.peco/config.json:
       path: peco.json
     ~/.config/nvim/colors/molokai.vim:

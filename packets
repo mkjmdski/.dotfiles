@@ -114,11 +114,10 @@ function install_osx {
     do
         brew install --cask $p
     done
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb broot doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed gh git-extras
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed gh git-extras
     do
         brew install $p
     done
-    broot --install
     if ! cat ~/.gnupg/gpg-agent.conf | grep -q /usr/local/bin/pinentry-mac; then
         echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
     fi

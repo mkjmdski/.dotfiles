@@ -3,6 +3,10 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     if [ -d "$HOME/repos/karhoo/k-tools" ]; then
         export PATH="$HOME/repos/karhoo/k-tools/bin:$PATH"
     fi
+    if [ -d "$HOME/repos/agmar/programs" ]; then
+        export PATH="$HOME/repos/agmar/programs/bin:$PATH"
+    fi
+
     # We want to extend path once
     export EDITOR="$(which nvim)"
     # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords

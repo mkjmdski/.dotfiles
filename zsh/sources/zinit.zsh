@@ -57,9 +57,6 @@ zinit ice from"gh-r" as"program" mv"yaml2json* -> yaml2json"
 zinit load wakeful/yaml2json
 
 if [ "$(uname | tolower)" = "linux" ]; then
-    zinit ice from"gh-r" as"program" pick"build/x86_64-linux/broot"
-    zinit load Canop/broot
-
     zinit ice from"gh-r" as"program" bpick"*.deb" pick"usr/bin/interactive-rebase-tool"
     zinit load MitMaro/git-interactive-rebase-tool
 fi
