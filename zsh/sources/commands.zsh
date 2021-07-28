@@ -95,3 +95,7 @@ fi
 if [[ $commands[ddgr] ]]; then
     alias ddgr='BROWSER=w3m ddgr'
 fi
+
+function jcode { code "$(s $1)" }
+function jexec { location=$1; shift; (j $location; eval "$@") }
+function take { mkdir -p $@ && cd ${@:$#} }

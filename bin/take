@@ -1,2 +1,0 @@
-#!/bin/zsh
-mkdir -p $@ && cd ${@:$#}
