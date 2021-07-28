@@ -90,6 +90,8 @@ function install_debian {
             snap install --beta "${app}"
         fi
     done
+    snap install --edge glab
+    snap connect glab:ssh-keys
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
     for repo in "syndbg/goenv" "tfutils/tfenv" "yuya-takeyama/helmenv"
     do
@@ -114,7 +116,7 @@ function install_osx {
     do
         brew install --cask $p
     done
-    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed gh git-extras
+    for p in gnupg2 pinentry-mac neovim zsh fasd python trash-cli libusb doctl kubernetes-cli docker bumpversion openvpn curl neovim tfenv goenv trash-cli xclip helm coreutils bat peco jq gnu-sed gh git-extras glab
     do
         brew install $p
     done
