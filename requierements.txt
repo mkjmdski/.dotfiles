@@ -15,3 +15,5 @@ tsrc==2.2.0
 ddgr==1.9
 # https://github.com/kislyuk/yq
 yq==2.12.2
+# https://pypi.org/project/pydf/
+pydf==12

@@ -3,9 +3,12 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     if [ -d "$HOME/repos/karhoo/k-tools" ]; then
         export PATH="$HOME/repos/karhoo/k-tools/bin:$PATH"
     fi
+
     if [ -d "$HOME/repos/agmar/programs" ]; then
         export PATH="$HOME/repos/agmar/programs/bin:$PATH"
     fi
+
+    export PATH="$DOTFILES/bin:$PATH"
 
     # We want to extend path once
     export EDITOR="$(which nvim)"
@@ -46,6 +49,10 @@ if [ ! "$PATH_LOADED" = "true" ]; then
 
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    if [[ $commands[jira] ]]; then
+        eval "$(jira --completion-script-zsh)"
+    fi
+
     if [[ -z "${CLOUDSDK_HOME}" ]]; then
         search_locations=(
             "$HOME/google-cloud-sdk"
@@ -72,10 +79,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
             fi
         fi
         alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
-        alias gcl="gcloud config configurations list"
         source "${CLOUDSDK_HOME}/completion.zsh.inc"
         export CLOUDSDK_HOME
     fi
 fi
-alias tolower="tr '[:upper:]' '[:lower:]'"
-alias toupper="tr '[:lower:]' '[:upper:]'"
