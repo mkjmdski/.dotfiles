@@ -1,6 +1,7 @@
-#!/bin/zsh
+#!/bin/zsh -e
 (
-    take invoices
+    mkdir -p invoices
+    cd invoices
     find . -type f -exec rm {} \;
     mv ../invoice-* .
     for invoice in invoice-*; do
