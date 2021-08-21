@@ -81,10 +81,6 @@ if [[ $commands[doctl] ]]; then
   source <(doctl completion zsh)
 fi
 
-if [[ $commands[bump] ]]; then
-    alias bump="bump --allow-dirty"
-fi
-
 alias git-cd='cd $(git root)'
 alias history='fc -il 1'
 
