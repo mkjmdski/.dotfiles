@@ -30,3 +30,5 @@ script.sh
 tfstate.json
 *.tfstate
 .terraform.tfstate.lock.info
+*.tfplan
+*.plan
