@@ -31,10 +31,10 @@
     ~/.config/Code/User/keybindings.json:
       path: keybindings.json
       if: uname -a | grep -iq ubuntu
-    ~/Library/Application Support/Code/User/settings.json:
+    ~/Library/Application\ Support/Code/User/settings.json:
       path: vscode/settings.json
       if: uname -a | grep -iq darwin
-    ~/Library/Application Support/Code/User/keybindings.json:
+    ~/Library/Application\ Support/Code/User/keybindings.json:
       path: vscode/keybindings.json
       if: uname -a | grep -iq darwin
     ~/.icons:
