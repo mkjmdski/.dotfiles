@@ -60,11 +60,11 @@
     "*.ipynb": "jupyter-notebook"
   },
   "markdownlint.focusMode": true,
-  "markdownlint.ignore": [
-    "MD024",
-    "MD025",
-    "MD026",
-    "MD033",
-    "MD041"
-  ]
+  "markdownlint.config": {
+    "MD024": false,
+    "MD025": false,
+    "MD026": false,
+    "MD033": false,
+    "MD041": false
+  }
 }
