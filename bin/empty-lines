@@ -3,6 +3,10 @@ skip_last_line=$1
 skip_double_line=$2
 skip_first_empty=$3
 git ls-files -z -- . ':!:*.tgz' | while IFS= read -rd '' f; do
+    # skip symlinks
+    if [ -L "$f" ]; then
+        continue
+    fi
     # add missing empty-line in the end of file
     if [ -z "$skip_last_line" ]; then
         tail -c1 < "$f" | read -r _ || echo >> "$f"

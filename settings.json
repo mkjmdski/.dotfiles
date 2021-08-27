@@ -37,7 +37,8 @@
     "MD024": false,
     "MD025": false,
     "MD026": false,
-    "MD033": false
+    "MD033": false,
+    "MD041": false
   },
   "python.autoComplete.addBrackets": true,
   "python.formatting.provider": "black",
