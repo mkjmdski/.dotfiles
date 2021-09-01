@@ -1,6 +1,6 @@
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias toupper="tr '[:lower:]' '[:upper:]'"
-
+alias tf-docs='docker run --rm -it -v $(pwd):/workspace gcr.io/cloud-foundation-cicd/cft/developer-tools:0.13 /bin/bash -c "source /usr/local/bin/task_helper_functions.sh && generate_docs"'
 if [[ $commands[kubectl] ]]; then
     alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
     alias ke="k exec"
