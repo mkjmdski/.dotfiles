@@ -4,10 +4,10 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": true
   },
-  "[yaml]":  {
-      "editor.insertSpaces": true,
-      "editor.tabSize": 2,
-      "editor.autoIndent": "full"
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "full"
   },
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
@@ -66,5 +66,10 @@
     "MD026": false,
     "MD033": false,
     "MD041": false
-  }
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true
+  },
+  "cSpell.language": "en,pl",
 }
