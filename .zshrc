@@ -12,8 +12,8 @@ zstyle ':completion:*' menu select
 source $sources/zinit.zsh
 source $sources/commands.zsh
 
-if [[ -f "$HOME/repos/agmar/programs/.rc" ]]; then
-    source "$HOME/repos/agmar/programs/.rc"
+if [[ -f "$HOME/repos/agmar/toolkitz/programs/.rc" ]]; then
+    source "$HOME/repos/agmar/toolkitz/programs/.rc"
 fi
 
 # auto change directory

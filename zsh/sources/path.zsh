@@ -4,8 +4,8 @@ if [ ! "$PATH_LOADED" = "true" ]; then
         export PATH="$HOME/repos/karhoo/k-tools/bin:$PATH"
     fi
 
-    if [ -d "$HOME/repos/agmar/programs" ]; then
-        export PATH="$HOME/repos/agmar/programs/bin:$PATH"
+    if [ -d "$HOME/repos/agmar/toolkitz/programs" ]; then
+        export PATH="$HOME/repos/agmar/toolkitz/programs/bin:$PATH"
     fi
 
     export PATH="$DOTFILES/bin:$PATH"
