@@ -72,4 +72,6 @@
     "editor.formatOnSave": true
   },
   "cSpell.language": "en,pl",
+  "window.zoomLevel": -1,
+  "cSpell.enabled": false,
 }
