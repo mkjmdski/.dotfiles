@@ -9,7 +9,9 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     fi
 
     export PATH="$DOTFILES/bin:$PATH"
-
+    export PATH="$DOTFILES/venv/bin:$PATH"
+    eval $(thefuck --alias)
+    
     # We want to extend path once
     export EDITOR="$(which nvim)"
     # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords

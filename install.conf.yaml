@@ -12,7 +12,7 @@
   - command: ./packets
     stdin: true
   - chsh -s $(which zsh)
-  - pip3 install --user --upgrade -r requierements.txt
+  - python3 -m venv venv && source venv/bin/activate && pip3 install --upgrade -r requirements.txt
   - git config --global include.path "$PWD/global.gitconfig"
   - git config --global core.excludesfile "$PWD/global.gitignore"
   - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
