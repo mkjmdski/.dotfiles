@@ -1,6 +1,6 @@
 git+https://github.com/jeffkaufman/icdiff.git@release-2.0.4
 # https://github.com/nvbn/thefuck
-thefuck==3.30
+thefuck==3.31
 # https://github.com/drbild/json2yaml
 json2yaml==1.1.1
 # linters
