@@ -11,7 +11,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export PATH="$DOTFILES/bin:$PATH"
     export PATH="$DOTFILES/venv/bin:$PATH"
     eval $(thefuck --alias)
-    
+
     # We want to extend path once
     export EDITOR="$(which nvim)"
     # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
@@ -35,7 +35,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     if [[ $commands[ruby] ]]; then export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"; fi
     if uname | grep -iq darwin; then
         export PATH="$(brew --prefix openvpn)/sbin:$PATH"
-        export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+        export PATH="$(brew --prefix gnu-sed)/libexec/gnubin:$PATH"
     fi
     # Add custom bin files
     if [ -d "$HOME/bin" ]; then export PATH="$HOME/bin:$PATH"; fi
