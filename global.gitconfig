@@ -90,11 +90,11 @@
 	a = add --all
 	m = commit --message
 	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
-	amp = "!f(){ git add -A && git commit -m \"$@\"; git push || git p ; }; f"
-	mp = "!f(){ git commit -m \"$@\"; git push || git p ; }; f"
+	amp = "!f(){ git add -A && git commit -m \"$@\"; git p ; }; f"
+	mp = "!f(){ git commit -m \"$@\"; git p ; }; f"
 	merge-me = "!f(){ b=$(git current-branch); git checkout ${1:-master}; git merge $b; }; f"
 	s = status
-	annotate-tag = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git push || git p ; }; f"
+	annotate-tag = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git p ; }; f"
 	st = stash save --include-untracked
 	pop = stash pop
 	push-u = "!f(){ git push -u ${1-origin} $(git current-branch) ; }; f"
