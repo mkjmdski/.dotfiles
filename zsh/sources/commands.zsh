@@ -53,7 +53,7 @@ if [[ $commands[docker] ]]; then
         alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest}'
     fi
     if [[ ! $commands[golangci-lint] ]]; then
-        alias golangci-lint='docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.42.1 golangci-lint run -v'
+        alias golangci-lint='docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.42.1 golangci-lint'
     fi
 fi
 
