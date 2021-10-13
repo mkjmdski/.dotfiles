@@ -47,9 +47,14 @@ fi
 alias xD="echo 'xD'"
 alias xd="echo 'xd'"
 
-if [[ $commands[docker] ]] && [[ ! $commands[envy] ]]; then
-    # export ENVY_VERSION=1.26.11
-    alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest}'
+if [[ $commands[docker] ]]; then
+    if [[ ! $commands[envy] ]]; then
+        # export ENVY_VERSION=1.26.11
+        alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest}'
+    fi
+    if [[ ! $commands[golangci-lint] ]]; then
+        alias golangci-lint='docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.42.1 golangci-lint run -v'
+    fi
 fi
 
 if [[ ! -z "$(which envy)" ]] && [[ -d "$HOME/repos/karhoo/k8s-manifests" ]]; then
