@@ -193,10 +193,9 @@ const Shell = imports.gi.Shell;
 // Extension imports
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
-// Globals
-const mySettings = Settings.get();
 function bind(keyBindings) {
     log("Binding keys");
+    let mySettings = Settings.get();
     keyBindings.forEach((callback, key) => {
         //const key = keyString as KeyBindingSettingName;
         if (Main.wm.addKeybinding && Shell.ActionMode) { // introduced in 3.16
@@ -767,6 +766,7 @@ const SETTINGS_INSETS_SECONDARY_RIGHT = 'insets-secondary-right';
 const SETTINGS_INSETS_SECONDARY_TOP = 'insets-secondary-top';
 const SETTINGS_INSETS_SECONDARY_BOTTOM = 'insets-secondary-bottom';
 const SETTINGS_DEBUG = 'debug';
+const SETTINGS_THEME = 'theme';
 const gridSettings = {
     [SETTINGS_GRID_SIZES]: [],
     [SETTINGS_AUTO_CLOSE]: null,
@@ -789,6 +789,7 @@ const gridSettings = {
     [SETTINGS_INSETS_SECONDARY_TOP]: 0,
     [SETTINGS_INSETS_SECONDARY_BOTTOM]: 0,
     [SETTINGS_DEBUG]: null,
+    [SETTINGS_THEME]: null,
 };
 let launcher;
 let tracker;
@@ -809,6 +810,7 @@ const lastResizeInfo = {
     presetName: '',
     windowTitle: '',
 };
+let theme = getTheme();
 // Hangouts workaround
 let excludedApplications = new Array("Unknown");
 const keyBindings = new Map([
@@ -907,12 +909,12 @@ class App {
         this.gridShowing = false;
         tracker = Shell$1.WindowTracker.get_default();
         initSettings();
-        const gridWidget = (new St.BoxLayout({ style_class: 'grid-preview' }));
+        const gridWidget = (new St.BoxLayout({ style_class: `${theme}__preview` }));
         this.gridWidget = gridWidget;
         Main$1.uiGroup.add_actor(gridWidget);
         this.initGrids(gridWidget);
         log("Create Button on Panel");
-        launcher = new GTileStatusButton('tiling-icon');
+        launcher = new GTileStatusButton(`${theme}__icon`);
         if (gridSettings[SETTINGS_SHOW_ICON]) {
             Main$1.panel.addToStatusArea("GTileStatusButton", launcher);
         }
@@ -1233,11 +1235,11 @@ const GTileStatusButton = new Lang.Class({
         //Done by default in PanelMenuButton - Just need to override the method
         if (SHELL_VERSION.version_at_least_34()) {
             this.add_style_class_name(classname);
-            this.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+            this.connect('button-press-event', this._onButtonPress.bind(this));
         }
         else {
             this.actor.add_style_class_name(classname);
-            this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+            this.actor.connect('button-press-event', this._onButtonPress.bind(this));
         }
         log("GTileStatusButton _init done");
     },
@@ -1312,6 +1314,7 @@ function getIntSetting(settingsValue) {
 }
 function initSettings() {
     log("Init settings");
+    theme = getTheme();
     const gridSizes = settings.get_string(SETTINGS_GRID_SIZES) || '';
     log(SETTINGS_GRID_SIZES + " set to " + gridSizes);
     initGridSizes(gridSizes);
@@ -1891,10 +1894,17 @@ function moveWindowToRect(window, rect) {
 class TopBar {
     constructor(_title) {
         this._title = _title;
-        this.actor = new St.BoxLayout({ style_class: 'top-box' });
-        this._stlabel = new St.Label({ style_class: 'grid-title', text: this._title });
-        this._closebutton = new St.Button({ style_class: 'close-button' });
-        this._closebutton.add_style_class_name('close-button-container');
+        this.actor = new St.BoxLayout({
+            style_class: `${theme}__title-container`
+        });
+        this._stlabel = new St.Label({
+            style_class: `${theme}__title`,
+            text: this._title
+        });
+        this._closebutton = new St.Button({
+            style_class: `${theme}__close`,
+        });
+        this._closebutton.add_style_class_name(`${theme}__close-container`);
         this._connect_id = this._closebutton.connect('button-press-event', Lang.bind(this, this._onButtonPress));
         this.actor.add_child(this._closebutton);
         this.actor.add_child(this._stlabel);
@@ -1921,7 +1931,7 @@ class ToggleSettingsButtonListener {
     }
     addActor(actor) {
         log("ToggleSettingsButtonListener Connect update-toggle");
-        actor.connect('update-toggle', Lang.bind(this, this._updateToggle));
+        actor.connect('update-toggle', this._updateToggle.bind(this));
         this.actors.push(actor);
     }
     _updateToggle() {
@@ -1938,20 +1948,31 @@ ToggleSettingsButton.prototype = {
     _init: function (text, property) {
         this.text = text;
         this.actor = new St.Button({
-            style_class: 'settings-button',
+            style_class: `${theme}__action-button`,
             reactive: true,
             can_focus: true,
             track_hover: true
         });
-        this.label = new St.Label({ style_class: 'settings-label', reactive: true, can_focus: true, track_hover: true, text: this.text });
-        this.icon = new St.BoxLayout({ style_class: this.text + "-icon", reactive: true, can_focus: true, track_hover: true });
+        this.label = new St.Label({
+            style_class: `${theme}__action-label`,
+            reactive: true,
+            can_focus: true,
+            track_hover: true,
+            text: this.text
+        });
+        this.icon = new St.BoxLayout({
+            style_class: `${theme}__action-button--${this.text}`,
+            reactive: true,
+            can_focus: true,
+            track_hover: true
+        });
         this.actor.add_actor(this.icon);
         this.property = property;
         this._update();
         log("ToggleSettingsButton Connect button-press-event");
-        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+        this.actor.connect('button-press-event', this._onButtonPress.bind(this));
         log("ToggleSettingsButton Connect update-toggle");
-        this.connect('update-toggle', Lang.bind(this, this._update));
+        this.connect('update-toggle', this._update.bind(this));
     },
     _update: function () {
         log("ToggleSettingsButton _update event " + this.property);
@@ -1969,12 +1990,17 @@ ToggleSettingsButton.prototype = {
     }
 };
 Signals.addSignalMethods(ToggleSettingsButton.prototype);
+const ACTION_CLASSES = {
+    BUTTON: "__action-button",
+    MAIN_AND_LIST: "__action-button--main-and-list",
+    TWO_LIST: "__action-button--two-list",
+};
 class ActionButton {
     constructor(grid, classname) {
         this.grid = grid;
         this.grid = grid;
         this.actor = new St.Button({
-            style_class: 'settings-button',
+            style_class: `${getTheme()}${ACTION_CLASSES.BUTTON}`,
             reactive: true,
             can_focus: true,
             track_hover: true
@@ -1982,7 +2008,7 @@ class ActionButton {
         this.icon = new St.BoxLayout({ style_class: classname, reactive: true, can_focus: true, track_hover: true });
         this.actor.add_actor(this.icon);
         log("ActionButton Connect button-press-event");
-        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+        this.actor.connect('button-press-event', this._onButtonPress.bind(this));
     }
     _onButtonPress() {
         log("ActionButton _onButtonPress Emitting signal button-press-event");
@@ -1994,11 +2020,11 @@ class ActionButton {
     emit(name, ...args) { }
 }
 Signals.addSignalMethods(ActionButton.prototype);
-const AUTO_TILE_MAIN_AND_LIST_CLASS_NAME = "action-main-list";
 class AutoTileMainAndList extends ActionButton {
     constructor(grid) {
-        super(grid, AUTO_TILE_MAIN_AND_LIST_CLASS_NAME);
-        this.classname = AUTO_TILE_MAIN_AND_LIST_CLASS_NAME;
+        const theme = `${getTheme()}${ACTION_CLASSES.MAIN_AND_LIST}`;
+        super(grid, theme);
+        this.classname = theme;
         log("AutoTileMainAndList connect button-press-event");
         this.connect('button-press-event', () => this._onButtonPress());
     }
@@ -2072,8 +2098,9 @@ function AutoTileMain() {
 }
 class AutoTileTwoList extends ActionButton {
     constructor(grid) {
-        super(grid, "action-two-list");
-        this.classname = "action-two-list";
+        const theme = `${getTheme()}${ACTION_CLASSES.TWO_LIST}`;
+        super(grid, theme);
+        this.classname = theme;
         log("AutoTileTwoList connect button-press-event");
         this.connect('button-press-event', () => this._onButtonPress());
     }
@@ -2136,7 +2163,7 @@ class GridSettingsButton {
         this.cols = gridSize.width;
         this.rows = gridSize.height;
         this.actor = new St.Button({
-            style_class: 'settings-button',
+            style_class: `${theme}__preset-button`,
             reactive: true,
             can_focus: true,
             track_hover: true,
@@ -2161,7 +2188,7 @@ class Grid {
         this.tableHeight = (this.tableWidth / workArea.width) * workArea.height;
         this.actor = new St.BoxLayout({
             vertical: true,
-            style_class: 'grid-panel',
+            style_class: theme,
             reactive: true,
             can_focus: true,
             track_hover: true
@@ -2175,14 +2202,14 @@ class Grid {
         this.animation_time = gridSettings[SETTINGS_ANIMATION] ? 0.3 : 0;
         this.topbar = new TopBar(title);
         this.bottombarContainer = new St.Bin({
-            style_class: 'bottom-box-container',
+            style_class: `${theme}__preset-container`,
             reactive: true,
             can_focus: true,
             track_hover: true
         });
         this.bottomBarTableLayout = new Clutter.GridLayout();
         this.bottombar = new St.Widget({
-            style_class: 'bottom-box',
+            style_class: `${theme}__preset`,
             can_focus: true,
             track_hover: true,
             reactive: true,
@@ -2194,14 +2221,14 @@ class Grid {
         this.bottomBarTableLayout.set_column_homogeneous(true);
         this.bottombarContainer.add_actor(this.bottombar);
         this.veryBottomBarContainer = new St.Bin({
-            style_class: 'very-bottom-box-container',
+            style_class: `${theme}__action-container`,
             reactive: true,
             can_focus: true,
             track_hover: true
         });
         this.veryBottomBarTableLayout = new Clutter.GridLayout();
         this.veryBottomBar = new St.Widget({
-            style_class: 'very-bottom-box',
+            style_class: `${theme}__action`,
             can_focus: true,
             track_hover: true,
             reactive: true,
@@ -2227,14 +2254,14 @@ class Grid {
         }
         this.bottombar.height *= (rowNum + 1);
         this.tableContainer = new St.Bin({
-            style_class: 'table-container',
+            style_class: `${theme}__tile-container`,
             reactive: true,
             can_focus: true,
             track_hover: true
         });
         this.tableLayoutManager = new Clutter.GridLayout();
         this.table = new St.Widget({
-            style_class: 'table',
+            style_class: `${theme}__tile-table`,
             can_focus: true,
             track_hover: true,
             reactive: true,
@@ -2264,10 +2291,10 @@ class Grid {
         toggleSettingListener.addActor(toggle);
         let action = new AutoTileMainAndList(this);
         this.veryBottomBarTableLayout.attach(action.actor, 2, 0, 1, 1);
-        action.connect('resize-done', Lang.bind(this, this._onResize));
+        action.connect('resize-done', this._onResize.bind(this));
         action = new AutoTileTwoList(this);
         this.veryBottomBarTableLayout.attach(action.actor, 3, 0, 1, 1);
-        action.connect('resize-done', Lang.bind(this, this._onResize));
+        action.connect('resize-done', this._onResize.bind(this));
         this.x = 0;
         this.y = 0;
         this.interceptHide = false;
@@ -2674,11 +2701,16 @@ class GridElement {
         this.height = height;
         this.coordx = coordx;
         this.coordy = coordy;
-        this.actor = new St.Button({ style_class: 'table-element', reactive: true, can_focus: true, track_hover: true });
+        this.actor = new St.Button({
+            style_class: `${theme}__tile-table-item`,
+            reactive: true,
+            can_focus: true,
+            track_hover: true
+        });
         this.actor.visible = false;
         this.actor.opacity = 0;
         this.id = getMonitorKey(monitor) + "-" + coordx + ":" + coordy;
-        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+        this.actor.connect('button-press-event', this._onButtonPress.bind(this));
         this.hoverConnect = this.actor.connect('notify::hover', () => this._onHoverChanged());
         this.active = false;
     }
@@ -2721,6 +2753,13 @@ class GridElement {
     _destroy() {
         this.active = false;
     }
+}
+function getTheme() {
+    let themeName = settings.get_string(SETTINGS_THEME) || 'Default';
+    themeName = themeName.toLowerCase().replace(/[^A-Za-z0-9]/g, '-');
+    const theme = `gtile-${themeName}`;
+    log("Theme changed to the" + theme);
+    return theme;
 }
 
 registerExtension(function () { }, enable, disable);

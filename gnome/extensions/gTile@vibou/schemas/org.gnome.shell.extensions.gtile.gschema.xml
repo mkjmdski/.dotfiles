@@ -363,7 +363,7 @@
 			<summary>Preset resize11 settings.</summary>
 		</key>
 		<key type = "s" name="resize12">
-			<default>'3x3 0:2 1:2'</default>
+			<default>'2x3 0:2 1:2'</default>
 			<summary>Preset resize12 settings.</summary>
 		</key>
 		<key type = "s" name="resize13">
@@ -508,12 +508,20 @@
 			<summary>Bottom gap around border of screen for secondary monitor</summary>
 		</key>
 		<key type = "s" name="main-window-sizes">
-            <default>'.5, .625, 3/4'</default>
+			<default>'.5, .625, 3/4'</default>
 			<summary>"Autotile Main window sizes. (Ratio of the screen to take up. Can be a decimal or a ratio).</summary>
 		</key>
 		<key type = "b" name="debug">
 			<default>false</default>
 			<summary>Put debug lines into global.log. To see, run journalctl /usr/bin/gnome-shell -f in terminal</summary>
+		</key>
+		<key type = "s" name="theme">
+			<default>'Default'</default>
+			<summary>Active theme.</summary>
+		</key>
+		<key type="as" name="themes">
+			<default><![CDATA[['Default', 'Classic', 'Minimal Dark', 'Minimal Light']]]></default>
+			<summary>You can add or remove themes. Element classes are automatically changed by theme name.</summary>
 		</key>
 	</schema>
 </schemalist>

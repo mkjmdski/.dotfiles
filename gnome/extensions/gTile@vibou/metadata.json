@@ -10,9 +10,10 @@
     "3.32",
     "3.36",
     "3.38",
-    "40"
+    "40",
+    "41"
   ],
   "url": "https://github.com/gTile",
   "uuid": "gTile@vibou",
-  "version": 45
+  "version": 47
 }
