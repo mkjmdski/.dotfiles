@@ -105,7 +105,7 @@
 	unstage = reset HEAD
 	current-branch = "rev-parse --abbrev-ref HEAD"
 	# show changed dirs
-	dirs = "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
+	dirs = "!f(){ git diff --dirstat=files,0 | awk '{print $2}' | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
 	squash-branch = "!f() { git reset $(git merge-base ${2:-master} $(git current-branch)) ; git a ; git m ${1:-$(git log -1 --pretty=%B)} ; }; f"
