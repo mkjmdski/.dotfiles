@@ -1,2 +1,5 @@
 [user]
 	email = mikolaj.mlodzikowski@karhoo.com
+
+[url "ssh://git@github.com/karhoo"]
+    insteadOf = https://github.com/karhoo
