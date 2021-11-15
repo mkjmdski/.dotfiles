@@ -1,6 +1,5 @@
 #!/bin/bash
-host="http://jenkins.jenkins-prod.svc.cluster.local/job/$(git remote get-url origin | cut -d '/' -f 2 | cut -d '.' -f 1)/job/master/"
-link="https://${host}/app/${org}/${workspace}"
+link="http://jenkins.jenkins-prod.svc.cluster.local/job/$(git remote get-url origin | cut -d '/' -f 2 | cut -d '.' -f 1)/job/master/"
 if which xdg-open &> /dev/null; then
     xdg-open $link
 elif which open &> /dev/null; then
