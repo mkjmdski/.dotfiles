@@ -45,7 +45,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export HELM_DRIVER=configmap
     export PATH="$HOME/.helmenv/bin:$PATH"
     export TF_PLUGIN_CACHE_DIR="$HOME/.terraform-plugins"
-    export ZPLUG_LOADFILE="$DOTFILES/.zplugs.zsh"
     export PATH_LOADED="true"
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 

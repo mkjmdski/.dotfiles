@@ -105,3 +105,6 @@ zinit load sharkdp/fd
 
 zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
 zinit load BurntSushi/ripgrep
+
+zinit ice from"gh-r" as"program" mv"stern* -> stern"
+zinit load wercker/stern
