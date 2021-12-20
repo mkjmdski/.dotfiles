@@ -63,6 +63,9 @@ standard-chpwd() {
     fi
 }
 
-add-zsh-hook chpwd load-nvmrc
+if [[ $commands[nvm] ]]; then
+  add-zsh-hook chpwd load-nvmrc
+fi
+
 add-zsh-hook chpwd standard-chpwd
 load-nvmrc
