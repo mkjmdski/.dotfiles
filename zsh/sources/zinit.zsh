@@ -1,5 +1,5 @@
-zinit light zinit-zsh/z-a-as-monitor
-zinit light zinit-zsh/z-a-bin-gem-node
+zinit light zdharma-continuum/z-a-as-monitor
+zinit light zdharma-continuum/z-a-bin-gem-node
 
 for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
@@ -38,8 +38,8 @@ zinit ice as"program" pick"$ZPFX/bin/git-*" src"etc/git-extras-completion.zsh" m
 zinit light tj/git-extras
 
 zinit light zsh-users/zsh-autosuggestions
-zinit light zdharma/fast-syntax-highlighting
-zinit light zdharma/history-search-multi-word
+zinit light zdharma-continuum/fast-syntax-highlighting
+zinit light zdharma-continuum/history-search-multi-word
 zinit light zsh-users/zsh-history-substring-search
 
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
@@ -86,7 +86,7 @@ function _ls-aliases() {
 }
 
 zinit ice gem'!colorls' atload"_ls-aliases" id-as'colorls'
-zinit load zdharma/null
+zinit load zdharma-continuum/null
 
 zinit ice from"gh-r" as"program" mv"peco* -> peco" pick"peco/peco"
 zinit load peco/peco
