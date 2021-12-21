@@ -1,5 +1,5 @@
 #!/bin/bash -eux
-
+# https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
 function setup_binary_env {
     repo=$1
     location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
