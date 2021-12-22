@@ -58,8 +58,10 @@ zinit light hlissner/zsh-autopair
 zinit light Tarrasch/zsh-bd
 zinit light brymck/print-alias
 
-zinit ice from"gh-r" as"program" mv"jira* -> jira"
-zinit load go-jira/jira
+if [ "$DOTFILES_CONF_jira" = "true" ]; then
+    zinit ice from"gh-r" as"program" mv"jira* -> jira"
+    zinit load go-jira/jira
+fi
 
 zinit ice from"gh-r" as"program" mv"yaml2json* -> yaml2json"
 zinit load wakeful/yaml2json
@@ -106,5 +108,7 @@ zinit load sharkdp/fd
 zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
 zinit load BurntSushi/ripgrep
 
-zinit ice from"gh-r" as"program" mv"stern* -> stern"
-zinit load wercker/stern
+if [ "$DOTFILES_CONF_kubernetes" = "true" ]; then
+    zinit ice from"gh-r" as"program" mv"stern* -> stern"
+    zinit load wercker/stern
+fi

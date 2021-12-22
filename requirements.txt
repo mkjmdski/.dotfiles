@@ -1,6 +1,4 @@
 git+https://github.com/jeffkaufman/icdiff.git@release-2.0.4
-# https://github.com/nvbn/thefuck
-thefuck==3.30
 # https://github.com/drbild/json2yaml
 json2yaml==1.1.1
 # linters
@@ -15,3 +13,5 @@ ddgr==1.9
 yq==2.12.2
 # https://pypi.org/project/pydf/
 pydf==12
+# https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
+shyaml==0.6.2

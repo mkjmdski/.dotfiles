@@ -1,6 +1,7 @@
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias toupper="tr '[:lower:]' '[:upper:]'"
 alias tf-docs='docker run --rm -it -v $(pwd):/workspace gcr.io/cloud-foundation-cicd/cft/developer-tools:0.13 /bin/bash -c "source /usr/local/bin/task_helper_functions.sh && generate_docs"'
+
 if [[ $commands[kubectl] ]]; then
     alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
     alias ke="k exec"
@@ -44,9 +45,7 @@ if [[ $commands[tfenv] ]]; then
     fi
 fi
 
-alias xD="echo 'xD'"
-alias xd="echo 'xd'"
-
+# karhoo
 if [[ $commands[docker] ]]; then
     if [[ ! $commands[envy] ]]; then
         # export ENVY_VERSION=1.26.11
@@ -60,6 +59,7 @@ fi
 if [[ ! -z "$(which envy)" ]] && [[ -d "$HOME/repos/karhoo/k8s-manifests" ]]; then
     export K8S_MANIFESTS_DIR="$HOME/repos/karhoo/k8s-manifests"
 fi
+# eof karhoo
 
 if [[ $commands[pydf] ]]; then
     alias df="pydf"
@@ -69,18 +69,11 @@ if [[ $commands[apt-get] ]]; then
     alias apt-get="sudo apt-get"
     alias add-apt-repository="sudo add-apt-repository"
     alias apt="sudo apt"
-fi
-
-if [[ $commands[dpkg] ]]; then
     alias dpkg="sudo dpkg"
 fi
 
 if [ $commands[helm] ]; then
   source <(helm completion zsh)
-fi
-
-if [[ $commands[helmsman] ]]; then
-    alias helmsman='GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json KUBE_CONTEXT=$(kubectl config current-context) helmsman'
 fi
 
 if [[ $commands[doctl] ]]; then
@@ -89,10 +82,6 @@ fi
 
 alias git-cd='cd $(git root)'
 alias history='fc -il 1'
-
-if [[ $commands[barracudavpn] ]]; then
-    alias barracudavpn='TERM=xterm barracudavpn'
-fi
 
 if [[ $commands[ddgr] ]]; then
     alias ddgr='BROWSER=w3m ddgr'

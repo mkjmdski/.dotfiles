@@ -4,6 +4,7 @@ bungcip.better-toml
 christian-kohler.path-intellisense
 CoenraadS.bracket-pair-colorizer-2
 DavidAnson.vscode-markdownlint
+deerawan.vscode-dash
 donjayamanne.python-extension-pack
 DotJoshJohnson.xml
 dracula-theme.theme-dracula
@@ -14,6 +15,7 @@ eriklynd.json-tools
 formulahendry.auto-close-tag
 formulahendry.auto-rename-tag
 foxundermoon.shell-format
+golang.go
 groksrc.ruby
 hangxingliu.vscode-nginx-conf-hint
 hashicorp.terraform
@@ -39,6 +41,7 @@ shanoor.vscode-nginx
 shd101wyy.markdown-preview-enhanced
 sidneys1.gitconfig
 sparty02.sentinel-vscode
+tsandall.opa
 usernamehw.errorlens
 vincaslt.highlight-matching-tag
 VisualStudioExptTeam.vscodeintellicode

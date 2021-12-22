@@ -73,4 +73,6 @@
   },
   "cSpell.language": "en,pl",
   "cSpell.enabled": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active"
 }

@@ -1,0 +1,14 @@
+kubectl: true
+cloudflare: true
+node: true
+digitalocean: true
+google: true
+spotify: true
+slack: true
+jira: false
+terraform: true
+git: true
+code: true
+code_extensions: true
+gnome: true
+grub: true

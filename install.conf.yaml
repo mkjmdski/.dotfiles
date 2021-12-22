@@ -8,14 +8,19 @@
 - create:
   - "$HOME/bin"
   - "$HOME/.terraform-plugins"
+- link:
+  ~/.icons:
+    path: gnome/icons
+    if: &gnome-check if [ "$(cat config.yaml | grep gnome | awk '{print $2}')" = "true" ]; then gnome-shell --version; fi
+  ~/.themes:
+    path: gnome/themes
+    if: *gnome-check
+  ~/.local/share/gnome-shell/extensions:
+    path: gnome/extensions
+    if: *gnome-check
 - shell:
-  - command: ./packets
+  - command: ./install-packets.sh
     stdin: true
-  - chsh -s $(which zsh)
-  - python3 -m venv venv && source venv/bin/activate && pip3 install --upgrade -r requirements.txt
-  - git config --global include.path "$PWD/global.gitconfig"
-  - git config --global core.excludesfile "$PWD/global.gitignore"
-  - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
     ~/.peco/config.json:
       path: peco.json
@@ -27,32 +32,22 @@
       path: .zshrc
     ~/.config/Code/User/settings.json:
       path: settings.json
-      if: uname -a | grep -iq ubuntu
+      if: &ubuntu uname -a | grep -iq ubuntu
     ~/.config/Code/User/keybindings.json:
       path: keybindings.json
-      if: uname -a | grep -iq ubuntu
+      if: *ubuntu
     ~/Library/Application\ Support/Code/User/settings.json:
       path: vscode/settings.json
-      if: uname -a | grep -iq darwin
+      if: &mac uname -a | grep -iq darwin
     ~/Library/Application\ Support/Code/User/keybindings.json:
       path: vscode/keybindings.json
-      if: uname -a | grep -iq darwin
-    ~/.icons:
-      path: gnome/icons
-      if: gnome-shell --version
-    ~/.themes:
-      path: gnome/themes
-      if: gnome-shell --version
-    ~/.local/share/gnome-shell/extensions:
-      path: gnome/extensions
-      if: gnome-shell --version
+      if: *mac
     ~/.config/terminator/config:
       path: terminator.config
       if: terminator --version
     ~/Library/Preferences/com.googlecode.iterm2.plist:
       path: com.googlecode.iterm2.plist
-      if: uname -a | grep -iq darwin
+      if: *mac
     ~/.ssh/config:
       path: ssh.config
-- shell:
-  - for ext in $(gnome-extensions list); do gnome-extensions enable $ext; done || echo 'no gnome'
+      if: if [ "$(whoami)" = "mlodzikos" ] || [ "$(whoami)" = "mikolajmlodzikowski" ]; then which ssh; fi

@@ -65,9 +65,11 @@
 # [mergetool "pycharm"]
 # 	cmd = /usr/local/bin/charm merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
 # VIM
+
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
+
 [mergetool "vimdiff"]
 	prompt = false
 
@@ -77,10 +79,13 @@
 	renames = true
 	tool = icdiff
 #     tool = pycharm
+
 [difftool]
 	prompt = false
+
 [difftool "icdiff"]
 	cmd = icdiff --line-numbers $LOCAL $REMOTE
+
 # [difftool "pycharm"]
 # 	cmd = /usr/local/bin/charm diff "$LOCAL" "$REMOTE" && echo "Press enter to continue..." && read
 
@@ -112,14 +117,12 @@
 	is-clean = "!f() { if ! git diff --exit-code &> /dev/null || [[ ! -z "$(git ls-files --other --directory --exclude-standard)" ]]; then exit 1; fi ; }; f"
 	rebase-main = "!f() {b="$(git current-branch)"; git checkout ${1:-master}; git pull; git checkout $b; git rebase ${1:-master} ; }; f"
 	message = "log -1 --pretty=%B"
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[user]
-	email = mikolaj.mlodzikowski@gmail.com
-	name = Mikołaj Młodzikowski
 
 [includeIf "gitdir:~/repos/karhoo/**"]
     path = .gitconfig-work
