@@ -12,3 +12,5 @@ code: true
 code_extensions: true
 gnome: true
 grub: true
+golang: true
+gitlab: true

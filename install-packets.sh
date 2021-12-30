@@ -226,9 +226,11 @@ elif uname -a | grep -iq darwin; then
     install_osx_standard
 fi
 
-python3 -m venv venv
-source venv/bin/activate
-pip3 install --upgrade -r pip/standard.requirements.txt
+if [ ! -d  "venv" ]; then
+    python3 -m venv venv
+    source venv/bin/activate
+    pip3 install --upgrade -r requirements.txt
+fi
 
 if apt-get --version &> /dev/null; then
     install_debian_extras
