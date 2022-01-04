@@ -8,4 +8,14 @@
         pdftk "${invoice}" cat 1 output "tmp-${invoice}"
     done
     pdftk tmp-invoice-* cat output uber.pdf
+
+    echo "VAT: "
+    for invoice in invoice-*; do
+         pdftotext -layout "${invoice}" - | grep -i 'Wartość całkowita VAT' | awk '{print $6}'
+    done | sed 's|,|.|g' | awk '{s+=$1}END{print s}'
+
+    echo "Bez VAT: "
+    for invoice in invoice-*; do
+         pdftotext -layout "${invoice}" - | grep -i 'Razem po potrąceniu' | awk '{print $5}'
+    done | sed 's|,|.|g' | awk '{s+=$1}END{print s}'
 )

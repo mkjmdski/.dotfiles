@@ -73,8 +73,7 @@ function install_debian_extras {
         ca-certificates \
         gnupg-agent \
         software-properties-common \
-        w3m \
-        pdftk
+        w3m
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
@@ -83,6 +82,13 @@ function install_debian_extras {
     sudo apt-get update
     sudo apt-get install docker-ce docker-ce-cli containerd.io
     sudo usermod -a -G docker $(whoami)
+
+    if [ "$DOTFILES_CONF_uber" = "true" ]; then
+        sudo apt-get install -y \
+            pdftk \
+            poppler-utils
+
+    fi
 
     if [ "$DOTFILES_CONF_gnome" = "true" ]; then
         sudo apt-get install -y \
@@ -191,11 +197,12 @@ function install_osx_extras {
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         brew install glab
     fi
-    # should come from zinit
-    # bat peco jq
-    # if [ "$DOTFILES_CONF_git" = "true" ]; then
-    #     brew install git-extras
-    # fi
+
+    if [ "$DOTFILES_CONF_uber" = "true" ]; then
+        brew install poppler
+        brew install pdftk
+    fi
+
     for p in gnupg2 pinentry-mac neovim zsh fasd trash-cli libusb docker neovim trash-cli xclip coreutils gnu-sed
     do
         brew install $p
