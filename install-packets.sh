@@ -135,11 +135,10 @@ function install_debian_extras {
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         snap install --edge glab
         snap connect glab:ssh-keys
+        glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
     fi
 
     if [ "$DOTFILES_CONF_golang" = "true" ]; then
-        snap install --edge glab
-        snap connect glab:ssh-keys
         setup_binary_env "syndbg/goenv"
     fi
 
@@ -196,6 +195,7 @@ function install_osx_extras {
     fi
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         brew install glab
+        glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
     fi
 
     if [ "$DOTFILES_CONF_uber" = "true" ]; then
