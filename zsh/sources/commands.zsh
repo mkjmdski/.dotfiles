@@ -93,6 +93,6 @@ function take { mkdir -p $@ && cd ${@:$#} }
 
 
 # https://github.com/arzzen/calc.plugin.zsh# Put these in your .zshrc (No need to install a plugin)
-cc() python3 -c "from math import *; print($*);"
-alias cc='noglob cc'
-# You can use `cc` just like `=` from above. All functions from the math module of Python are available for use.
+calc() python3 -c "from math import *; print($*);"
+alias calc='noglob calc'
+# You can use `calc` just like `=` from above. All functions from the math module of Python are available for use.

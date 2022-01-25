@@ -9,13 +9,22 @@
     done
     pdftk tmp-invoice-* cat output uber.pdf
 
-    echo "VAT: "
-    for invoice in invoice-*; do
-         pdftotext -layout "${invoice}" - | grep -i 'Wartość całkowita VAT' | awk '{print $6}'
-    done | sed 's|,|.|g' | awk '{s+=$1}END{print s}'
+    echo "VAT "
+    while read -r price; do
+        echo $price | grep -Eo '[0-9,\.]{1,5}'
+    done< <(for invoice in invoice-*; do
+                pdftotext -layout "${invoice}" - | egrep -i '(Wartość całkowita VAT)' | awk '{print $4 $5}'
+            done | sed 's|,|.|g') | awk '{s+=$1}END{print s}'
 
-    echo "Bez VAT: "
-    for invoice in invoice-*; do
-         pdftotext -layout "${invoice}" - | grep -i 'Razem po potrąceniu' | awk '{print $5}'
-    done | sed 's|,|.|g' | awk '{s+=$1}END{print s}'
+    echo
+    echo
+
+    echo "Dochodowy"
+    sum="$(while read -r price; do
+        echo $price | grep -Eo '[0-9,\.]{1,5}'
+    done< <(for invoice in invoice-*; do
+                pdftotext -layout "${invoice}" - | egrep -i '(Razem po potrąceniu|Wartość całkowita netto )' | awk '{print $4 $5}'
+            done | sed 's|,|.|g') | awk '{s+=$1}END{print s}')"
+    echo "całość netto   : $sum"
+    echo "wartość podatku: $(calc $sum * 19 / 100)"
 )
