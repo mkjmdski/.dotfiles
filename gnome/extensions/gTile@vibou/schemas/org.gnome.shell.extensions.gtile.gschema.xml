@@ -447,6 +447,10 @@
 			<default>true</default>
 			<summary>Close gTile after window have been resized.</summary>
 		</key>
+		<key type = "b" name="auto-close-keyboard-shortcut">
+			<default>false</default>
+			<summary>Close gTile after window has been resized using a keyboard shortcut.</summary>
+		</key>
 		<key type = "b" name="animation">
 			<default>true</default>
 			<summary>Make background slection highlight to move more smooth.</summary>
@@ -458,6 +462,10 @@
 		<key type = "b" name="global-presets">
 			<default>true</default>
 			<summary>Keyboard presets are always active (as opposed active only when tiling window is visible).</summary>
+		</key>
+		<key type = "b" name="target-presets-to-monitor-of-mouse">
+			<default>false</default>
+			<summary>Keyboard shortcuts will target the monitor where the mouse curser is.</summary>
 		</key>
 		<key type = "b" name="moveresize-enabled">
 			<default>true</default>

@@ -4,7 +4,6 @@ const GObject = imports.gi.GObject;
 const Gdk = imports.gi.Gdk;
 const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
-const Lang = imports.lang;
 
 // Extension imports
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -13,9 +12,11 @@ const Settings = Me.imports.settings;
 // Redefining globals from extension.js - do not know how to do it better :-(
 const SETTINGS_GRID_SIZES = 'grid-sizes';
 const SETTINGS_AUTO_CLOSE = 'auto-close';
+const SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT = "auto-close-keyboard-shortcut";
 const SETTINGS_ANIMATION = 'animation';
 const SETTINGS_SHOW_ICON = 'show-icon';
 const SETTINGS_GLOBAL_PRESETS = 'global-presets';
+const SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE = "target-presets-to-monitor-of-mouse";
 const SETTINGS_MOVERESIZE_ENABLED = 'moveresize-enabled';
 const SETTINGS_WINDOW_MARGIN = 'window-margin';
 const SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED = 'window-margin-fullscreen-enabled';
@@ -249,12 +250,14 @@ function basics_tab(notebook, settings) {
     bs_grid.set_margin_start(24);
     bs_grid.set_margin_top(24);
 
-    add_check("Auto close", SETTINGS_AUTO_CLOSE, bs_grid, settings);
+    add_check("Auto close on resize", SETTINGS_AUTO_CLOSE, bs_grid, settings);
+    add_check("Auto close on keyboard shortcut", SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT, bs_grid, settings);
     add_check("Animation",  SETTINGS_ANIMATION,  bs_grid, settings);
     add_check("Show icon",  SETTINGS_SHOW_ICON,  bs_grid, settings);
 
     add_text ("Grid sizes (like 6x4,8x6,21x11)", SETTINGS_GRID_SIZES, bs_grid, settings, 30);
     add_check("Global resize presets (works without gTile activated)", SETTINGS_GLOBAL_PRESETS  , bs_grid, settings);
+    add_check("Keyboard presets target monitor of mouse", SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE, bs_grid, settings);
 
     add_check("Enable accelerators for moving and resizing windows", SETTINGS_MOVERESIZE_ENABLED  , bs_grid, settings);
 
@@ -493,10 +496,11 @@ function add_combobox(options, grid, callback) {
 
 // grabbed from sysmonitor code
 
-const IntSelect = new Lang.Class({
-        Name: 'gTile.IntSelect',
+const IntSelect = GObject.registerClass({
+        GTypeName: 'gTile.IntSelect',
+    }, class IntSelect extends GObject.Object {
 
-    _init: function(name) {
+    _init(name) {
         this.label = new Gtk.Label({
             label: name + ":",
             halign: Gtk.Align.START
@@ -509,20 +513,22 @@ const IntSelect = new Lang.Class({
         box_append(this.actor, this.label)
         box_append(this.actor, this.spin)
         this.spin.set_numeric(true);
-    },
-    set_args: function(minv, maxv, incre, page){
+    }
+
+    set_args(minv, maxv, incre, page){
         this.spin.set_range(minv, maxv);
         this.spin.set_increments(incre, page);
-    },
-    set_value: function(value){
+    }
+
+    set_value(value){
         this.spin.set_value(value);
     }
 });
 
-const TextEntry = new Lang.Class({
+const TextEntry = GObject.registerClass({
         Name: 'gTile.TextEntry',
-
-    _init: function(name) {
+    },  class TextEntry extends GObject.Object {
+    _init(name) {
         this.label = new Gtk.Label({label: name + ":"});
         this.textentry = new Gtk.Entry();
         this.actor = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 10});
@@ -530,11 +536,13 @@ const TextEntry = new Lang.Class({
         box_append(this.actor, this.label);
         box_append(this.actor, this.textentry);
         this.textentry.set_text("");
-    },
-    set_args: function(width){
+    }
+
+    set_args(width){
         this.textentry.set_width_chars(width);
-    },
-    set_value: function(value){
+    }
+
+    set_value(value){
         this.textentry.set_text(value);
     }
 });
