@@ -1,0 +1,9 @@
+#!/bin/bash
+terraform plan | tee tfplan.ignore
+echo ">>> ADDRESSES <<<"
+echo ">>> created"
+for d in $(cat tfplan.ignore | grep 'created' | cut -d ' ' -f 4); do echo "'${d}'"; done | tee plan.ignore
+echo
+echo ">>> destroyed"
+echo
+for d in $(cat tfplan.ignore | grep 'destroyed' | cut -d ' ' -f 4); do echo "'${d}'"; done | tee -a plan.ignore

@@ -1,0 +1,33 @@
+#!/bin/zsh -e
+calc() python3 -c "from math import *; print($*);"
+alias calc='noglob calc'
+# fix this
+(
+    mkdir -p invoices
+    cd invoices
+    find . -type f -exec rm {} \;
+    mv ../invoice-* .
+    for invoice in invoice-*; do
+        pdftk "${invoice}" cat 1 output "tmp-${invoice}"
+    done
+    pdftk tmp-invoice-* cat output uber.pdf
+
+    echo "VAT "
+    while read -r price; do
+        echo $price | grep -Eo '[0-9,\.]{1,5}'
+    done< <(for invoice in invoice-*; do
+                pdftotext -layout "${invoice}" - | egrep -i '(Wartość całkowita VAT)' | awk '{print $4 $5}'
+            done | sed 's|,|.|g') | awk '{s+=$1}END{print s}'
+
+    echo
+    echo
+
+    echo "Dochodowy"
+    sum="$(while read -r price; do
+        echo $price | grep -Eo '[0-9,\.]{1,5}'
+    done< <(for invoice in invoice-*; do
+                pdftotext -layout "${invoice}" - | egrep -i '(Razem po potrąceniu|Wartość całkowita netto )' | awk '{print $4 $5}'
+            done | sed 's|,|.|g') | awk '{s+=$1}END{print s}')"
+    echo "całość netto   : $sum"
+    echo "wartość podatku: $(calc $sum * 19 / 100)"
+)

@@ -1,0 +1,28 @@
+#!/bin/bash
+skip_last_line=$1
+skip_double_line=$2
+skip_first_empty=$3
+git ls-files -z -- . ':!:*.tgz' | while IFS= read -rd '' f; do
+    # skip symlinks
+    if [ -L "$f" ]; then
+        continue
+    fi
+    # add missing empty-line in the end of file
+    if [ -z "$skip_last_line" ]; then
+        tail -c1 < "$f" | read -r _ || echo >> "$f"
+    fi
+    # https://stackoverflow.com/questions/12598916/how-to-use-sed-to-remove-only-double-empty-lines
+    # remove double empty-line inside the file
+    if [ -z "$skip_double_line" ]; then
+        sed '
+            N;
+            /^\n$/d;
+            P;
+            D
+        ' -i "$f"
+    fi
+    # https://stackoverflow.com/questions/19767593/sed-command-to-delete-empty-lines-till-the-first-occurrence-of-sentence
+    if [ -z "$skip_first_empty" ]; then
+        sed -n $'/[^ \t]/,$p' -i "$f"
+    fi
+done

@@ -4,9 +4,13 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": true
   },
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "full"
+  },
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
-  "editor.formatOnSaveTimeout": 10000,
   "editor.codeActionsOnSave": {
     "source.fixAll": true
   },
@@ -26,68 +30,49 @@
     "**/img/**": true,
     "**/var/cache/**": true
   },
-  "gitProjectManager.baseProjectsFolders": [
-    "~/repos"
-  ],
-  "gitlens.advanced.messages": {
-    "suppressShowKeyBindingsNotice": true
-  },
-  "markdownlint.config": {
-    "MD024": false,
-    "MD025": false,
-    "MD026": false,
-    "MD033": false
-  },
-"python.autoComplete.addBrackets": true,
+  "python.autoComplete.addBrackets": true,
   "python.formatting.provider": "black",
-  "python.jediEnabled": false,
-  "terraform.codelens.enabled": true,
-  "terraform.indexing": {
-    "delay": 500,
-    "enabled": false,
-    "exclude": [
-      ".terraform/**/*",
-      "**/.terraform/**/*"
-    ],
-    "liveIndexing": false
-  },
-  "terraform.languageServer": {
-    "external": true,
-    "args": [
-      "serve"
-    ]
-  },
   "window.closeWhenEmpty": true,
   "window.restoreFullscreen": true,
   "window.restoreWindows": "all",
-  "window.zoomLevel": 2,
   "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "newUntitledFile",
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
-"diffEditor.maxComputationTime": 0,
-"python.languageServer": "Pylance",
-"jupyter.addGotoCodeLenses": false,
-"jupyter.allowImportFromNotebook": false,
-"jupyter.allowInput": false,
-"jupyter.allowLiveShare": false,
-"jupyter.askForLargeDataFrames": false,
-"jupyter.collapseCellInputCodeByDefault": false,
-"jupyter.colorizeInputBox": false,
-"jupyter.debugJustMyCode": false,
-"jupyter.decorateCells": false,
-"jupyter.enableAutoMoveToNextCell": false,
-"jupyter.enableCellCodeLens": false,
-"jupyter.enableGather": false,
-"jupyter.enablePlotViewer": false,
-"jupyter.enabled": false,
-"python.analysis.completeFunctionParens": true,
-"workbench.editorAssociations": [
-  {
-    "viewType": "jupyter.notebook.ipynb",
-    "filenamePattern": "*.ipynb"
-  }
-]
+  "diffEditor.maxComputationTime": 0,
+  "python.languageServer": "Pylance",
+  "jupyter.addGotoCodeLenses": false,
+  "jupyter.allowImportFromNotebook": false,
+  "jupyter.allowInput": false,
+  "jupyter.allowLiveShare": false,
+  "jupyter.askForLargeDataFrames": false,
+  "jupyter.collapseCellInputCodeByDefault": false,
+  "jupyter.colorizeInputBox": false,
+  "jupyter.debugJustMyCode": false,
+  "jupyter.decorateCells": false,
+  "jupyter.enableAutoMoveToNextCell": false,
+  "jupyter.enableCellCodeLens": false,
+  "jupyter.enablePlotViewer": false,
+  "python.analysis.completeFunctionParens": true,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "markdownlint.focusMode": true,
+  "markdownlint.config": {
+    "MD024": false,
+    "MD025": false,
+    "MD026": false,
+    "MD033": false,
+    "MD041": false
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true
+  },
+  "cSpell.language": "en,pl",
+  "cSpell.enabled": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active"
 }
