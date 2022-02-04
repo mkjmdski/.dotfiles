@@ -10,18 +10,18 @@
 
 # IDE files #
 #############
-.idea
-.iml
+.idea/
+*.iml
 
 
 # NPM #
-node_modules
+node_modules/
 
 # Terraform #
 .terraform
 
 # Python
-venv
+venv/
 .venv
 
 # random
