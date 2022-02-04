@@ -83,4 +83,9 @@ spaceship_gcloud() {
     "$SPACESHIP_GCLOUD_SUFFIX"
 }
 
-SPACESHIP_PROMPT_ORDER=(time user dir host git git_last_commit golang docker venv gcloud kubectl exec_time line_sep battery vi_mode jobs exit_code char)
+SPACESHIP_KUBECONTEXT_PREFIX="at ☸️  "
+if [ -f "$HOME/.dotfiles/.is_laptop" ]; then
+  SPACESHIP_PROMPT_ORDER=(battery time dir git git_last_commit golang venv kubectl_context exec_time line_sep jobs exit_code char)
+else
+  SPACESHIP_PROMPT_ORDER=(time dir git git_last_commit golang venv kubectl_context exec_time line_sep jobs exit_code char)
+fi

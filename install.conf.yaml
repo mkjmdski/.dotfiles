@@ -8,21 +8,20 @@
 - create:
   - "$HOME/bin"
   - "$HOME/.terraform-plugins"
-- shell:
-  - command: ./packets
-    stdin: true
-  - sudo chsh -s $(which zsh)
-  - pip3 install --user --upgrade -r requierements.txt
-  - git config --global include.path "$PWD/global.gitconfig"
-  - git config --global core.excludesfile "$PWD/global.gitignore"
-  - for extension in $(cat installed_vs_extensions); do code --install-extension $extension; done
 - link:
-    ~/.config/broot/conf.toml:
-      path: broot.toml
-    ~/.config/conky:
-      path: conky
-    ~/.local/share/applications/show-desktop.desktop:
-      path: applications/show-desktop.desktop
+  ~/.icons:
+    path: gnome/icons
+    if: &gnome-check if [ "$(cat config.yaml | grep gnome | awk '{print $2}')" = "true" ]; then gnome-shell --version; fi
+  ~/.themes:
+    path: gnome/themes
+    if: *gnome-check
+  ~/.local/share/gnome-shell/extensions:
+    path: gnome/extensions
+    if: *gnome-check
+- shell:
+  - command: ./install-packets.sh
+    stdin: true
+- link:
     ~/.peco/config.json:
       path: peco.json
     ~/.config/nvim/colors/molokai.vim:
@@ -33,25 +32,22 @@
       path: .zshrc
     ~/.config/Code/User/settings.json:
       path: settings.json
-      if: uname -a | grep -iq ubuntu
+      if: &ubuntu uname -a | grep -iq ubuntu
     ~/.config/Code/User/keybindings.json:
       path: keybindings.json
-      if: uname -a | grep -iq ubuntu
-    ~/Library/Application Support/Code/User/settings.json:
+      if: *ubuntu
+    ~/Library/Application\ Support/Code/User/settings.json:
       path: vscode/settings.json
-      if: uname -a | grep -iq darwin
-    ~/Library/Application Support/Code/User/keybindings.json:
+      if: &mac uname -a | grep -iq darwin
+    ~/Library/Application\ Support/Code/User/keybindings.json:
       path: vscode/keybindings.json
-      if: uname -a | grep -iq darwin
-    ~/.icons:
-      path: gnome/icons
-      if: gnome-shell --version
-    ~/.themes:
-      path: gnome/themes
-      if: gnome-shell --version
-    ~/.local/share/gnome-shell/extensions:
-      path: gnome/extensions
-      if: gnome-shell --version
+      if: *mac
     ~/.config/terminator/config:
       path: terminator.config
       if: terminator --version
+    ~/Library/Preferences/com.googlecode.iterm2.plist:
+      path: com.googlecode.iterm2.plist
+      if: *mac
+    ~/.ssh/config:
+      path: ssh.config
+      if: if [ "$(whoami)" = "mlodzikos" ] || [ "$(whoami)" = "mikolajmlodzikowski" ]; then which ssh; fi

@@ -65,9 +65,11 @@
 # [mergetool "pycharm"]
 # 	cmd = /usr/local/bin/charm merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
 # VIM
+
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
+
 [mergetool "vimdiff"]
 	prompt = false
 
@@ -77,37 +79,44 @@
 	renames = true
 	tool = icdiff
 #     tool = pycharm
+
 [difftool]
 	prompt = false
+
 [difftool "icdiff"]
 	cmd = icdiff --line-numbers $LOCAL $REMOTE
+
 # [difftool "pycharm"]
 # 	cmd = /usr/local/bin/charm diff "$LOCAL" "$REMOTE" && echo "Press enter to continue..." && read
 
 #### ALIASES
 [alias]
+	p = "!f(){ git push || (git pull && git push) ; }; f"
 	a = add --all
 	m = commit --message
-	p = !git pull && git push
+	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
+	amp = "!f(){ git add -A && git commit -m \"$@\"; git p ; }; f"
+	mp = "!f(){ git commit -m \"$@\"; git p ; }; f"
+	merge-me = "!f(){ b=$(git current-branch); git checkout ${1:-master}; git merge $b; }; f"
 	s = status
-	u = push --set-upstream origin
+	annotate-tag = "!f(){ tag=\"$(git describe --tags)\"; git delete-tag $tag; git tag -a $tag -m \"$(git show -s --format=%s)\"; git p ; }; f"
 	st = stash save --include-untracked
 	pop = stash pop
-	push-u = "!f(){ push -u ${1-origin} $(git current-branch) ; }; f"
+	push-u = "!f(){ git push -u ${1-origin} $(git current-branch) ; }; f"
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all
-	uncommit = back
+	uncommit = reset HEAD~
 	unstage = reset HEAD
 	current-branch = "rev-parse --abbrev-ref HEAD"
 	# show changed dirs
-	dirs = "!f(){ git diff --dirstat=files,0 HEAD~1 | awk '{print $2}' | cut -d '/' -f 1 | sort | uniq ; }; f"
+	dirs = "!f(){ git diff --dirstat=files,0 | awk '{print $2}' | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
-	# gitlab specific
-	push-ci-skip = push -o ci.skip
-	make-mr = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" ; }; f"
-	make-mr-upstream = "!f(){ git push -o merge_request.create -o merge_request.remove_source_branch -o merge_request.target=\"${1-master}\" --set-upstream origin $(git current-branch) ; }; f"
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
+	squash-branch = "!f() { git reset $(git merge-base ${2:-master} $(git current-branch)) ; git a ; git m ${1:-$(git log -1 --pretty=%B)} ; }; f"
+	is-clean = "!f() { if ! git diff --exit-code &> /dev/null || [[ ! -z "$(git ls-files --other --directory --exclude-standard)" ]]; then exit 1; fi ; }; f"
+	rebase-main = "!f() {b="$(git current-branch)"; git checkout ${1:-master}; git pull; git checkout $b; git rebase ${1:-master} ; }; f"
+	message = "log -1 --pretty=%B"
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -115,9 +124,5 @@
 	process = git-lfs filter-process
 	required = true
 
-[user]
-	email = mikolaj.mlodzikowski@gmail.com
-	name = Mikołaj Młodzikowski
-
-[includeIf "gitdir:~/repos/eg/"]
+[includeIf "gitdir:~/repos/karhoo/**"]
     path = .gitconfig-work

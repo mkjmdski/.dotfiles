@@ -7,10 +7,10 @@
  */
 
 
-const Main = imports.ui.main;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const St = imports.gi.St;
+const Main = imports.ui.main;
 
 const Config = imports.misc.config;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -18,9 +18,9 @@ const Convenience = Me.imports.convenience;
 const Intellihide = Me.imports.intellihide;
 const DockedWorkspaces = Me.imports.dockedWorkspaces;
 
-var intellihide;
-var dock;
-var settings;
+var intellihide = null;
+var dock = null;
+var settings = null;
 var workspacesToDockStylesheet = null;
 
 function loadStylesheet() {
@@ -167,6 +167,12 @@ function bindSettingsChanges() {
         intellihide = new Intellihide.Intellihide(dock);
     });
     settings.connect('changed::center-thumbnails-option', function(){
+        intellihide.destroy();
+        dock.destroy();
+        dock = new DockedWorkspaces.DockedWorkspaces();
+        intellihide = new Intellihide.Intellihide(dock);
+    });
+    settings.connect('changed::shortcuts-panel-appsbutton-animation', function(){
         intellihide.destroy();
         dock.destroy();
         dock = new DockedWorkspaces.DockedWorkspaces();

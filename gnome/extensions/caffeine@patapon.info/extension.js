@@ -21,9 +21,9 @@
 
 'use strict';
 
-const Lang = imports.lang;
 const St = imports.gi.St;
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
 const PanelMenu = imports.ui.panelMenu;
@@ -38,12 +38,23 @@ const SHOW_NOTIFICATIONS_KEY = 'show-notifications';
 const USER_ENABLED_KEY = 'user-enabled';
 const RESTORE_KEY = 'restore-state';
 const FULLSCREEN_KEY = 'enable-fullscreen';
+const NIGHT_LIGHT_KEY = 'control-nightlight';
+const NIGHT_LIGHT_APP_ONLY_KEY = 'control-nightlight-for-app';
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-caffeine');
 const _ = Gettext.gettext;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
+
+const ColorInterface = '<node> \
+  <interface name="org.gnome.SettingsDaemon.Color"> \
+    <property name="DisabledUntilTomorrow" type="b" access="readwrite"/>\
+    <property name="NightLightActive" type="b" access="read"/>\
+  </interface>\
+  </node>';
+
+const ColorProxy = Gio.DBusProxy.makeProxyWrapper(ColorInterface);
 
 const DBusSessionManagerIface = '<node>\
   <interface name="org.gnome.SessionManager">\
@@ -57,9 +68,9 @@ const DBusSessionManagerIface = '<node>\
     <method name="Uninhibit">\
         <arg type="u" direction="in" />\
     </method>\
-	<method name="GetInhibitors">\
-	    <arg type="ao" direction="out" />\
-	</method>\
+       <method name="GetInhibitors">\
+           <arg type="ao" direction="out" />\
+       </method>\
     <signal name="InhibitorAdded">\
         <arg type="o" direction="out" />\
     </signal>\
@@ -68,6 +79,7 @@ const DBusSessionManagerIface = '<node>\
     </signal>\
   </interface>\
 </node>';
+
 const DBusSessionManagerProxy = Gio.DBusProxy.makeProxyWrapper(DBusSessionManagerIface);
 
 const DBusSessionManagerInhibitorIface = '<node>\
@@ -77,6 +89,7 @@ const DBusSessionManagerInhibitorIface = '<node>\
     </method>\
   </interface>\
 </node>';
+
 const DBusSessionManagerInhibitorProxy = Gio.DBusProxy.makeProxyWrapper(DBusSessionManagerInhibitorIface);
 
 const IndicatorName = "Caffeine";
@@ -86,35 +99,45 @@ const EnabledIcon = 'my-caffeine-on-symbolic';
 let CaffeineIndicator;
 let ShellVersion = parseInt(Config.PACKAGE_VERSION.split(".")[1]);
 
-const Caffeine = new Lang.Class({
-    Name: IndicatorName,
-    Extends: PanelMenu.Button,
+const Caffeine = GObject.registerClass(
+class Caffeine extends PanelMenu.Button {
+    _init() {
+        super._init(null, IndicatorName);
 
-    _init: function(metadata, params) {
-        this.parent(null, IndicatorName);
-        this.actor.accessible_role = Atk.Role.TOGGLE_BUTTON;
+        this.accessible_role = Atk.Role.TOGGLE_BUTTON;
 
         this._settings = Convenience.getSettings();
-        this._settings.connect("changed::" + SHOW_INDICATOR_KEY, Lang.bind(this, function() {
+        this._settings.connect(`changed::${SHOW_INDICATOR_KEY}`, () => {
             if (this._settings.get_boolean(SHOW_INDICATOR_KEY))
-                this.actor.show();
+                this.show();
             else
-                this.actor.hide();
-        }));
+                this.hide();
+        });
         if (!this._settings.get_boolean(SHOW_INDICATOR_KEY))
-            this.actor.hide();
+            this.hide();
+
+        this._proxy = new ColorProxy(Gio.DBus.session, 'org.gnome.SettingsDaemon.Color', '/org/gnome/SettingsDaemon/Color', (proxy, error) => {
+            if (error) {
+              log(error.message);
+              return;
+            }
+        });
+
+        this._night_light = false;
 
         this._sessionManager = new DBusSessionManagerProxy(Gio.DBus.session,
                                                           'org.gnome.SessionManager',
                                                           '/org/gnome/SessionManager');
-        this._inhibitorAddedId = this._sessionManager.connectSignal('InhibitorAdded',
-                                                                    Lang.bind(this, this._inhibitorAdded));
-        this._inhibitorRemovedId = this._sessionManager.connectSignal('InhibitorRemoved',
-                                                                      Lang.bind(this, this._inhibitorRemoved));
+        this._inhibitorAddedId = this._sessionManager.connectSignal('InhibitorAdded', this._inhibitorAdded.bind(this));
+        this._inhibitorRemovedId = this._sessionManager.connectSignal('InhibitorRemoved', this._inhibitorRemoved.bind(this));
 
         // From auto-move-windows@gnome-shell-extensions.gcampax.github.com
-        this._windowTracker = Shell.WindowTracker.get_default();
-        
+        this._appSystem = Shell.AppSystem.get_default();
+
+        this._appsChangedId =
+            this._appSystem.connect('installed-changed',
+                this._updateAppData.bind(this));
+
         // ("screen" in global) is false on 3.28, although global.screen exists
         if (typeof global.screen !== "undefined") {
             this._screen = global.screen;
@@ -125,15 +148,10 @@ const Caffeine = new Lang.Class({
             this._display = this._screen;
         }
 
-        // Connect after so the handler from ShellWindowTracker has already run
-        this._windowCreatedId = this._display.connect_after('window-created', Lang.bind(this, this._mayInhibit));
-        let shellwm = global.window_manager;
-        this._windowDestroyedId = shellwm.connect('destroy', Lang.bind(this, this._mayUninhibit));
-
         this._icon = new St.Icon({
             style_class: 'system-status-icon'
         });
-        this._icon.gicon = Gio.icon_new_for_string(Me.path + '/icons/' + DisabledIcon +'.svg');
+        this._icon.gicon = Gio.icon_new_for_string(`${Me.path}/icons/${DisabledIcon}.svg`);
 
         this._state = false;
         // who has requested the inhibition
@@ -143,9 +161,10 @@ const Caffeine = new Lang.Class({
         this._cookies = [];
         this._objects = [];
 
-        this.actor.add_actor(this._icon);
-        this.actor.add_style_class_name('panel-status-button');
-        this.actor.connect('button-press-event', Lang.bind(this, this.toggleState));
+        this.add_actor(this._icon);
+        this.add_style_class_name('panel-status-button');
+        this.connect('button-press-event', this.toggleState.bind(this));
+        this.connect('touch-event', this.toggleState.bind(this));
 
         // Restore user state
         if (this._settings.get_boolean(USER_ENABLED_KEY) && this._settings.get_boolean(RESTORE_KEY)) {
@@ -153,14 +172,16 @@ const Caffeine = new Lang.Class({
         }
         // Enable caffeine when fullscreen app is running
         if (this._settings.get_boolean(FULLSCREEN_KEY)) {
-            this._inFullscreenId = this._screen.connect('in-fullscreen-changed', Lang.bind(this, this.toggleFullscreen));
+            this._inFullscreenId = this._screen.connect('in-fullscreen-changed', this.toggleFullscreen.bind(this));
             this.toggleFullscreen();
         }
-        // List current windows to check if we need to inhibit
-        global.get_window_actors().map(Lang.bind(this, function(window) {
-            this._mayInhibit(null, window.meta_window, null);
-        }));
-    },
+
+        this._appConfigs = [];
+        this._appData = new Map();
+
+        this._settings.connect(`changed::${INHIBIT_APPS_KEY}`, this._updateAppConfigs.bind(this));
+        this._updateAppConfigs();
+    }
 
     get inFullscreen() {
         let nb_monitors = this._screen.get_n_monitors();
@@ -172,53 +193,55 @@ const Caffeine = new Lang.Class({
             }
         }
         return inFullscreen;
-    },
+    }
 
-    toggleFullscreen: function() {
-        Mainloop.timeout_add_seconds(2, Lang.bind(this, function() {
-          if (this.inFullscreen && this._apps.indexOf('fullscreen') == -1) {
-              this.addInhibit('fullscreen');
-          }
-        }));
+    toggleFullscreen() {
+        Mainloop.timeout_add_seconds(2, () => {
+            if (this.inFullscreen && !this._apps.includes('fullscreen')) {
+                this.addInhibit('fullscreen');
+                this._manageNightLight('disabled');
+            }
+        });
 
-        if (!this.inFullscreen && this._apps.indexOf('fullscreen') != -1) {
-              this.removeInhibit('fullscreen');
+        if (!this.inFullscreen && this._apps.includes('fullscreen')) {
+            this.removeInhibit('fullscreen');
+            this._manageNightLight('enabled');
         }
-    },
+    }
 
-    toggleState: function() {
+    toggleState() {
         if (this._state) {
-            this._apps.map(Lang.bind(this, function(app_id) {
-                this.removeInhibit(app_id);
-            }));
+            this._apps.forEach(app_id => this.removeInhibit(app_id));
+            this._manageNightLight('enabled');
         }
         else {
             this.addInhibit('user');
+            this._manageNightLight('disabled');
         }
-    },
+    }
 
-    addInhibit: function(app_id) {
+    addInhibit(app_id) {
         this._sessionManager.InhibitRemote(app_id,
             0, "Inhibit by %s".format(IndicatorName), 12,
-            Lang.bind(this, function(cookie) {
+            cookie => {
                 this._last_cookie = cookie;
                 this._last_app = app_id;
-            })
+            }
         );
-    },
+    }
 
-    removeInhibit: function(app_id) {
+    removeInhibit(app_id) {
         let index = this._apps.indexOf(app_id);
         this._sessionManager.UninhibitRemote(this._cookies[index]);
-    },
+    }
 
-    _inhibitorAdded: function(proxy, sender, [object]) {
-        this._sessionManager.GetInhibitorsRemote(Lang.bind(this, function([inhibitors]){
+    _inhibitorAdded(proxy, sender, [object]) {
+        this._sessionManager.GetInhibitorsRemote(([inhibitors]) => {
             for(var i in inhibitors) {
                 let inhibitor = new DBusSessionManagerInhibitorProxy(Gio.DBus.session,
                                                              'org.gnome.SessionManager',
                                                              inhibitors[i]);
-                inhibitor.GetAppIdRemote(Lang.bind(this, function(app_id) {
+                inhibitor.GetAppIdRemote(app_id => {
                     if (app_id != '' && app_id == this._last_app) {
                         if (this._last_app == 'user')
                             this._settings.set_boolean(USER_ENABLED_KEY, true);
@@ -229,17 +252,18 @@ const Caffeine = new Lang.Class({
                         this._last_cookie = "";
                         if (this._state === false) {
                             this._state = true;
-                            this._icon.gicon = Gio.icon_new_for_string(Me.path + '/icons/' + EnabledIcon +'.svg');;
-                            if (this._settings.get_boolean(SHOW_NOTIFICATIONS_KEY) && !this.inFullscreen)
-                                Main.notify(_("Auto suspend and screensaver disabled"));
+                            this._icon.gicon = Gio.icon_new_for_string(`${Me.path}/icons/${EnabledIcon}.svg`);
+                            if (this._settings.get_boolean(SHOW_NOTIFICATIONS_KEY) && !this.inFullscreen) {
+                                this._sendNotification('enabled');
+                            }
                         }
                     }
-                }));
+                });
             }
-        }));
-    },
+        });
+    }
 
-    _inhibitorRemoved: function(proxy, sender, [object]) {
+    _inhibitorRemoved(proxy, sender, [object]) {
         let index = this._objects.indexOf(object);
         if (index != -1) {
             if (this._apps[index] == 'user')
@@ -250,46 +274,107 @@ const Caffeine = new Lang.Class({
             this._objects.splice(index, 1);
             if (this._apps.length === 0) {
                 this._state = false;
-                this._icon.gicon = Gio.icon_new_for_string(Me.path + '/icons/' + DisabledIcon +'.svg');;
-                if(this._settings.get_boolean(SHOW_NOTIFICATIONS_KEY))
-                    Main.notify(_("Auto suspend and screensaver enabled"));
+                this._icon.gicon = Gio.icon_new_for_string(`${Me.path}/icons/${DisabledIcon}.svg`);
+                if(this._settings.get_boolean(SHOW_NOTIFICATIONS_KEY)) {
+                    this._sendNotification('disabled');
+                }
             }
         }
-    },
+    }
 
-    _mayInhibit: function(display, window, noRecurse) {
-        let app = this._windowTracker.get_window_app(window);
-        if (!app) {
-            if (!noRecurse) {
-                // window is not tracked yet
-                Mainloop.idle_add(Lang.bind(this, function() {
-                    this._mayInhibit(display, window, true);
-                    return false;
-                }));
-            }
-            return;
+    _manageNightLight(state){
+        if (state == 'enabled') {
+          if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._proxy.NightLightActive && !this._settings.get_boolean(NIGHT_LIGHT_APP_ONLY_KEY)) {
+              this._proxy.DisabledUntilTomorrow = false;
+              this._night_light = true;
+          } else {
+              this._night_light = false;
+          }
         }
+        if (state == 'disabled') {
+          if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._proxy.NightLightActive && !this._settings.get_boolean(NIGHT_LIGHT_APP_ONLY_KEY)) {
+              this._proxy.DisabledUntilTomorrow = true;
+              this._night_light = true;
+          } else {
+              this._night_light = false;
+          }
+        }
+    }
+
+    _sendNotification(state){
+        if (state == 'enabled') {
+          if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._night_light && this._proxy.DisabledUntilTomorrow) {
+              Main.notify(_('Auto suspend and screensaver disabled. Night Light paused.'));
+          } else {
+              Main.notify(_('Auto suspend and screensaver disabled'));
+          }
+        }
+        if (state == 'disabled') {
+            if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._night_light && !this._proxy.DisabledUntilTomorrow) {
+                Main.notify(_('Auto suspend and screensaver enabled. Night Light resumed.'));
+            } else {
+                Main.notify(_('Auto suspend and screensaver enabled'));
+            }
+        }
+    }
+
+    _updateAppConfigs() {
+        this._appConfigs.length = 0;
+        this._settings.get_strv(INHIBIT_APPS_KEY).forEach(appId => {
+            this._appConfigs.push(appId);
+        });
+        this._updateAppData();
+    }
+
+    _updateAppData() {
+        let ids = this._appConfigs.slice()
+        let removedApps = [...this._appData.keys()]
+            .filter(a => !ids.includes(a.id));
+        removedApps.forEach(app => {
+            app.disconnect(this._appData.get(app).windowsChangedId);
+            let id = app.get_id();
+            this._appData.delete(app);
+        });
+        let addedApps = ids
+            .map(id => this._appSystem.lookup_app(id))
+            .filter(app => app && !this._appData.has(app));
+        addedApps.forEach(app => {
+            let data = {
+                windowsChangedId: app.connect('windows-changed',
+                    this._appWindowsChanged.bind(this)),
+            };
+            let id = app.get_id();
+            this._appData.set(app, data);
+        });
+    }
+
+    _appWindowsChanged(app) {
         let app_id = app.get_id();
-        let apps = this._settings.get_strv(INHIBIT_APPS_KEY);
-        if (apps.indexOf(app_id) != -1)
+        let appState = app.get_state();
+        // app is STARTING (1) or RUNNING (2)
+        if ((appState == 1) || (appState == 2)) {
             this.addInhibit(app_id);
-    },
-
-    _mayUninhibit: function(shellwm, actor) {
-        let window = actor.meta_window;
-        let app = this._windowTracker.get_window_app(window);
-        if (app) {
-            let app_id = app.get_id();
-            if (this._apps.indexOf(app_id) != -1)
-                this.removeInhibit(app_id);
-        }
-    },
-
-    destroy: function() {
-        // remove all inhibitors
-        this._apps.map(Lang.bind(this, function(app_id) {
+            if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._proxy.NightLightActive) {
+                this._proxy.DisabledUntilTomorrow = true;
+                this._night_light = true;
+            } else {
+                this._night_light = false;
+            }
+        // app is STOPPED (0)
+        } else {
             this.removeInhibit(app_id);
-        }));
+            if (this._settings.get_boolean(NIGHT_LIGHT_KEY) && this._proxy.NightLightActive) {
+                this._proxy.DisabledUntilTomorrow = false;
+                this._night_light = true;
+            } else {
+                this._night_light = false;
+            }
+        }
+    }
+
+    destroy() {
+        // remove all inhibitors
+        this._apps.forEach(app_id => this.removeInhibit(app_id));
         // disconnect from signals
         if (this._settings.get_boolean(FULLSCREEN_KEY))
             this._screen.disconnect(this._inFullscreenId);
@@ -309,14 +394,18 @@ const Caffeine = new Lang.Class({
             global.window_manager.disconnect(this._windowDestroyedId);
             this._windowDestroyedId = 0;
         }
-        this.parent();
+        if (this._appsChangedId) {
+            this._appSystem.disconnect(this._appsChangedId);
+            this._appsChangedId = 0;
+        }
+        this._appConfigs.length = 0;
+        this._updateAppData();
+        super.destroy();
     }
 });
 
 function init(extensionMeta) {
     Convenience.initTranslations();
-    let theme = imports.gi.Gtk.IconTheme.get_default();
-    theme.append_search_path(extensionMeta.path + "/icons");
 }
 
 function enable() {

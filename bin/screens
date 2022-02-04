@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case $1 in
+    'off')
+        xrandr --output DP-4 --off
+        xrandr --output DP-2 --off
+    ;;
+    'on')
+        xrandr --output DP-4 --auto
+        xrandr --output DP-2 --auto
+    ;;
+esac

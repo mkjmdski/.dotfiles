@@ -1,21 +1,20 @@
-if [[ $commands[jira] ]]; then
-    eval "$(jira --completion-script-zsh)"
-fi
+alias tolower="tr '[:upper:]' '[:lower:]'"
+alias toupper="tr '[:lower:]' '[:upper:]'"
+alias tf-docs='docker run --rm -it -v $(pwd):/workspace gcr.io/cloud-foundation-cicd/cft/developer-tools:0.13 /bin/bash -c "source /usr/local/bin/task_helper_functions.sh && generate_docs"'
 
 if [[ $commands[kubectl] ]]; then
     alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
     alias ke="k exec"
     alias ket="ke -it"
     alias kgpf="kgp -o name | head -n 1"
-    function ketf {
-        ket $(kgpf) -- "${1-sh}"
-    }
+    alias ketf='ket $(kgpf) -- /bin/sh'
+    alias kg='k get'
+    alias kgj='kg job'
     source <(kubectl completion zsh)
 fi
 
 if [[ $commands[jq] ]]; then
-    alias json-minify="$(which jq) -Mrc . <"
-    alias jq="jq -C"
+    alias json-minify="jq -Mrc . <"
 fi
 
 if [[ $commands[nvim] ]]; then
@@ -27,46 +26,6 @@ if [[ $commands[bat] ]]; then
     alias cat="PAGER=less bat -p"
 fi
 
-if [[ $commands[docker] ]]; then
-    alias dcc="docker-compose"
-fi
-
-
-if [[ -z "${CLOUDSDK_HOME}" ]]; then
-  search_locations=(
-    "$HOME/google-cloud-sdk"
-    "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
-    "/usr/share/google-cloud-sdk"
-    "/snap/google-cloud-sdk/current"
-    "/usr/lib64/google-cloud-sdk/"
-    "/opt/google-cloud-sdk"
-  )
-
-  for gcloud_sdk_location in $search_locations; do
-    if [[ -d "${gcloud_sdk_location}" ]]; then
-      CLOUDSDK_HOME="${gcloud_sdk_location}"
-      break
-    fi
-  done
-fi
-
-if (( ${+CLOUDSDK_HOME} )); then
-  if (( ! $+commands[gcloud] )); then
-    # Only source this if GCloud isn't already on the path
-    if [[ -f "${CLOUDSDK_HOME}/path.zsh.inc" ]]; then
-      source "${CLOUDSDK_HOME}/path.zsh.inc"
-    fi
-  fi
-  alias gcloud="export SPACESHIP_GCLOUD_SHOW='true'; $(which gcloud)"
-  alias gcl="gcloud config configurations list"
-  source "${CLOUDSDK_HOME}/completion.zsh.inc"
-  export CLOUDSDK_HOME
-fi
-
-function gca {
-    gcloud config configurations activate $(gcl | grep $1 | awk '{print $1}')
-}
-
 if [[ $commands[trash] ]]; then
     alias rm=trash
     alias "rm-ls"=trash-list
@@ -75,27 +34,32 @@ if [[ $commands[trash] ]]; then
     alias crm="/bin/rm"
 fi
 
-
-if [[ $commands[gopass] ]]; then
-    function gopass-clipboard {
-        clipcopy <<< $(gopass show $1 | head -n 1)
-    }
-fi
-
-if [[ $commands[fpp] ]]; then
-    alias fpp="EDITOR='code --wait' fpp"
-fi
-
 if [[ $commands[tfenv] ]]; then
     tfenv_root=$(echo $(which tfenv) | rev | cut -d/ -f 3- | rev)
     tf_ver="${tfenv_root}/version"
     if [ -f "$tf_ver" ]; then
         tf_ver="${tfenv_root}/versions/$(cat $tf_ver)/terraform"
         complete -o nospace -C $tf_ver terraform
+    elif [[ $commands[terraform] ]]; then
+        complete -o nospace -C $(which terraform) terraform
     fi
-elif [[ $commands[terraform] ]]; then
-    complete -o nospace -C $(which terraform) terraform
 fi
+
+# karhoo
+if [[ $commands[docker] ]]; then
+    if [[ ! $commands[envy] ]]; then
+        # export ENVY_VERSION=1.26.11
+        alias envy='docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest}'
+    fi
+    if [[ ! $commands[golangci-lint] ]]; then
+        alias golangci-lint='docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.42.1 golangci-lint'
+    fi
+fi
+
+if [[ ! -z "$(which envy)" ]] && [[ -d "$HOME/repos/karhoo/k8s-manifests" ]]; then
+    export K8S_MANIFESTS_DIR="$HOME/repos/karhoo/k8s-manifests"
+fi
+# eof karhoo
 
 if [[ $commands[pydf] ]]; then
     alias df="pydf"
@@ -104,9 +68,7 @@ fi
 if [[ $commands[apt-get] ]]; then
     alias apt-get="sudo apt-get"
     alias add-apt-repository="sudo add-apt-repository"
-fi
-
-if [[ $commands[dpkg] ]]; then
+    alias apt="sudo apt"
     alias dpkg="sudo dpkg"
 fi
 
@@ -114,62 +76,23 @@ if [ $commands[helm] ]; then
   source <(helm completion zsh)
 fi
 
-if [[ $commands[helmsman] ]]; then
-    alias helmsman='GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json KUBE_CONTEXT=$(kubectl config current-context) helmsman'
-fi
-
 if [[ $commands[doctl] ]]; then
   source <(doctl completion zsh)
 fi
 
-if [[ $commands[broot] ]]; then
-    function br {
-        f=$(mktemp)
-        (
-            set +e
-            broot --outcmd "$f" "$@"
-            code=$?
-            if [ "$code" != 0 ]; then
-                /bin/rm -f "$f"
-                exit "$code"
-            fi
-        )
-        code=$?
-        if [ "$code" != 0 ]; then
-        return "$code"
-        fi
-        d=$(<"$f")
-        /bin/rm -f "$f"
-        eval "$d"
-    }
-fi
-
-function newest {
-    /bin/ls -Art $1* | tail -n 1
-}
-
-function take {
-  mkdir -p $@ && cd ${@:$#}
-}
-
-function swap {
-    local TMPFILE=tmp.$$
-    mv "$1" $TMPFILE
-    mv "$2" "$1"
-    mv $TMPFILE "$2"
-}
-
-function trail {
-    grep "\S" | awk '{$1=$1};1'
-}
-
-function to-single-quote {
-    sed "s/\"/'/g"
-}
-
-function to-double-quote {
-    sed "s/'/\"/g"
-}
-
 alias git-cd='cd $(git root)'
 alias history='fc -il 1'
+
+if [[ $commands[ddgr] ]]; then
+    alias ddgr='BROWSER=w3m ddgr'
+fi
+
+function jcode { code "$(s $1)" }
+function jexec { location=$1; shift; (j $location; eval "$@") }
+function take { mkdir -p $@ && cd ${@:$#} }
+
+
+# https://github.com/arzzen/calc.plugin.zsh# Put these in your .zshrc (No need to install a plugin)
+calc() python3 -c "from math import *; print($*);"
+alias calc='noglob calc'
+# You can use `calc` just like `=` from above. All functions from the math module of Python are available for use.

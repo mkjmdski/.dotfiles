@@ -1,5 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Show Desktop
-Icon=desktop
-Exec=xdotool key --clearmodifiers Super+d

@@ -15,7 +15,7 @@
  *     Mattia Meneguzzo odysseus@fedoraproject.org,
  *     Meng Zhuo <mengzhuo1203+spam@gmail.com>,
  *     Jens Lody <jens@jenslody.de>
- * Copyright (C) 2014 -2018
+ * Copyright (C) 2014 -2020
  *     Jens Lody <jens@jenslody.de>,
  * Copyright (C) 2018
  *     Taylor Raack <taylor@raack.info>
@@ -378,7 +378,11 @@ function parseWeatherCurrent() {
     this._currentWeatherSunrise.text = sunrise;
     this._currentWeatherSunset.text = sunset;
     this._currentWeatherBuild.text = lastBuild;
-    this._currentWeatherWind.text = this.formatWind(json.wind.speed, this.getWindDirection(json.wind.deg));
+    if (json.wind != undefined && json.wind.deg != undefined) {
+        this._currentWeatherWind.text = this.formatWind(json.wind.speed, this.getWindDirection(json.wind.deg));
+    } else {
+        this._currentWeatherWind.text = _("?");
+    }
 
     this.parseWeatherForecast();
     this.recalcLayout();

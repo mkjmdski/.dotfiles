@@ -11,18 +11,30 @@
 # IDE files #
 #############
 .idea/
-.iml
+*.iml
 
 
 # NPM #
-node_modules
+node_modules/
 
 # Terraform #
 .terraform
 
 # Python
-venv
+venv/
 .venv
 
 # Vagrant
 .vagrant/
+
+# random
+script.sh
+*.ignore
+
+
+# terraform
+tfstate.json
+*.tfstate
+.terraform.tfstate.lock.info
+*.tfplan
+*.plan

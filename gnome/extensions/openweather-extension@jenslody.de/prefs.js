@@ -8,7 +8,7 @@
  *     Canek Pelaez <canek@ciencias.unam.mx>,
  *     Christian METZLER <neroth@xeked.com>,
  *     Jens Lody <jens@jenslody.de>,
- * Copyright (C) 2014 -2018
+ * Copyright (C) 2014 -2020
  *     Jens Lody <jens@jenslody.de>,
  *
  * This file is part of gnome-shell-extension-openweather.
@@ -41,7 +41,6 @@ const Mainloop = imports.mainloop;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Config = imports.misc.config;
-const Convenience = Me.imports.convenience;
 
 const EXTENSIONDIR = Me.dir.get_path();
 
@@ -142,7 +141,6 @@ const WeatherPrefsWidget = new GObject.Class({
         this.searchMenu = this.Window.get_object("search-menu");
         this.searchName = this.Window.get_object("search-name");
         this.searchCombo = this.Window.get_object("search-combo");
-        this.spinner = this.Window.get_object("spinner");
 
         this.searchName.connect("icon-release", Lang.bind(this, this.clearEntry));
         this.editName.connect("icon-release", Lang.bind(this, this.clearEntry));
@@ -177,13 +175,10 @@ const WeatherPrefsWidget = new GObject.Class({
             if (location === "")
                 return 0;
 
-            let item;
-            if (this.spinner.get_parent()) {
-                item = this.spinner.get_parent();
-            }else {
-                item = new Gtk.MenuItem()
-                item.add(this.spinner);
-            }
+            let item = new Gtk.MenuItem();
+            let spinner = new Gtk.Spinner();
+            spinner.start();
+            item.add(spinner);
 
             this.searchMenu.append(item);
             this.showSearchMenu();
@@ -540,7 +535,8 @@ const WeatherPrefsWidget = new GObject.Class({
 
         let config = this.configWidgets;
         for (let i in config) {
-            if ((config[i][0].active !== undefined) &&
+            if (!config[i][0].toString().includes("FINALIZED") &&
+                (config[i][0].active !== undefined) &&
                 (config[i][0].active != this[config[i][1]]))
                 config[i][0].active = this[config[i][1]];
         }
@@ -713,7 +709,7 @@ const WeatherPrefsWidget = new GObject.Class({
     },
 
     loadConfig: function() {
-        this.Settings = Convenience.getSettings(OPENWEATHER_SETTINGS_SCHEMA);
+        this.Settings = ExtensionUtils.getSettings(OPENWEATHER_SETTINGS_SCHEMA);
         this.Settings.connect("changed", Lang.bind(this, function() {
             this.refreshUI();
         }));
@@ -1113,7 +1109,7 @@ const WeatherPrefsWidget = new GObject.Class({
 });
 
 function init() {
-    Convenience.initTranslations('gnome-shell-extension-openweather');
+    ExtensionUtils.initTranslations('gnome-shell-extension-openweather');
 }
 
 function buildPrefsWidget() {
