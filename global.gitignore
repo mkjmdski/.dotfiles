@@ -24,9 +24,15 @@ node_modules/
 venv/
 .venv
 
+# Vagrant
+.vagrant/
+
 # random
 script.sh
 *.ignore
+
+
+# terraform
 tfstate.json
 *.tfstate
 .terraform.tfstate.lock.info
