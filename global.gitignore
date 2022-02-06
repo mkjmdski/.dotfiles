@@ -18,7 +18,9 @@
 node_modules/
 
 # Terraform #
+!.terraform-version
 .terraform
+.terraform-*
 
 # Python
 venv/
@@ -31,10 +33,9 @@ venv/
 script.sh
 *.ignore
 
-
 # terraform
-tfstate.json
-*.tfstate
+tfstate.json*
+*.tfstate*
 .terraform.tfstate.lock.info
 *.tfplan
 *.plan

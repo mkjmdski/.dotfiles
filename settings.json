@@ -74,5 +74,7 @@
   "cSpell.language": "en,pl",
   "cSpell.enabled": false,
   "editor.bracketPairColorization.enabled": true,
-  "editor.guides.bracketPairs": "active"
+  "editor.guides.bracketPairs": "active",
+  "window.zoomLevel": 1,
+  "bracket-pair-colorizer-2.depreciation-notice": false
 }
