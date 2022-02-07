@@ -1,5 +1,6 @@
 #!/bin/bash
 terraform plan | tee tfplan.ignore
+sed -i 's/\x1b\[[0-9;]*m//g' tfplan.ignore
 echo ">>> ADDRESSES <<<"
 echo ">>> created"
 for d in $(cat tfplan.ignore | grep 'created' | cut -d ' ' -f 4); do echo "'${d}'"; done | tee plan.ignore
