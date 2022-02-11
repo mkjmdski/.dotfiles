@@ -1,0 +1,90 @@
+#!/bin/bash
+
+if [ -d '.terraform' ]; then
+    tf_initialized='true'
+else
+    tf_initialized='false'
+fi
+echo "tf initialized: ${tf_initialized}"
+if [ "$tf_initialized" = 'false' ]; then
+    echo "initalizing!"
+    terraform init
+fi
+
+nested_python="""
+import os
+sep=os.linesep
+with open('versions.tf', 'r') as _f:
+    content = list(_f.readlines())
+bracket_counter=0
+backend_content=False
+for line in content.copy():
+    if 'backend' in line:
+        backend_content=True
+    if backend_content:
+        if '{' in line:
+            bracket_counter += 1
+            content.remove(line)
+            continue
+        if '}' in line:
+            bracket_counter -= 1
+            content.remove(line)
+            continue
+        if bracket_counter == 0:
+            break
+        else:
+            content.remove(line)
+with open('versions.tf.local', 'w') as _f:
+    _f.write(content[0])
+    _f.write('    backend \"local\" {' + sep)
+    _f.write('      path = \"./tfstate.json\"' + sep)
+    _f.write('    }' + sep)
+    _f.writelines(content[1:])
+"""
+
+backend_state() {
+    if cat versions.tf | grep -q 'backend "local"'; then
+        echo "local"
+    elif [ -f versions.tf ]; then
+        echo "remote"
+    else
+        echo "none"
+    fi
+}
+
+if [ ! -f versions.tf.local ]; then
+    echo "creating versions.tf.local file"
+    echo $nested_python | python3
+fi
+
+if [ "$(backend_state)" = 'remote' ]; then
+    if echo $@ | grep -q "pull"; then
+        echo "pulling current remote state for local development"
+        terraform state pull >tfstate.json
+    fi
+fi
+
+if [ "$(backend_state)" = 'local' ]; then
+    if echo $@ | grep -q "push"; then
+        echo "pushing local changes to remote backend"
+        terraform state push tfstate.json
+    fi
+fi
+
+if [ ! -d ".terraform-remote" ]; then
+    echo "moving current .terraform to .terraform-remote"
+    mv .terraform .terraform-remote
+else
+    echo "swaping current .terraform with .terraform-remote"
+    swap .terraform .terraform-remote
+fi
+
+echo "swapping versions.tf with versions.tf.local"
+swap versions.tf versions.tf.local
+
+if echo $@ | grep -q "init"; then
+    echo "initalizing terraform"
+    terraform init
+fi
+
+echo "Current backend active: $(backend_state)"
