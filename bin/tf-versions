@@ -1,0 +1,13 @@
+#!/bin/bash
+
+providers=( $(cat .terraform.lock.hcl | grep provider -A 1 | cut -d '"' -f 2 | grep -v '\-\-' | awk '(NR + 1) % 2 == 0' | cut -d '/' -f 3) )
+sources=( $(cat .terraform.lock.hcl | grep provider -A 1 | cut -d '"' -f 2 | grep -v '\-\-' | awk '(NR + 1 )% 2 == 0' | cut -d '/' -f 2-3) )
+versions=( $(cat .terraform.lock.hcl | grep provider -A 1 | cut -d '"' -f 2 | grep -v '\-\-' | awk 'NR % 2 == 0') )
+
+for i in "${!providers[@]}"
+do
+    echo "${providers[$i]} {"
+    echo "   source = \"${sources[$i]}\""
+    echo "   version = \"${versions[$i]}\""
+    echo "}"
+done
