@@ -34,6 +34,7 @@ script.sh
 *.ignore
 
 # terraform
+!.terraform-version
 tfstate.json*
 *.tfstate*
 .terraform.tfstate.lock.info

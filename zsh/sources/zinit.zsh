@@ -108,6 +108,12 @@ zinit load sharkdp/fd
 zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
 zinit load BurntSushi/ripgrep
 
+zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
+zinit load hidetatz/kubecolor
+
+zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*.tar.gz" mv "kubectl-debug* -> kubectl-debug" pick "kubectl-debug/kubectl-debug"
+zinit load aylei/kubectl-debug
+
 if [ "$DOTFILES_CONF_kubernetes" = "true" ]; then
     zinit ice from"gh-r" as"program" mv"stern* -> stern"
     zinit load wercker/stern

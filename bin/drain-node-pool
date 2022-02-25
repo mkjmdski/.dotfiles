@@ -1,0 +1,14 @@
+#!/bin/bash -eux
+
+node_pool=$1
+node_pool_2=$2
+disable_eviction=${3:-false}
+time_out=${4:-60}
+kubectl cordon --selector=cloud.google.com/gke-nodepool=$node_pool
+while read -r node; do
+    kubectl drain --force --ignore-daemonsets --delete-emptydir-data --grace-period=$time_out --disable-eviction=$disable_eviction "$node"
+    until [ $(list-pods $node_pool_2 ",status.phase=Pending" | wc -l) = 0 ]; do
+        list-pods $node_pool_2 ",status.phase=Pending"
+        sleep 45;
+    done
+done< <(kubectl get nodes --selector=cloud.google.com/gke-nodepool=$node_pool | awk '{print $1}' | tail -n +2)

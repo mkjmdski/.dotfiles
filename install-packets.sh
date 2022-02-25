@@ -270,7 +270,7 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
         "$KREW" update
     )
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-    for plugin in ctx ns; do
+    for plugin in ctx ns tree; do
         kubectl krew install $plugin
     done
 

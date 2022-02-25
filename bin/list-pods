@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+node_pool=$1
+shift
+while read -r node; do
+    kubectl get pod --all-namespaces --no-headers --field-selector spec.nodeName=${node}$@
+done< <(kubectl get node --selector=cloud.google.com/gke-nodepool=$node_pool --no-headers | awk '{print $1}')

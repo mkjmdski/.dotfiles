@@ -3,7 +3,10 @@ alias toupper="tr '[:lower:]' '[:upper:]'"
 alias tf-docs='docker run --rm -it -v $(pwd):/workspace gcr.io/cloud-foundation-cicd/cft/developer-tools:0.13 /bin/bash -c "source /usr/local/bin/task_helper_functions.sh && generate_docs"'
 
 if [[ $commands[kubectl] ]]; then
-    alias kubectl="export SPACESHIP_KUBECTL_SHOW='true'; $(which kubectl)"
+    if [[ $commands[kubecolor] ]]; then
+        alias kubectl=kubecolor
+        alias k=kubecolor
+    fi
     alias ke="k exec"
     alias ket="ke -it"
     alias kgpf="kgp -o name | head -n 1"

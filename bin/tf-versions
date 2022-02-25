@@ -6,7 +6,7 @@ versions=( $(cat .terraform.lock.hcl | grep provider -A 1 | cut -d '"' -f 2 | gr
 
 for i in "${!providers[@]}"
 do
-    echo "${providers[$i]} {"
+    echo "${providers[$i]} = {"
     echo "   source = \"${sources[$i]}\""
     echo "   version = \"${versions[$i]}\""
     echo "}"

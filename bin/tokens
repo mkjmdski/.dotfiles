@@ -1,0 +1,2 @@
+export TFE_TOKEN=$(cat ~/.terraform.d/credentials.tfrc.json | jq -r '.credentials."app.terraform.io".token')
+export DIGITALOCEAN_TOKEN=$(cat /home/mlodzikos/.config/doctl/config.yaml | yaml2json | jq -r '.["access-token"]')
