@@ -1,2 +1,5 @@
 export TFE_TOKEN=$(cat ~/.terraform.d/credentials.tfrc.json | jq -r '.credentials."app.terraform.io".token')
 export DIGITALOCEAN_TOKEN=$(cat /home/mlodzikos/.config/doctl/config.yaml | yaml2json | jq -r '.["access-token"]')
+export AWS_DEFAULT_REGION=eu-west-1
+export AWS_ACCESS_KEY_ID=$(cat ~/.aws/credentials | grep 'aws_access' | head -n 1 | cut -d '=' -f 2)
+export AWS_SECRET_ACCESS_KEY=$(cat ~/.aws/credentials | grep 'secret' | head -n 1 | cut -d '=' -f 2)

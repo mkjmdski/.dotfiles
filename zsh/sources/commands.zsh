@@ -13,7 +13,9 @@ if [[ $commands[kubectl] ]]; then
     alias ketf='ket $(kgpf) -- /bin/sh'
     alias kg='k get'
     alias kgj='kg job'
-    source <(kubectl completion zsh)
+    alias kns='command kubectl ns'
+    # completion for kubecolor instead of kubectl
+    source <(kubectl completion zsh | sed 's|kubectl|kubecolor|g')
 fi
 
 if [[ $commands[jq] ]]; then
