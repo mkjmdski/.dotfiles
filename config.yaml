@@ -5,7 +5,7 @@ digitalocean: true
 google: true
 spotify: true
 slack: true
-jira: false
+jira: true
 terraform: true
 git: true
 code: true
