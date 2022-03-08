@@ -14,9 +14,9 @@ alias calc='noglob calc'
 
     echo "VAT "
     while read -r price; do
-        echo $price | grep -Eo '[0-9,\.]{1,5}'
+        echo $price | grep -Eo '([0-9]+\.[0-9]{2})'
     done< <(for invoice in invoice-*; do
-                pdftotext -layout "${invoice}" - | egrep -i '(Wartość całkowita VAT)' | awk '{print $4 $5}'
+                pdftotext -layout "${invoice}" - | egrep -i '(Wartość całkowita VAT)'
             done | sed 's|,|.|g') | awk '{s+=$1}END{print s}'
 
     echo
@@ -24,7 +24,7 @@ alias calc='noglob calc'
 
     echo "Dochodowy"
     sum="$(while read -r price; do
-        echo $price | grep -Eo '[0-9,\.]{1,5}'
+        echo $price | grep -Eo '([0-9]+\.[0-9]{2})'
     done< <(for invoice in invoice-*; do
                 pdftotext -layout "${invoice}" - | egrep -i '(Razem po potrąceniu|Wartość całkowita netto )' | awk '{print $4 $5}'
             done | sed 's|,|.|g') | awk '{s+=$1}END{print s}')"
