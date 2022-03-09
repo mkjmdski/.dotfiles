@@ -17,6 +17,16 @@ if [[ $commands[kubectl] ]]; then
     alias kctx='command kubectl ctx'
     alias kd='k describe'
     # completion for kubecolor instead of kubectl
+
+# dynamically switch cluster / namespace
+knss() {
+    k ns $(kns | grep $1)
+}
+
+kctxx() {
+    k ctx $(kctx | grep $1)
+}
+
     source <(kubectl completion zsh | sed 's|kubectl|kubecolor|g')
 fi
 
