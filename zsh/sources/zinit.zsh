@@ -5,11 +5,9 @@ for lib in clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
 done
 
-for binary in fasd kubectl; do
-    if [[ $commands[$binary] ]]; then
-        zinit snippet OMZ::plugins/$binary/$binary.plugin.zsh
-    fi
-done
+if [[ $commands[fasd] ]]; then
+    zinit snippet OMZ::plugins/fasd/fasd.plugin.zsh
+fi
 
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf
@@ -31,6 +29,7 @@ _fzf_compgen_dir() {
 for plugin in extract command-not-found gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd; do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
+
 GIT_AUTO_FETCH_INTERVAL=1800
 HIST_STAMPS="yyyy-mm-dd"
 
@@ -108,13 +107,15 @@ zinit load sharkdp/fd
 zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
 zinit load BurntSushi/ripgrep
 
-zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
-zinit load hidetatz/kubecolor
+if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
+    zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
 
-zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*.tar.gz" mv "kubectl-debug* -> kubectl-debug" pick "kubectl-debug/kubectl-debug"
-zinit load aylei/kubectl-debug
+    zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
+    zinit load hidetatz/kubecolor
 
-if [ "$DOTFILES_CONF_kubernetes" = "true" ]; then
+    zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*.tar.gz" mv "kubectl-debug* -> kubectl-debug" pick "kubectl-debug/kubectl-debug"
+    zinit load aylei/kubectl-debug
+
     zinit ice from"gh-r" as"program" mv"stern* -> stern"
     zinit load wercker/stern
 fi

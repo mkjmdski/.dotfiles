@@ -15,6 +15,7 @@ if [[ $commands[kubectl] ]]; then
     alias kgj='kg job'
     alias kns='command kubectl ns'
     alias kctx='command kubectl ctx'
+    alias kd='k describe'
     # completion for kubecolor instead of kubectl
     source <(kubectl completion zsh | sed 's|kubectl|kubecolor|g')
 fi

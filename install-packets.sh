@@ -179,7 +179,7 @@ function install_osx_extras {
     if [ "$DOTFILES_CONF_digitalocean" = "true" ]; then
         brew install doctl
     fi
-    if [ "$DOTFILES_CONF_kubernetes" = "true" ]; then
+    if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
         brew install kubernetes-cli
         brew install helm
         setup_binary_env "yuya-takeyama/helmenv"
