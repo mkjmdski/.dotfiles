@@ -30,7 +30,6 @@
     "**/img/**": true,
     "**/var/cache/**": true
   },
-  "python.autoComplete.addBrackets": true,
   "python.formatting.provider": "black",
   "window.closeWhenEmpty": true,
   "window.restoreFullscreen": true,
@@ -44,17 +43,11 @@
   "diffEditor.maxComputationTime": 0,
   "python.languageServer": "Pylance",
   "jupyter.addGotoCodeLenses": false,
-  "jupyter.allowImportFromNotebook": false,
-  "jupyter.allowInput": false,
-  "jupyter.allowLiveShare": false,
   "jupyter.askForLargeDataFrames": false,
-  "jupyter.collapseCellInputCodeByDefault": false,
-  "jupyter.colorizeInputBox": false,
   "jupyter.debugJustMyCode": false,
   "jupyter.decorateCells": false,
   "jupyter.enableAutoMoveToNextCell": false,
   "jupyter.enableCellCodeLens": false,
-  "jupyter.enablePlotViewer": false,
   "python.analysis.completeFunctionParens": true,
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
@@ -67,14 +60,13 @@
     "MD033": false,
     "MD041": false
   },
-  "[terraform]": {
-    "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.formatOnSave": true
-  },
-  "cSpell.language": "en,pl",
-  "cSpell.enabled": false,
+  // "[terraform]": {
+  //   "editor.defaultFormatter": "hashicorp.terraform",
+  //   "editor.formatOnSave": true
+  // },
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
   "bracket-pair-colorizer-2.depreciation-notice": false,
-  "window.zoomLevel": 1
+  "window.zoomLevel": 1,
+  "yaml.customTags": [ "!vault" ]
 }

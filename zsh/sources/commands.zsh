@@ -20,11 +20,22 @@ if [[ $commands[kubectl] ]]; then
 
 # dynamically switch cluster / namespace
 knss() {
-    k ns $(kns | grep $1)
+    k ns $(kns | grep $1 | head -n 1)
 }
 
 kctxx() {
-    k ctx $(kctx | grep $1)
+    k ctx $(kctx | grep $1 | head -n 1)
+}
+
+ap() {
+    if [ -z "$ANSIBLE_USER" ]
+        ANSIBLE_USER=miko
+    fi
+    ansible-playbok --user $ANSIBLE_USER "$@" | sed 's/\\n/\n/g'
+}
+
+ap-check() {
+    ap --check --diff "$@"
 }
 
     source <(kubectl completion zsh | sed 's|kubectl|kubecolor|g')

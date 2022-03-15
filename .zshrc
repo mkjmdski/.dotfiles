@@ -61,6 +61,9 @@ standard-chpwd() {
     if [ ! -d "venv" ] && [ ! -z "$VIRTUAL_ENV" ]; then
         deactivate
     fi
+    if [ -f "ansible-vault.txt" ]; then
+      export ANSIBLE_VAULT_PASSWORD_FILE="$PWD/ansible-vault.txt"
+    fi
 }
 
 if [[ $commands[nvm] ]]; then
