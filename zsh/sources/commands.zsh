@@ -126,3 +126,40 @@ function take { mkdir -p $@ && cd ${@:$#} }
 calc() python3 -c "from math import *; print($*);"
 alias calc='noglob calc'
 # You can use `calc` just like `=` from above. All functions from the math module of Python are available for use.
+
+if [[ $commands[gh] ]]; then
+    gh-pr () {
+        args=""
+        reviewer=""
+        if pwd | grep -q karhoo; then
+            reviewer="karhoo/cloudops"
+        elif pwd | grep -q vega; then
+            reviewer="vegaprotocol/ops"
+        fi
+        title=""
+        body=""
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+            case $key in
+            -t | --title)
+                title="$2"
+                shift
+                shift
+                ;;
+            -b | --body)
+                body="$2"
+                shift
+                shift
+                ;;
+            *)
+                args="$args $1"
+                shift
+                ;;
+            esac
+        done
+        if [ -z "$title" ]; then
+            title="$(git log -1 --pretty=%B)"
+        fi
+        eval "gh pr create $args --title=$title --body=$body --reviewer=$reviewer"
+    }
+fi

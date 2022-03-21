@@ -9,6 +9,8 @@
     "editor.tabSize": 2,
     "editor.autoIndent": "full"
   },
+  "window.restoreWindows": "none",
+  "files.hotExit": "off",
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
