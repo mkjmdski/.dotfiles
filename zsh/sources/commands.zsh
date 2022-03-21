@@ -160,6 +160,6 @@ if [[ $commands[gh] ]]; then
         if [ -z "$title" ]; then
             title="$(git log -1 --pretty=%B)"
         fi
-        eval "gh pr create $args --title=$title --body=$body --reviewer=$reviewer"
+        eval "gh pr create $args --title='$title' --body='$body' --reviewer='$reviewer'"
     }
 fi
