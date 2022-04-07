@@ -15,6 +15,7 @@ const SETTINGS_AUTO_CLOSE = 'auto-close';
 const SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT = "auto-close-keyboard-shortcut";
 const SETTINGS_ANIMATION = 'animation';
 const SETTINGS_SHOW_ICON = 'show-icon';
+const SETTINGS_GLOBAL_AUTO_TILING = 'global-auto-tiling';
 const SETTINGS_GLOBAL_PRESETS = 'global-presets';
 const SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE = "target-presets-to-monitor-of-mouse";
 const SETTINGS_MOVERESIZE_ENABLED = 'moveresize-enabled';
@@ -24,6 +25,7 @@ const SETTINGS_MAX_TIMEOUT = 'max-timeout';
 const SETTINGS_PRESET_RESIZE = 'resize';
 const SETTINGS_MAIN_WINDOW_SIZES = 'main-window-sizes';
 const SETTINGS_DEBUG = 'debug';
+const SETTINGS_SHOW_GRID_LINES = 'show-grid-lines';
 
 const SETTINGS_INSETS_PRIMARY_LEFT = 'insets-primary-left';
 const SETTINGS_INSETS_PRIMARY_RIGHT = 'insets-primary-right';
@@ -256,10 +258,26 @@ function basics_tab(notebook, settings) {
     add_check("Show icon",  SETTINGS_SHOW_ICON,  bs_grid, settings);
 
     add_text ("Grid sizes (like 6x4,8x6,21x11)", SETTINGS_GRID_SIZES, bs_grid, settings, 30);
+    add_check("Global auto tiling hotkeys (works without gTile activated)", SETTINGS_GLOBAL_AUTO_TILING  , bs_grid, settings);
+    let globalAutoTilingWarning = '<span foreground="red">Warning: Make sure to change the auto tiling hotkeys when activating this setting, ' +
+        'as the default hotkeys use 0-9 and M. This option will bind these hotkeys globally, making them unusable for other functions!</span>';
+    let globalAutoTilingWarningLabel = new Gtk.Label({
+        label: globalAutoTilingWarning,
+        halign: Gtk.Align.START,
+        justify: Gtk.Justification.LEFT,
+        use_markup: true,
+        visible: false,
+        wrap: true,
+    })
+    bs_grid.attach_next_to(globalAutoTilingWarningLabel, null, Gtk.PositionType.BOTTOM, 1, 1)
+    settings.connect('changed::'+SETTINGS_GLOBAL_AUTO_TILING, () => {
+        globalAutoTilingWarningLabel.visible = settings.get_boolean(SETTINGS_GLOBAL_AUTO_TILING);
+    })
     add_check("Global resize presets (works without gTile activated)", SETTINGS_GLOBAL_PRESETS  , bs_grid, settings);
     add_check("Keyboard presets target monitor of mouse", SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE, bs_grid, settings);
 
     add_check("Enable accelerators for moving and resizing windows", SETTINGS_MOVERESIZE_ENABLED  , bs_grid, settings);
+    add_check("Show grid lines when changing grid size", SETTINGS_SHOW_GRID_LINES, bs_grid, settings);
 
     add_int("Maximum timeout for preset cycling (ms)", SETTINGS_MAX_TIMEOUT, bs_grid, settings, 500, 10000, 100, 1000);
 
@@ -295,7 +313,10 @@ function presets_tab(notebook, settings) {
     pr_grid.set_margin_start(24);
     pr_grid.set_margin_top(24);
 
-    let text = "Resize presets (grid size and 2 corner tiles - 0:0 is top left tile, columns first, e.g. '4x2 2:1 3:1' is right bottom quarter of screen)";
+    let text = `
+      Resize presets (grid size and 2 corner tiles - 1:1 is top left tile, columns first, e.g. '4x2 3:2 4:2' is right bottom quarter of screen)
+      If grid size is omitted, global grid size will be used.
+    `;
     pr_grid.attach_next_to(new Gtk.Label({
         label: text,
         halign: Gtk.Align.START,
@@ -337,14 +358,14 @@ function margins_tab(notebook, settings) {
     }), null, Gtk.PositionType.BOTTOM, 1, 1)
     add_check("Apply margin to fullscreen windows", SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED, mg_grid, settings);
     add_int ("Window margin"            , SETTINGS_WINDOW_MARGIN           , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets primary left"      , SETTINGS_INSETS_PRIMARY_LEFT     , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets primary right"     , SETTINGS_INSETS_PRIMARY_RIGHT    , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets primary top"       , SETTINGS_INSETS_PRIMARY_TOP      , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets primary bottom"    , SETTINGS_INSETS_PRIMARY_BOTTOM   , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets secondary left"    , SETTINGS_INSETS_SECONDARY_LEFT   , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets secondary right"   , SETTINGS_INSETS_SECONDARY_RIGHT  , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets secondary top"     , SETTINGS_INSETS_SECONDARY_TOP    , mg_grid, settings, 0, 240, 1, 10);
-    add_int ("Insets secondary bottom"  , SETTINGS_INSETS_SECONDARY_BOTTOM , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Left margin on primary screen"      , SETTINGS_INSETS_PRIMARY_LEFT     , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Right margin on primary screen"     , SETTINGS_INSETS_PRIMARY_RIGHT    , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Top margin on primary screen"       , SETTINGS_INSETS_PRIMARY_TOP      , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Bottom margin on primary screen"    , SETTINGS_INSETS_PRIMARY_BOTTOM   , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Left margin on secondary screen"    , SETTINGS_INSETS_SECONDARY_LEFT   , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Right margin on secondary screen"   , SETTINGS_INSETS_SECONDARY_RIGHT  , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Top margin on secondary screen"     , SETTINGS_INSETS_SECONDARY_TOP    , mg_grid, settings, 0, 240, 1, 10);
+    add_int ("Bottom margin on secondary screen"  , SETTINGS_INSETS_SECONDARY_BOTTOM , mg_grid, settings, 0, 240, 1, 10);
 
     let mg_window = new Gtk.ScrolledWindow({'vexpand': true});
     set_child(mg_window, mg_grid);
@@ -374,16 +395,16 @@ function help_tab(notebook) {
 
 function theme_tab(notebook, settings) {
     const options = settings.get_strv(SETTINGS_THEMES);
-  
+
     const grid = new Gtk.Grid({
       column_spacing: 10,
       orientation: Gtk.Orientation.VERTICAL,
       row_spacing: 10,
     });
-  
+
     grid.set_margin_start(24);
     grid.set_margin_top(24);
-  
+
     grid.attach_next_to(new Gtk.Label({
       label: 'Theme',
       halign: Gtk.Align.START,
@@ -391,24 +412,24 @@ function theme_tab(notebook, settings) {
       use_markup: false,
       wrap: true,
     }), null, Gtk.PositionType.BOTTOM, 1, 1)
-  
+
     let themes = add_combobox(options, grid, function (active) {
       settings.set_string(SETTINGS_THEME, active);
     });
-  
+
     const active = settings.get_string(SETTINGS_THEME);
-  
+
     themes.set_active(options.indexOf(active) || 0);
-  
+
     let window = new Gtk.ScrolledWindow({ 'vexpand': true });
-  
+
     set_child(window, grid);
     let label = new Gtk.Label({
       label: "Theme",
       halign: Gtk.Align.START,
       use_markup: false,
     });
-  
+
     notebook.append_page(window, label);
 }
 
@@ -427,7 +448,9 @@ function buildPrefsWidget() {
 
     let main_vbox = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
-        spacing: 10
+        spacing: 10,
+        'width-request': 820,
+        'height-request': 600
     });
 
     if (Gtk.get_major_version() >= 4) {

@@ -334,7 +334,6 @@ function snapToNeighbors(window) {
     }
 }
 
-const MAX_TUPLE_MEMBER_VALUE = Number.MAX_SAFE_INTEGER;
 /**
  * TileSpec represents a rectangular area on display by means of specifying a
  * number of evenly spaced tiles and two corners.
@@ -347,23 +346,151 @@ class TileSpec {
         this.rdc = rdc;
     }
     toString() {
-        return [[this.gridWidth, this.gridHeight].join('x'),
-            [this.luc.x, this.luc.y].join(':'),
-            [this.rdc.x, this.rdc.y].join(':')].join(' ');
+        return `${[this.gridWidth, this.gridHeight].join('x')} ${this.luc.toString()} ${this.rdc.toString}`;
     }
     toFrameRect(workArea) {
-        const elemSize = new Size(Math.floor(workArea.size.width / this.gridWidth), Math.floor(workArea.size.height / this.gridHeight));
-        return new Rect(new XY(workArea.origin.x + this.luc.x * elemSize.width, workArea.origin.y + this.luc.y * elemSize.height), new Size((this.rdc.x + 1 - this.luc.x) * elemSize.width, (this.rdc.y + 1 - this.luc.y) * elemSize.height));
+        const elemSize = new Size(workArea.size.width / this.gridWidth, workArea.size.height / this.gridHeight);
+        let left;
+        let top;
+        let right;
+        let bottom;
+        if (this.luc.types.x == 'tile') {
+            const positiveTileNumber = this._convertNegativeCoord(this.gridWidth, this.luc.xy.x);
+            left = Math.round(workArea.origin.x + (positiveTileNumber - 1) * elemSize.width);
+        }
+        else if (this.luc.types.x == 'approx_percentage') {
+            const snappedToGrid = Math.round(this.gridWidth * this.luc.xy.x);
+            left = Math.round(workArea.origin.x + snappedToGrid * elemSize.width);
+        }
+        else {
+            left = Math.round(workArea.origin.x + workArea.size.width * this.luc.xy.x);
+        }
+        if (this.luc.types.y == 'tile') {
+            const positiveTileNumber = this._convertNegativeCoord(this.gridHeight, this.luc.xy.y);
+            top = Math.round(workArea.origin.y + (positiveTileNumber - 1) * elemSize.height);
+        }
+        else if (this.luc.types.y == 'approx_percentage') {
+            const snappedToGrid = Math.round(this.gridHeight * this.luc.xy.y);
+            top = Math.round(workArea.origin.y + snappedToGrid * elemSize.height);
+        }
+        else {
+            top = Math.round(workArea.origin.y + workArea.size.height * this.luc.xy.y);
+        }
+        if (this.rdc.types.x == 'tile') {
+            const positiveTileNumber = this._convertNegativeCoord(this.gridWidth, this.rdc.xy.x);
+            right = Math.round(workArea.origin.x + positiveTileNumber * elemSize.width);
+        }
+        else if (this.rdc.types.x == 'approx_percentage') {
+            const snappedToGrid = Math.round(this.gridWidth * this.rdc.xy.x);
+            right = Math.round(workArea.origin.x + snappedToGrid * elemSize.width);
+        }
+        else {
+            right = Math.round(workArea.origin.x + workArea.size.width * this.rdc.xy.x);
+        }
+        if (this.rdc.types.y == 'tile') {
+            const positiveTileNumber = this._convertNegativeCoord(this.gridHeight, this.rdc.xy.y);
+            bottom = Math.round(workArea.origin.y + positiveTileNumber * elemSize.height);
+        }
+        else if (this.rdc.types.y == 'approx_percentage') {
+            const snappedToGrid = Math.round(this.gridHeight * this.rdc.xy.y);
+            bottom = Math.round(workArea.origin.y + snappedToGrid * elemSize.height);
+        }
+        else {
+            bottom = Math.round(workArea.origin.y + workArea.size.height * this.rdc.xy.y);
+        }
+        return new Rect(new XY(left, top), new Size(right - left - 1, bottom - top - 1));
     }
     get gridSize() {
         return new GridSize(this.gridWidth, this.gridHeight);
     }
-    viewSize() {
-        const sizeXY = this.rdc.minus(this.luc);
-        return new GridSize(sizeXY.x + 1, sizeXY.y + 1);
+    isFullscreen(workArea) {
+        return this.toFrameRect(workArea).equal(workArea, 1);
     }
-    isFullscreen() {
-        return this.viewSize().equals(this.gridSize);
+    /**
+     * Converts negative coordinates (e.g. -1:-1) to a positive format on a specified grid.
+     * If x or y is a positive number, it is ignored.
+     * E.g. -1:-1 on a 3:3 grid is a 3:3, as well as -1:3.
+     */
+    _convertNegativeCoord(gridEdges, coord) {
+        if (coord < 0) {
+            return gridEdges + coord + 1;
+        }
+        else {
+            return coord;
+        }
+    }
+}
+const MAX_TUPLE_MEMBER_VALUE = Number.MAX_SAFE_INTEGER;
+/**
+ * Tuple Holder represents a single starting or ending point (x and y coordinates),
+ * as well as the type of the coordinate - "tile", "approx_percentage" or "percentage" now.
+ *
+ * E.g. ~0.75:0.75 is {X:0.75,Y:0.75}, types - 'percentage' & 'percentage'
+ * approximate - true.
+ */
+class TupleHolder {
+    constructor(raw) {
+        this.raw = raw;
+        const gssk = this.raw.split(':');
+        this._validateTuple(gssk);
+        this.xy = this._parseTuple(gssk);
+        this.types = this._parseTypes(gssk);
+    }
+    toString() {
+        return this.raw;
+    }
+    _parseTuple(tuple) {
+        const x = this._parseCoordinate(tuple[0]);
+        const y = this._parseCoordinate(tuple[1]);
+        return new XY(x, y);
+    }
+    _parseTypes(tuple) {
+        const typeX = this._parseType(tuple[0]);
+        const typeY = this._parseType(tuple[1]);
+        return new CoordinateTypesHolder(typeX, typeY);
+    }
+    _parseCoordinate(coord) {
+        return Number(coord.replace('~', ''));
+    }
+    _parseType(coord) {
+        if (coord.includes('~')) {
+            return 'approx_percentage';
+        }
+        else if (coord.includes('.')) {
+            return 'percentage';
+        }
+        else {
+            return 'tile';
+        }
+    }
+    _validateTuple(gssk) {
+        if (gssk.length !== 2) {
+            throw new Error(`Failed to split ${this.raw} into two numbers`);
+        }
+        this._validateCoordinate(gssk[0]);
+        this._validateCoordinate(gssk[1]);
+    }
+    /**
+     * Allowed values:
+     * 1.0 (exact match)
+     * Any float from 0.0 till 0.999..., with or without preceding approx indicator (~)
+     * Any positive or negative integer, except 0
+     */
+    _validateCoordinate(coord) {
+        const testRegex = /(~?0\.[0-9]+|1\.0|-?[1-9]+[0-9]*)/;
+        if (!testRegex.test(coord)) {
+            throw new Error(`Failed to parse ${coord} in tuple ${this.raw}`);
+        }
+    }
+}
+/**
+ * Holds coordinate types for the tuple.
+ * Currently 3 types are supported - tile, approx_percentage and percentage.
+ */
+class CoordinateTypesHolder {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }
 class GridSize {
@@ -602,22 +729,33 @@ class Edges {
         }
     }
 }
+function withinTol(a, b, tol) {
+    return Math.abs(a - b) <= tol;
+}
+
 /**
  * parsePreset parses a sequence of TileSpec objects from a string like "8x8 0:0
  * 0:7, 8x10 0:0 2:7" or "8x8 0:0 0:7, 0:0 2:7"
  *
  * The 8x8 and 8x10 values above are the "grid size." The grid size may be
- * omitted in all but the first component of the preset.
+ * omitted, then fallback grid size will be used.
  */
-function parsePreset(preset) {
+function parsePreset(preset, fallback) {
     const parts = preset.split(',').map(x => x.trim());
     let mostRecentSpec = null;
     return parts.map((part, index) => {
         if (hasImpliedGridSize(part)) {
             if (mostRecentSpec === null) {
-                throw new Error(`preset component[${index}] ${part} of ${preset} is missing grid size (e.g., '3x3')`);
+                if (fallback === undefined) {
+                    throw new Error(`preset component[${index}] ${part} of ${preset} is missing grid size (e.g., '3x3') and no fallback is specified`);
+                }
+                else {
+                    part = `${fallback.width}x${fallback.height} ${part}`;
+                }
             }
-            part = `${mostRecentSpec.gridWidth}x${mostRecentSpec.gridHeight} ${part}`;
+            else {
+                part = `${mostRecentSpec.gridWidth}x${mostRecentSpec.gridHeight} ${part}`;
+            }
         }
         const parsed = parseSinglePreset(part);
         mostRecentSpec = parsed;
@@ -630,15 +768,8 @@ function parseSinglePreset(preset) {
         throw new Error(`Bad preset: ${JSON.stringify(preset)}`);
     }
     const gridFormat = parseTuple(ps[0], "x");
-    const luc = parseTuple(ps[1], ":");
-    const rdc = parseTuple(ps[2], ":");
-    if (gridFormat.x < 1 || luc.x < 0 || rdc.x < 0
-        || gridFormat.y < 1 || luc.y < 0 || rdc.y < 0
-        || gridFormat.x <= luc.x || gridFormat.x <= rdc.x
-        || gridFormat.y <= luc.y || gridFormat.y <= rdc.y
-        || luc.x > rdc.x || luc.y > rdc.y) {
-        throw new Error(`Bad preset: ${JSON.stringify(preset)}`);
-    }
+    let luc = new TupleHolder(ps[1]);
+    let rdc = new TupleHolder(ps[2]);
     return new TileSpec(gridFormat.x, gridFormat.y, luc, rdc);
 }
 function hasImpliedGridSize(singlePreset) {
@@ -654,13 +785,10 @@ function parseTuple(unparsed, delim) {
         throw new Error("Failed to split " + unparsed + " by delimiter " + delim + " into two numbers");
     }
     const numbers = gssk.map(Number);
-    if (numbers.some(n => isNaN(n) || n < 0 || n > MAX_TUPLE_MEMBER_VALUE)) {
-        throw new Error(`All elements of tuple must be intgers in [0, ${MAX_TUPLE_MEMBER_VALUE}]: ${JSON.stringify(unparsed)}`);
+    if (numbers.some(n => isNaN(n) || n > MAX_TUPLE_MEMBER_VALUE)) {
+        throw new Error(`All elements of tuple must be intgers in [-inf, ${MAX_TUPLE_MEMBER_VALUE}]: ${JSON.stringify(unparsed)}`);
     }
     return new XY(numbers[0], numbers[1]);
-}
-function withinTol(a, b, tol) {
-    return Math.abs(a - b) <= tol;
 }
 
 /**
@@ -739,6 +867,7 @@ const Meta$2 = imports.gi.Meta;
 const Clutter = imports.gi.Clutter;
 const Signals = imports.signals;
 const Workspace = imports.ui.workspace;
+const Mainloop = imports.mainloop;
 // Getter for accesing "get_active_workspace" on GNOME <=2.28 and >= 2.30
 const WorkspaceManager$1 = (global.screen || global.workspace_manager);
 // Extension imports
@@ -750,6 +879,7 @@ const SETTINGS_AUTO_CLOSE = 'auto-close';
 const SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT = "auto-close-keyboard-shortcut";
 const SETTINGS_ANIMATION = 'animation';
 const SETTINGS_SHOW_ICON = 'show-icon';
+const SETTINGS_GLOBAL_AUTO_TILING = 'global-auto-tiling';
 const SETTINGS_GLOBAL_PRESETS = 'global-presets';
 const SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE = "target-presets-to-monitor-of-mouse";
 const SETTINGS_MOVERESIZE_ENABLED = 'moveresize-enabled';
@@ -757,6 +887,7 @@ const SETTINGS_WINDOW_MARGIN = 'window-margin';
 const SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED = 'window-margin-fullscreen-enabled';
 const SETTINGS_MAX_TIMEOUT = 'max-timeout';
 const SETTINGS_MAIN_WINDOW_SIZES = 'main-window-sizes';
+const SETTINGS_SHOW_GRID_LINES = 'show-grid-lines';
 const SETTINGS_INSETS_PRIMARY = 'insets-primary';
 const SETTINGS_INSETS_PRIMARY_LEFT = 'insets-primary-left';
 const SETTINGS_INSETS_PRIMARY_RIGHT = 'insets-primary-right';
@@ -775,6 +906,7 @@ const gridSettings = {
     [SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT]: null,
     [SETTINGS_ANIMATION]: null,
     [SETTINGS_SHOW_ICON]: null,
+    [SETTINGS_GLOBAL_AUTO_TILING]: null,
     [SETTINGS_GLOBAL_PRESETS]: null,
     [SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE]: null,
     [SETTINGS_MOVERESIZE_ENABLED]: null,
@@ -782,6 +914,7 @@ const gridSettings = {
     [SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED]: false,
     [SETTINGS_MAX_TIMEOUT]: null,
     [SETTINGS_MAIN_WINDOW_SIZES]: [],
+    [SETTINGS_SHOW_GRID_LINES]: false,
     [SETTINGS_INSETS_PRIMARY]: 0,
     [SETTINGS_INSETS_PRIMARY_LEFT]: 0,
     [SETTINGS_INSETS_PRIMARY_RIGHT]: 0,
@@ -841,6 +974,10 @@ const key_bindings_tiling = new Map([
     ['cancel-tiling', () => { keyCancelTiling(); }],
     ['set-tiling', () => { keySetTiling(); }],
     ['change-grid-size', () => { keyChangeTiling(); }],
+    ['snap-to-neighbors', () => { snapToNeighborsBind(); }],
+    ['snap-to-neighbors', () => { snapToNeighborsBind(); }],
+]);
+const key_bindings_auto_tiling = new Map([
     ['autotile-main', () => { AutoTileMain(); }],
     ['autotile-1', () => { autoTileNCols(1); }],
     ['autotile-2', () => { autoTileNCols(2); }],
@@ -852,8 +989,6 @@ const key_bindings_tiling = new Map([
     ['autotile-8', () => { autoTileNCols(8); }],
     ['autotile-9', () => { autoTileNCols(9); }],
     ['autotile-10', () => { autoTileNCols(10); }],
-    ['snap-to-neighbors', () => { snapToNeighborsBind(); }],
-    ['snap-to-neighbors', () => { snapToNeighborsBind(); }],
 ]);
 const key_bindings_presets = new Map([
     ['preset-resize-1', () => { presetResize(1, 'resize1'); }],
@@ -908,6 +1043,8 @@ class App {
         this.gridsByMonitorKey = {};
         this.gridShowing = false;
         this.gridWidget = null;
+        this.gridLinesTimeout = null;
+        this.gridTiles = [];
     }
     enable() {
         this.gridShowing = false;
@@ -923,6 +1060,9 @@ class App {
             Main$1.panel.addToStatusArea("GTileStatusButton", launcher);
         }
         bind(keyBindings);
+        if (gridSettings[SETTINGS_GLOBAL_AUTO_TILING]) {
+            bind(key_bindings_auto_tiling);
+        }
         if (gridSettings[SETTINGS_GLOBAL_PRESETS]) {
             bind(key_bindings_presets);
         }
@@ -993,6 +1133,9 @@ class App {
         nbCols = gridSize.width;
         nbRows = gridSize.height;
         this.refreshGrids();
+        if (gridSettings[SETTINGS_SHOW_GRID_LINES]) {
+            this._showGridLines(gridSize);
+        }
     }
     moveGrids() {
         log("moveGrids");
@@ -1142,12 +1285,15 @@ class App {
     disable() {
         log("Extension disable begin");
         enabled = false;
+        // Notice for extension reviewer - this will call Mainloop.RemoveTimeout
+        this._hideGridLines();
         if (monitorsChangedConnect) {
             log("Disconnecting monitors-changed");
             Main$1.layoutManager.disconnect(monitorsChangedConnect);
             monitorsChangedConnect = false;
         }
         unbind(keyBindings);
+        unbind(key_bindings_auto_tiling);
         unbind(key_bindings_presets);
         unbind(keyBindingGlobalResizes);
         if (keyControlBound) {
@@ -1185,6 +1331,63 @@ class App {
             this.showTiling();
         }
         return this.gridShowing;
+    }
+    isGridShowing() {
+        return this.gridShowing;
+    }
+    _hideGridLines(removeTimeout = true) {
+        if (this.gridLinesTimeout != null) {
+            log("Removing grid lines...");
+            if (removeTimeout) {
+                Mainloop.timeout_remove(this.gridLinesTimeout);
+            }
+            this.gridLinesTimeout = null;
+            for (let tile of this.gridTiles) {
+                Main$1.uiGroup.remove_actor(tile);
+            }
+        }
+        this.gridTiles = [];
+    }
+    _showGridLines(gridSize) {
+        this._hideGridLines();
+        log("Started drawing grid lines...");
+        for (let monitorIdx = 0; monitorIdx < activeMonitors().length; monitorIdx++) {
+            const workArea = workAreaRectByMonitorIndex(monitorIdx);
+            const monitor = activeMonitors()[monitorIdx];
+            if (!workArea) {
+                continue;
+            }
+            let tileHeight = workArea.size.height / gridSize.height;
+            let tileWidth = workArea.size.width / gridSize.width;
+            let topOffset = workArea.topLeft().y;
+            let leftOffset = workArea.topLeft().x;
+            log(`Starting to draw grid lines for monitor ${JSON.stringify(monitor)}`);
+            for (let i = 1; i < gridSize.width; i++) {
+                const newGridWidget = new St.BoxLayout({ style_class: `${theme}__grid_lines_preview` });
+                const posX = leftOffset + tileWidth * i;
+                newGridWidget.width = 1;
+                newGridWidget.height = workArea.size.height;
+                newGridWidget.x = posX;
+                newGridWidget.y = 0;
+                this.gridTiles.push(newGridWidget);
+                Main$1.uiGroup.add_actor(newGridWidget);
+                log(`Grid vertical line of size ${tileWidth}:${tileHeight} is drawn at ${posX}:0 (monitor offset ${monitor.x}:${monitor.y})`);
+            }
+            for (let u = 1; u <= gridSize.height; u++) {
+                const newGridWidget = new St.BoxLayout({ style_class: `${theme}__grid_lines_preview` });
+                const posY = topOffset + tileHeight * u;
+                newGridWidget.width = workArea.size.width;
+                newGridWidget.height = 1;
+                newGridWidget.x = 0;
+                newGridWidget.y = posY;
+                this.gridTiles.push(newGridWidget);
+                Main$1.uiGroup.add_actor(newGridWidget);
+                log(`Grid horizontal line of size ${tileWidth}:${tileHeight} is drawn at 0:${posY} (monitor offset ${monitor.x}:${monitor.y})`);
+            }
+        }
+        this.gridLinesTimeout = Mainloop.timeout_add(1000, () => {
+            this._hideGridLines(false);
+        });
     }
     /**
      * onFocus is called when the global focus changes.
@@ -1328,9 +1531,11 @@ function initSettings() {
     getBoolSetting(SETTINGS_AUTO_CLOSE_KEYBOARD_SHORTCUT);
     getBoolSetting(SETTINGS_ANIMATION);
     getBoolSetting(SETTINGS_SHOW_ICON);
+    getBoolSetting(SETTINGS_GLOBAL_AUTO_TILING);
     getBoolSetting(SETTINGS_GLOBAL_PRESETS);
     getBoolSetting(SETTINGS_TARGET_PRESETS_TO_MONITOR_OF_MOUSE);
     getBoolSetting(SETTINGS_MOVERESIZE_ENABLED);
+    getBoolSetting(SETTINGS_SHOW_GRID_LINES);
     gridSettings[SETTINGS_WINDOW_MARGIN] = getIntSetting(SETTINGS_WINDOW_MARGIN);
     gridSettings[SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED] = getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
     gridSettings[SETTINGS_MAX_TIMEOUT] = getIntSetting(SETTINGS_MAX_TIMEOUT);
@@ -1554,6 +1759,9 @@ function bindKeyControls() {
             global.display.disconnect(focusConnect);
         }
         focusConnect = global.display.connect('notify::focus-window', () => globalApp.onFocus());
+        if (!gridSettings[SETTINGS_GLOBAL_AUTO_TILING]) {
+            bind(key_bindings_auto_tiling);
+        }
         if (!gridSettings[SETTINGS_GLOBAL_PRESETS]) {
             bind(key_bindings_presets);
         }
@@ -1567,6 +1775,9 @@ function unbindKeyControls() {
             log("Disconnect notify:focus-window");
             global.display.disconnect(focusConnect);
             focusConnect = false;
+        }
+        if (!gridSettings[SETTINGS_GLOBAL_AUTO_TILING]) {
+            unbind(key_bindings_auto_tiling);
         }
         if (!gridSettings[SETTINGS_GLOBAL_PRESETS]) {
             unbind(key_bindings_presets);
@@ -1671,7 +1882,7 @@ function presetResize(presetName, settingName) {
     log("Preset resize " + presetName + "  is " + presetString);
     let tileSpecs = [];
     try {
-        tileSpecs = parsePreset(presetString);
+        tileSpecs = parsePreset(presetString, currentGridSize());
     }
     catch (err) {
         log(`Bad preset ${presetName} ${JSON.stringify(presetString)}: ${err}`);
@@ -1727,7 +1938,7 @@ function presetResize(presetName, settingName) {
     }
     // The rectangle already incorporates insets, but it doesn't incorporate
     // window margin.
-    const zeroMargins = tileSpec.isFullscreen() && !getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
+    const zeroMargins = tileSpec.isFullscreen(workArea) && !getBoolSetting(SETTINGS_WINDOW_MARGIN_FULLSCREEN_ENABLED);
     const marginSize = new Size(zeroMargins ? 0 : gridSettings[SETTINGS_WINDOW_MARGIN], zeroMargins ? 0 : gridSettings[SETTINGS_WINDOW_MARGIN]);
     const rect = tileSpec.toFrameRect(workArea).inset(marginSize);
     moveWindowToRect(window, rect);
@@ -1771,6 +1982,10 @@ function moveWindowToRect(window, rect) {
     // windows. See https://github.com/gTile/gTile/issues/176#issue-751198339.
     window.move_frame(true, rect.origin.x, rect.origin.y);
     window.move_resize_frame(true, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+}
+// Converts global nbCols & nbRows to GridSize object
+function currentGridSize() {
+    return new GridSize(nbCols, nbRows);
 }
 /*****************************************************************
   PROTOTYPES
@@ -2014,11 +2229,13 @@ function autoTileNCols(cols) {
         return;
     }
     let windows = getNotFocusedWindowsOfMonitor(monitor);
-    let nbWindowOnEachSide = Math.ceil((windows.length + 1) / cols);
+    let nbWindowOnEachSide = Math.ceil((windows.length + (globalApp.isGridShowing() ? 1 : 0)) / cols);
     let winHeight = workArea.height / nbWindowOnEachSide;
     let countWin = 0;
-    moveResizeWindowWithMargins(window, workArea.x + countWin % cols * workArea.width / cols, workArea.y + (Math.floor(countWin / cols) * winHeight), workArea.width / cols, winHeight);
-    countWin++;
+    if (globalApp.isGridShowing()) {
+        moveResizeWindowWithMargins(window, workArea.x + countWin % cols * workArea.width / cols, workArea.y + (Math.floor(countWin / cols) * winHeight), workArea.width / cols, winHeight);
+        countWin++;
+    }
     // todo make function
     for (let windowIdx in windows) {
         let metaWindow = windows[windowIdx].meta_window;
@@ -2042,10 +2259,11 @@ function snapToNeighborsBind() {
  * the main grid size used for GUI elements and some presets.
  */
 class GridSettingsButton {
-    constructor(gridSize) {
+    constructor(gridSize, active) {
         this.text = gridSize.toString();
         this.cols = gridSize.width;
         this.rows = gridSize.height;
+        this.active = active;
         this.actor = new St.Button({
             style_class: `${theme}__preset-button`,
             reactive: true,
@@ -2053,7 +2271,20 @@ class GridSettingsButton {
             track_hover: true,
             label: this.text,
         });
+        if (this.active) {
+            this.activate();
+        }
         this.actor.connect('button-press-event', () => this._onButtonPress());
+    }
+    deactivate() {
+        log("Deactivating GridSettingsButton ${cols}:${rows}");
+        this.active = false;
+        this.actor.remove_style_pseudo_class('activate');
+    }
+    activate() {
+        log("Activating GridSettingsButton ${cols}:${rows}");
+        this.active = true;
+        this.actor.add_style_pseudo_class('activate');
     }
     _onButtonPress() {
         nbCols = this.cols;
@@ -2127,15 +2358,20 @@ class Grid {
         let rowNum = 0;
         let colNum = 0;
         let maxPerRow = 4;
+        this.rows = rows;
+        this.cols = cols;
+        this.gridSettingsButtons = [];
         for (let gridSize of gridSettings[SETTINGS_GRID_SIZES]) {
             if (colNum >= maxPerRow) {
                 colNum = 0;
                 rowNum += 1;
             }
-            const button = new GridSettingsButton(gridSize);
+            const isActiveGrid = this.cols == gridSize.width && this.rows == gridSize.height;
+            const button = new GridSettingsButton(gridSize, isActiveGrid);
             this.bottomBarTableLayout.attach(button.actor, colNum, rowNum, 1, 1);
             button.actor.connect('notify::hover', () => this._onSettingsButton());
             colNum++;
+            this.gridSettingsButtons.push(button);
         }
         this.bottombar.height *= (rowNum + 1);
         this.tableContainer = new St.Bin({
@@ -2163,9 +2399,7 @@ class Grid {
         this.actor.add_child(this.veryBottomBarContainer);
         this.monitor = monitor;
         this.monitor_idx = monitor_idx;
-        this.rows = rows;
         this.title = title;
-        this.cols = cols;
         this.isEntered = false;
         const toggleSettingListener = new ToggleSettingsButtonListener();
         let toggle = new ToggleSettingsButton("animation", SETTINGS_ANIMATION);
@@ -2233,6 +2467,7 @@ class Grid {
         this.rows = nbRows;
         this._displayElements();
         this._clearMoveResizeState();
+        this._updateGridSizeButtons();
     }
     set_position(x, y) {
         this.x = x;
@@ -2421,6 +2656,16 @@ class Grid {
         log("Disconnect hide-tiling");
         this.disconnect(this.connectHideTiling);
     }
+    _updateGridSizeButtons() {
+        for (let button of this.gridSettingsButtons) {
+            if (this.cols == button.cols && this.rows == button.rows) {
+                button.activate();
+            }
+            else {
+                button.deactivate();
+            }
+        }
+    }
     // Methods replaced by Signals.addSignalMethods.
     connect(name, callback) { return -1; }
     disconnect(id) { }
@@ -2562,7 +2807,7 @@ class GridElementDelegate {
         this.gridWidget = gridWidget;
         // The first element clicked in the rectangular selection.
         this.first = null;
-        // 
+        //
         this.currentElement = null;
         // Elements that are in a highlighted state in the UI. The highlighting
         // happens when the grid rectangle selcted includes a particular grid
