@@ -31,7 +31,7 @@ ap() {
     if [ -z "$ANSIBLE_USER" ]; then
         ANSIBLE_USER=miko
     fi
-    ~/.local/bin/ansible-playbook --user $ANSIBLE_USER "$@" | sed 's/\\n/\n/g'
+    /usr/bin/env ansible-playbook --user $ANSIBLE_USER "$@" | sed 's/\\n/\n/g'
 }
 
 ap-check() {
