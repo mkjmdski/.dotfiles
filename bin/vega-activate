@@ -1,0 +1,4 @@
+#!/bin/bash
+gcloud config set account miko@vegaprotocol.io
+gcloud container clusters get-credentials gke-01 --region europe-west1 --project vegaprotocol
+kubectl ctx vega=.
