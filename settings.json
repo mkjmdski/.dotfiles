@@ -69,6 +69,8 @@
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
   "bracket-pair-colorizer-2.depreciation-notice": false,
-  "window.zoomLevel": 1,
-  "yaml.customTags": [ "!vault" ]
+  "yaml.customTags": [
+    "!vault"
+  ],
+  "window.zoomLevel": -1
 }
