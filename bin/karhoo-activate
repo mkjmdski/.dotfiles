@@ -1,3 +1,5 @@
 #!/bin/bash
 gcloud config set account mikolaj.mlodzikowski@karhoo.com
-docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest} configure -a -c
+if [ ! "$1" = "--skip-envy" ]; then
+    docker run --rm -it -e K8S_MANIFESTS_DIR=/manifests -v "$K8S_MANIFESTS_DIR:/manifests" -v "$HOME/.config/gcloud:/root/.config/gcloud" -v "$HOME/.kube:/root/.kube" eu.gcr.io/karhoo-common/envy:${ENVY_VERSION:-latest} configure -a -c
+fi
