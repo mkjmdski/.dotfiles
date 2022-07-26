@@ -26,7 +26,7 @@ _fzf_compgen_dir() {
 }
 
 
-for plugin in extract command-not-found gpg-agent last-working-dir colored-man-pages copydir zsh-interactive-cd; do
+for plugin in extract command-not-found gpg-agent last-working-dir colored-man-pages zsh-interactive-cd; do
     zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
 done
 
@@ -108,7 +108,7 @@ zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ri
 zinit load BurntSushi/ripgrep
 
 if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
-    zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
+    # zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
 
     zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
     zinit load hidetatz/kubecolor
