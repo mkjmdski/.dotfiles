@@ -37,10 +37,10 @@
       path: keybindings.json
       if: *ubuntu
     ~/Library/Application\ Support/Code/User/settings.json:
-      path: vscode/settings.json
+      path: settings.json
       if: &mac uname -a | grep -iq darwin
     ~/Library/Application\ Support/Code/User/keybindings.json:
-      path: vscode/keybindings.json
+      path: keybindings.json
       if: *mac
     ~/.config/terminator/config:
       path: terminator.config

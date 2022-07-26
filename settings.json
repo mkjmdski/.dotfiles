@@ -1,4 +1,5 @@
 {
+  "security.workspace.trust.untrustedFiles": "open",
   "[python]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
@@ -35,7 +36,6 @@
   "python.formatting.provider": "black",
   "window.closeWhenEmpty": true,
   "window.restoreFullscreen": true,
-  "window.restoreWindows": "all",
   "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "newUntitledFile",

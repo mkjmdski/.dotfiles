@@ -197,13 +197,7 @@ function install_osx_extras {
         brew install glab
         glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
     fi
-
-    if [ "$DOTFILES_CONF_uber" = "true" ]; then
-        brew install poppler
-        brew install pdftk
-    fi
-
-    for p in gnupg2 pinentry-mac neovim zsh fasd trash-cli libusb docker neovim trash-cli xclip coreutils gnu-sed
+    for p in gnupg2 pinentry-mac neovim zsh fasd trash-cli libusb docker neovim trash-cli xclip coreutils gnu-sed wget
     do
         brew install $p
     done
@@ -258,16 +252,17 @@ if [ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
 fi
 
 curl -L https://cht.sh/:cht.sh > ~/bin/cht.sh
-sudo chmod -x ~/bin/*
+chmod -x ~/bin/*
 
 if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
     (
-        cd "$(mktemp -d)" &&
-        curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.{tar.gz,yaml}" &&
-        tar zxvf krew.tar.gz &&
-        KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" &&
-        "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz &&
-        "$KREW" update
+        set -x; cd "$(mktemp -d)" &&
+        OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+        ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+        KREW="krew-${OS}_${ARCH}" &&
+        curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+        tar zxvf "${KREW}.tar.gz" &&
+        ./"${KREW}" install krew
     )
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
     # https://krew.sigs.k8s.io/plugins/
@@ -288,7 +283,7 @@ fi
 if [ "$DOTFILES_CONF_git" = "true" ]; then
     git config --global include.path "$PWD/global.gitconfig"
     git config --global core.excludesfile "$PWD/global.gitignore"
-    if [ "$(whoami)" = "mlodzikos" ] || [ "$(whoami)" = "mikolajmlodzikowski" ]; then
+    if whoami | grep -iq 'mlodzik'; then
         git config --global user.name "Mikołaj Młodzikowski"
         git config --global user.email "mikolaj.mlodzikowski@gmail.com"
     fi

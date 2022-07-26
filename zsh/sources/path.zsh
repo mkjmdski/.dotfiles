@@ -9,6 +9,15 @@ if [ ! "$PATH_LOADED" = "true" ]; then
         export PATH="$HOME/repos/agmar/toolkitz/programs/bin:$PATH"
     fi
 
+    if [ -d "$HOME/homebrew/bin" ]; then
+	    export PATH="$HOME/homebrew/bin:$PATH"
+    fi
+
+    if [ -d "/Applications/Visual Studio Code 2.app/Contents/Resources/app/bin" ]; then
+    export PATH="$PATH:/Applications/Visual Studio Code 2.app/Contents/Resources/app/bin"
+    fi
+
+
     export PATH="$DOTFILES/bin:$PATH"
     export PATH="$DOTFILES/venv/bin:$PATH"
     eval $(parse-yaml $DOTFILES/config.yaml DOTFILES_CONF_)
