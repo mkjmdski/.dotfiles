@@ -73,7 +73,9 @@ function install_debian_extras {
         ca-certificates \
         gnupg-agent \
         software-properties-common \
-        w3m
+        w3m \
+        lsb-release
+
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
@@ -155,6 +157,17 @@ function install_debian_extras {
         sudo apt install -y gh
     fi
 
+    if [ "$DOTFILES_CONF_azure" = "true" ]; then
+        curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
+            gpg --dearmor | \
+            sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+        AZ_REPO=$(lsb_release -cs)
+        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
+            sudo tee /etc/apt/sources.list.d/azure-cli.list
+        sudo apt-get update
+        sudo apt-get install -y azure-cli
+    fi
+
     install_fonts
 }
 
@@ -196,6 +209,9 @@ function install_osx_extras {
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         brew install glab
         glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
+    fi
+    if [ "$DOTFILES_CONF_azure" = "true" ]; then
+        brew install az
     fi
     for p in gnupg2 pinentry-mac neovim zsh fasd trash-cli libusb docker neovim trash-cli xclip coreutils gnu-sed wget
     do
