@@ -117,7 +117,7 @@
 	is-clean = "!f() { if ! git diff --exit-code &> /dev/null || [[ ! -z "$(git ls-files --other --directory --exclude-standard)" ]]; then exit 1; fi ; }; f"
 	rebase-main = "!f() {b="$(git current-branch)"; git checkout ${1:-master}; git pull; git checkout $b; git rebase ${1:-master} ; }; f"
 	message = "log -1 --pretty=%B"
-
+        c = "checkout -"
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
