@@ -123,6 +123,3 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-
-[includeIf "gitdir:~/repos/karhoo/**"]
-    path = .gitconfig-work
