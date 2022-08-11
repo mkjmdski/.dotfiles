@@ -108,7 +108,7 @@ zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"ripgrep* -> ripgrep" pick"ri
 zinit load BurntSushi/ripgrep
 
 if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
-    # zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
+    zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
 
     zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
     zinit load hidetatz/kubecolor
@@ -118,4 +118,11 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
 
     zinit ice from"gh-r" as"program" mv"stern* -> stern"
     zinit load wercker/stern
+    if [ "$DOTFILES_CONF_azure" = "true" ]; then
+        zinit ice from"gh-r" as"program" bpick"*$(uname)*.zip"
+        zinit load Azure/kubelogin
+        if [ ! -e "$HOME/.zinit/plugins/Azure---kubelogin/kubelogin" ]; then
+            ln -s "$HOME/.zinit/plugins/Azure---kubelogin/bin/$(uname | tr '[:upper:]' '[:lower:]')_amd64/kubelogin" "$HOME/.zinit/plugins/Azure---kubelogin/kubelogin"
+        fi
+    fi
 fi
