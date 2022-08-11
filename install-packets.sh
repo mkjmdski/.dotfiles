@@ -117,6 +117,9 @@ function install_debian_extras {
     if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
         snap install --classic kubectl
         setup_binary_env "yuya-takeyama/helmenv"
+        if [ "$DOTFILES_CONF_gcloud" = "true" ]; then
+           sudo apt-get -y install google-cloud-sdk-gke-gcloud-auth-plugin
+        fi
     fi
 
     if [ "$DOTFILES_CONF_spotify" = "true" ]; then
@@ -196,6 +199,9 @@ function install_osx_extras {
         brew install kubernetes-cli
         brew install helm
         setup_binary_env "yuya-takeyama/helmenv"
+        # if [ "$DOTFILES_CONF_gcloud" = "true" ]; then
+        # https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
+        # fi
     fi
     if [ "$DOTFILES_CONF_golang" = "true" ]; then
         brew install goenv

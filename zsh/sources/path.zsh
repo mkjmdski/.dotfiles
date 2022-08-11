@@ -105,5 +105,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
         export CLOUDSDK_HOME
     fi
 
+    export USE_GKE_GCLOUD_AUTH_PLUGIN="True"
     export PATH_LOADED="true"
 fi
