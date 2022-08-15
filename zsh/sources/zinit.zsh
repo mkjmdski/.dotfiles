@@ -122,7 +122,7 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
         zinit ice from"gh-r" as"program" bpick"*$(uname)*.zip"
         zinit load Azure/kubelogin
         if [ ! -e "$HOME/.zinit/plugins/Azure---kubelogin/kubelogin" ]; then
-            ln -s "$HOME/.zinit/plugins/Azure---kubelogin/bin/$(uname | tr '[:upper:]' '[:lower:]')_amd64/kubelogin" "$HOME/.zinit/plugins/Azure---kubelogin/kubelogin"
+            ln -s "$HOME/.zinit/plugins/Azure---kubelogin/bin/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/kubelogin" "$HOME/.zinit/plugins/Azure---kubelogin/kubelogin"
         fi
     fi
 fi

@@ -37,7 +37,7 @@ ap() {
 ap-check() {
     ap --check --diff "$@"
 }
-
+    source <(kubectl completion zsh)
     source <(kubectl completion zsh | sed 's|kubectl|kubecolor|g')
 fi
 
