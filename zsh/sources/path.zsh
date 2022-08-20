@@ -64,7 +64,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export PATH="$HOME/.helmenv/bin:$PATH"
     export TF_PLUGIN_CACHE_DIR="$HOME/.terraform-plugins"
 
-    export HELM_DRIVER=configmap
+    # export HELM_DRIVER=configmap
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
     export NVM_DIR="$HOME/.nvm"
