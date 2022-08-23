@@ -30,9 +30,10 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     export LC_ALL=en_US.UTF-8
     export GOENV_ROOT="$HOME/.goenv"
     export PATH="$GOENV_ROOT/bin:$PATH"
+    eval "$(goenv init -)"
+    export GOROOT="$(goenv prefix)"
     export PATH="$GOROOT/bin:$PATH"
     export PATH="$PATH:$GOPATH/bin"
-    eval "$(goenv init -)"
 
     if [[ $commands[javac] ]]; then
         export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"
