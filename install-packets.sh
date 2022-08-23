@@ -204,7 +204,7 @@ function install_osx_extras {
         # fi
     fi
     if [ "$DOTFILES_CONF_golang" = "true" ]; then
-        brew install goenv
+        setup_binary_env "syndbg/goenv"
     fi
     if [ "$DOTFILES_CONF_terraform" = "true" ]; then
         brew install tfenv
