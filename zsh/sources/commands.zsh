@@ -27,6 +27,10 @@ kctxx() {
     k ctx $(kctx | grep $1 | head -n 1)
 }
 
+kgp-node() {
+    kgp $1 -o json | jq -r '.spec | .nodeName'
+}
+
 ap() {
     if [ -z "$ANSIBLE_USER" ]; then
         ANSIBLE_USER=miko

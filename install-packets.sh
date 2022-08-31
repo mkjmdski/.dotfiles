@@ -4,6 +4,11 @@ export DOTFILES="$HOME/.dotfiles"
 export PATH="$DOTFILES/bin:$PATH"
 eval $(parse-yaml $DOTFILES/config.yaml DOTFILES_CONF_)
 
+function set-glab-aliases {
+    glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
+    glab alias set get-state 'glab api /projects/${2-:id}/terraform/state/$1' --shell
+}
+
 function setup_binary_env {
     repo=$1
     location="$HOME/.$(echo $repo | cut -d'/' -f 2)"
@@ -140,7 +145,7 @@ function install_debian_extras {
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         snap install --edge glab
         snap connect glab:ssh-keys
-        glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
+        set-glab-aliases
     fi
 
     if [ "$DOTFILES_CONF_golang" = "true" ]; then
@@ -214,7 +219,7 @@ function install_osx_extras {
     fi
     if [ "$DOTFILES_CONF_gitlab" = "true" ]; then
         brew install glab
-        glab alias set get-variable 'glab api /projects/:id/variables/$1 | jq .value' --shell
+        set-glab-aliases
     fi
     if [ "$DOTFILES_CONF_azure" = "true" ]; then
         brew install az
