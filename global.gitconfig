@@ -96,7 +96,6 @@
 	m = commit --message
 	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
 	amp = "!f(){ git add -A && git commit -m \"$@\"; git p ; }; f"
-	map = amp
 	mp = "!f(){ git commit -m \"$@\"; git p ; }; f"
 	merge-me = "!f(){ b=$(git current-branch); git checkout ${1:-master}; git merge $b; }; f"
 	s = status
