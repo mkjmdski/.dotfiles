@@ -106,5 +106,6 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     fi
 
     export USE_GKE_GCLOUD_AUTH_PLUGIN="True"
+    export KUBECONFIG="$HOME/.kube/config"
     export PATH_LOADED="true"
 fi
