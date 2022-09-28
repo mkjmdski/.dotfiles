@@ -118,7 +118,9 @@ alias calc='noglob calc'
 
 if [[ $commands[glab] ]]; then
     glab-mr () {
-        body=""
+        local body=""
+        local title=""
+        local args=""
         while [[ $# -gt 0 ]]; do
             key="$1"
             case $key in
@@ -147,13 +149,13 @@ fi
 
 if [[ $commands[gh] ]]; then
     gh-pr () {
-        args=""
-        reviewer=""
+        local args=""
+        local reviewer=""
         if pwd | grep -q vega; then
             reviewer="vegaprotocol/ops"
         fi
-        title=""
-        body=""
+        local title=""
+        local body=""
         while [[ $# -gt 0 ]]; do
             key="$1"
             case $key in
