@@ -9,7 +9,7 @@ dir="${1:-.}"
     host=$(cat versions.tf | grep backend -A 5 | grep hostname | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
     workspace=$(cat versions.tf | grep workspaces -A 1 | grep name | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
     org=$(cat versions.tf | grep backend -A 5 | grep organization | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
-    link="https://${host}/app/${org}/${workspace}"
+    link="https://${host}/app/${org}/workspaces/${workspace}"
     if which xdg-open &> /dev/null; then
         xdg-open $link
     elif which open &> /dev/null; then
