@@ -346,7 +346,7 @@ class TileSpec {
         this.rdc = rdc;
     }
     toString() {
-        return `${[this.gridWidth, this.gridHeight].join('x')} ${this.luc.toString()} ${this.rdc.toString}`;
+        return ` ${[this.gridWidth, this.gridHeight].join('x')} ${this.luc.toString()} ${this.rdc.toString()}`;
     }
     toFrameRect(workArea) {
         const elemSize = new Size(workArea.size.width / this.gridWidth, workArea.size.height / this.gridHeight);
@@ -770,6 +770,10 @@ function parseSinglePreset(preset) {
     const gridFormat = parseTuple(ps[0], "x");
     let luc = new TupleHolder(ps[1]);
     let rdc = new TupleHolder(ps[2]);
+    if (gridFormat.x < 1 || gridFormat.x > 100
+        || gridFormat.y < 1 || gridFormat.y > 100) {
+        throw new Error(`Bad preset: ${JSON.stringify(preset)} grid size out of range 1..100`);
+    }
     return new TileSpec(gridFormat.x, gridFormat.y, luc, rdc);
 }
 function hasImpliedGridSize(singlePreset) {
