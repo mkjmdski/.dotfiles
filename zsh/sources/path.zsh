@@ -10,11 +10,17 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     fi
 
     if [ -d "$HOME/homebrew/bin" ]; then
-	    export PATH="$HOME/homebrew/bin:$PATH"
+        export PATH="$HOME/homebrew/bin:$PATH"
     fi
 
     if [ -d "/Applications/Visual Studio Code 2.app/Contents/Resources/app/bin" ]; then
-    export PATH="$PATH:/Applications/Visual Studio Code 2.app/Contents/Resources/app/bin"
+        export PATH="$PATH:/Applications/Visual Studio Code 2.app/Contents/Resources/app/bin"
+    fi
+
+    if [ -d "$HOME/.asdf" ]; then
+        . $HOME/.asdf/asdf.sh
+        # append completions to fpath
+        fpath=($fpath ${ASDF_DIR}/completions $fpath)
     fi
 
 

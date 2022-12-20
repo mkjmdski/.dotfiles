@@ -157,6 +157,8 @@ function install_debian_extras {
         $HOME/.tfenv/bin/tfenv install
     fi
 
+    setup_binary_env "asdf-vm/asdf"
+
     if [ "$DOTFILES_CONF_github" = "true" ]; then
         # https://github.com/cli/cli/blob/trunk/docs/install_linux.md
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg

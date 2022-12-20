@@ -5,8 +5,11 @@ source $sources/path.zsh
 source $sources/spaceship.zsh
 
 source ~/.zinit/bin/zinit.zsh
+
+# initialise completions with ZSH's compinit
 autoload -Uz compinit
 compinit
+
 zstyle ':completion:*' menu select
 
 source $sources/zinit.zsh
