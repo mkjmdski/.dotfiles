@@ -106,6 +106,7 @@ fi
 alias tf=terraform
 
 alias code.='code .'
+alias c="code ."
 
 function jcode { code "$(s $1)" }
 function jexec { location=$1; shift; (j $location; eval "$@") }
