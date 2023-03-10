@@ -3,7 +3,8 @@
   "[python]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true
   },
   "[yaml]": {
     "editor.insertSpaces": true,
@@ -44,12 +45,8 @@
   },
   "diffEditor.maxComputationTime": 0,
   "python.languageServer": "Pylance",
-  "jupyter.addGotoCodeLenses": false,
   "jupyter.askForLargeDataFrames": false,
   "jupyter.debugJustMyCode": false,
-  "jupyter.decorateCells": false,
-  "jupyter.enableAutoMoveToNextCell": false,
-  "jupyter.enableCellCodeLens": false,
   "python.analysis.completeFunctionParens": true,
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
@@ -72,5 +69,9 @@
   "yaml.customTags": [
     "!vault"
   ],
-  "window.zoomLevel": 1
+  "window.zoomLevel": 1,
+  "jupyter.interactiveWindow.textEditor.autoMoveToNextCell": false,
+  "jupyter.interactiveWindow.codeLens.enable": false,
+  "jupyter.interactiveWindow.codeLens.enableGotoCell": false,
+  "jupyter.interactiveWindow.cellMarker.decorateCells": false
 }
