@@ -1,21 +1,33 @@
 #!/bin/bash
-dir="${1:-.}"
-(
-    cd $dir
-    if [ ! -f 'versions.tf' ]; then
-        echo 'there is no versions.tf file, search for `terraform {` block in workspace files and put all of them as one into versions.tf'
-        kill -INT $$
-    fi
-    host=$(cat versions.tf | grep backend -A 5 | grep hostname | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
-    workspace=$(cat versions.tf | grep workspaces -A 1 | grep name | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
-    org=$(cat versions.tf | grep backend -A 5 | grep organization | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
-    link="https://${host}/app/${org}/workspaces/${workspace}"
-    if which xdg-open &> /dev/null; then
-        xdg-open $link
-    elif which open &> /dev/null; then
-        open $link
-    else
-        echo 'open this link in your browser'
-        echo $link
-    fi
-)
+
+_tfopen() {
+    dir=$1
+    (
+        cd $dir
+        if [ ! -f 'versions.tf' ]; then
+            echo 'there is no versions.tf file, search for `terraform {` block in workspace files and put all of them as one into versions.tf'
+            kill -INT $$
+        fi
+        host=$(cat versions.tf | grep backend -A 5 | grep hostname | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+        workspace=$(cat versions.tf | grep workspaces -A 1 | grep name | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+        org=$(cat versions.tf | grep backend -A 5 | grep organization | cut -d '=' -f 2 | tr -d '"' | sed 's/^ *//g')
+        link="https://${host}/app/${org}/workspaces/${workspace}"
+        if which xdg-open &> /dev/null; then
+            xdg-open $link
+        elif which open &> /dev/null; then
+            open $link
+        else
+            echo 'open this link in your browser'
+            echo $link
+        fi
+    )
+}
+
+if [[ "$#" -eq 0 ]]; then
+    _tfopen .
+else
+    for var in "$@"
+    do
+        _tfopen "$var"
+    done
+fi
