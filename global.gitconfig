@@ -94,6 +94,7 @@
 	p = "!f(){ git push || (git pull && git push) ; }; f"
 	a = add --all
 	m = commit --message
+	# ucam = "!f(){ if [[ \"$(git current-branch)\" =~ (ABP-.*)(-.*) ]]; then echo \"feat(${BASH_REMATCH[1]}): $1\"; else echo \"feat: $1\"; fi ; }; f"
 	cam = "!f(){ git a && git commit -m \"$1\" ; }; f"
 	amp = "!f(){ git add -A && git commit -m \"$@\"; git p ; }; f"
 	map = amp
