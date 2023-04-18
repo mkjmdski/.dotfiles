@@ -1,7 +1,7 @@
 zinit light zdharma-continuum/z-a-as-monitor
 zinit light zdharma-continuum/z-a-bin-gem-node
 
-for lib in clipboard directories termsupport key-bindings history; do
+for lib in functions clipboard directories termsupport key-bindings history; do
     zinit snippet OMZ::lib/$lib.zsh
 done
 
@@ -116,8 +116,8 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
     zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*.tar.gz" mv "kubectl-debug* -> kubectl-debug" pick "kubectl-debug/kubectl-debug"
     zinit load aylei/kubectl-debug
 
-    zinit ice from"gh-r" as"program" mv"stern* -> stern"
-    zinit load wercker/stern
+    # zinit ice from"gh-r" as"program" mv"stern* -> stern"
+    # zinit load wercker/stern
     if [ "$DOTFILES_CONF_azure" = "true" ]; then
         zinit ice from"gh-r" as"program" bpick"*$(uname)*.zip"
         zinit load Azure/kubelogin

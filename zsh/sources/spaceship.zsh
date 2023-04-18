@@ -32,7 +32,7 @@ spaceship_git_last_commit() {
   [[ -z $git_last_commit_status ]] && return
 
   # Display git_last_commit section
-  spaceship::section \
+  spaceship::section::v3 \
     "$SPACESHIP_GIT_LAST_COMMIT_COLOR" \
     "$SPACESHIP_GIT_LAST_COMMIT_PREFIX" \
     "$SPACESHIP_GIT_LAST_COMMIT_SYMBOL$git_last_commit_status" \
@@ -76,14 +76,14 @@ spaceship_gcloud() {
   # Get active project
   local GCLOUD_ACTIVE_PROJECT=$(cat ~/.config/gcloud/configurations/config_$GCLOUD_CONFIG | grep project | cut -d '=' -f 2)
   [[ -z $GCLOUD_ACTIVE_PROJECT ]] && return
-  spaceship::section \
+  spaceship::section::v3 \
     "$SPACESHIP_GCLOUD_COLOR" \
     "$SPACESHIP_GCLOUD_PREFIX" \
     "${SPACESHIP_GCLOUD_SYMBOL}$GCLOUD_ACTIVE_PROJECT " \
     "$SPACESHIP_GCLOUD_SUFFIX"
 }
 
-SPACESHIP_KUBECONTEXT_PREFIX="at ☸️  "
+SPACESHIP_KUBECTL_CONTEXT_PREFIX="at ☸️  "
 if [ -f "$HOME/.dotfiles/.is_laptop" ]; then
   SPACESHIP_PROMPT_ORDER=(battery time dir git git_last_commit golang venv kubectl_context exec_time line_sep jobs exit_code char)
 else

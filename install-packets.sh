@@ -51,6 +51,7 @@ function install_debian_standard {
         python3-pip \
         python3-dev \
         python3-setuptools \
+	python3-venv \
         curl
 }
 
@@ -87,28 +88,30 @@ function install_debian_extras {
         $(lsb_release -cs) \
         stable"
     sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo usermod -a -G docker $(whoami)
-
-    if [ "$DOTFILES_CONF_uber" = "true" ]; then
-        sudo apt-get install -y \
-            pdftk \
-            poppler-utils
-
-    fi
 
     if [ "$DOTFILES_CONF_gnome" = "true" ]; then
         sudo apt-get install -y \
             chrome-gnome-shell \
-            gnome-tweak-tool
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/KaizIqbal/Bibata_Cursor/master/Bibata.sh)"
+            gnome-tweaks
+        if [ ! -d ~/.icons/Bibata-Modern-Amber ]; then
+            (
+                cd /tmp
+                curl -Lo bibata.tgz https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.3/Bibata-Modern-Amber.tar.gz
+                tar -xvf bibata.tgz
+                mv Bibata-* ~/.icons/
+            )
+        fi
         for ext in $(gnome-extensions list); do
             gnome-extensions enable $ext
         done
     fi
 
     if [ "$DOTFILES_CONF_google" = "true" ]; then
-        snap install --classic google-cloud-sdk
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
+        sudo apt-get update && sudo apt-get install google-cloud-cli
     fi
 
     if [ "$DOTFILES_CONF_slack" = "true" ]; then
@@ -122,8 +125,8 @@ function install_debian_extras {
     if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
         snap install --classic kubectl
         setup_binary_env "yuya-takeyama/helmenv"
-        if [ "$DOTFILES_CONF_gcloud" = "true" ]; then
-           sudo apt-get -y install google-cloud-sdk-gke-gcloud-auth-plugin
+        if [ "$DOTFILES_CONF_google" = "true" ]; then
+            sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
         fi
     fi
 
