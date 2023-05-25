@@ -114,7 +114,7 @@ function take { mkdir -p $@ && cd ${@:$#} }
 
 
 # https://github.com/arzzen/calc.plugin.zsh# Put these in your .zshrc (No need to install a plugin)
-calc() python3 -c "from math import *; print($*);"
+calc() { python3 -c "from math import *; print($*);" }
 alias calc='noglob calc'
 # You can use `calc` just like `=` from above. All functions from the math module of Python are available for use.
 
@@ -148,6 +148,7 @@ if [[ $commands[glab] ]]; then
         fi
         glab mr create --push --remove-source-branch --title="$title" --yes --no-editor --description="$body"
     }
+    glab-repo='glab repo view --web --branch $(git current-branch)'
 fi
 
 if [[ $commands[gh] ]]; then
@@ -183,6 +184,7 @@ if [[ $commands[gh] ]]; then
         fi
         eval "gh pr create $args --title='$title' --body='$body' --reviewer='$reviewer'"
     }
+    alias gh-repo='gh repo view --web --branch $(git current-branch)'
 fi
 
 # az cli autocomplete

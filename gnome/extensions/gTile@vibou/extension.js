@@ -187,33 +187,33 @@ function versionGreaterThanOrEqualTo(a, b) {
 }
 
 // Library imports
-const Main = imports.ui.main;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
+const Main$1 = imports.ui.main;
+const Meta$2 = imports.gi.Meta;
+const Shell$1 = imports.gi.Shell;
 // Extension imports
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Settings = Me.imports.settings;
+const Me$1 = imports.misc.extensionUtils.getCurrentExtension();
+const Settings$1 = Me$1.imports.settings;
 function bind(keyBindings) {
     log("Binding keys");
-    let mySettings = Settings.get();
+    let mySettings = Settings$1.get();
     keyBindings.forEach((callback, key) => {
         //const key = keyString as KeyBindingSettingName;
-        if (Main.wm.addKeybinding && Shell.ActionMode) { // introduced in 3.16
-            Main.wm.addKeybinding(key, mySettings, Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL, callback);
+        if (Main$1.wm.addKeybinding && Shell$1.ActionMode) { // introduced in 3.16
+            Main$1.wm.addKeybinding(key, mySettings, Meta$2.KeyBindingFlags.NONE, Shell$1.ActionMode.NORMAL, callback);
         }
-        else if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
-            Main.wm.addKeybinding(key, mySettings, Meta.KeyBindingFlags.NONE, Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY, callback);
+        else if (Main$1.wm.addKeybinding && Shell$1.KeyBindingMode) { // introduced in 3.7.5
+            Main$1.wm.addKeybinding(key, mySettings, Meta$2.KeyBindingFlags.NONE, Shell$1.KeyBindingMode.NORMAL | Shell$1.KeyBindingMode.MESSAGE_TRAY, callback);
         }
         else {
-            global.display.add_keybinding(key, mySettings, Meta.KeyBindingFlags.NONE, callback);
+            global.display.add_keybinding(key, mySettings, Meta$2.KeyBindingFlags.NONE, callback);
         }
     });
 }
 function unbind(keyBindings) {
     log("Unbinding keys");
     for (let key of keyBindings.keys()) {
-        if (Main.wm.removeKeybinding) { // introduced in 3.7.2
-            Main.wm.removeKeybinding(key);
+        if (Main$1.wm.removeKeybinding) { // introduced in 3.7.2
+            Main$1.wm.removeKeybinding(key);
         }
         else {
             global.display.remove_keybinding(key);
@@ -226,7 +226,7 @@ https://github.com/tpyl/gssnaptoneighbors
  by Timo Pylvanainen <tpyl@iki.fi>
  */
 const Meta$1 = imports.gi.Meta;
-const WorkspaceManager = global.screen || global.workspace_manager;
+const WorkspaceManager$1 = global.screen || global.workspace_manager;
 const OVERLAP_TOLERANCE = 5;
 const SCAN_BOX_SIZE = 50;
 /**
@@ -235,7 +235,7 @@ const SCAN_BOX_SIZE = 50;
 function getWindowsOnActiveWorkspace() {
     let windows = [];
     let windowActors = global.get_window_actors();
-    let curWorkSpace = WorkspaceManager.get_active_workspace();
+    let curWorkSpace = WorkspaceManager$1.get_active_workspace();
     for (let i = 0; i < windowActors.length; i++) {
         let win = windowActors[i].meta_window;
         if (win.located_on_workspace(curWorkSpace) &&
@@ -319,8 +319,8 @@ function snapToNeighbors(window) {
     let workArea = window.get_work_area_current_monitor();
     let myrect = window.get_frame_rect();
     let windows = getWindowsOnActiveWorkspace();
-    // Scan for overlapping windows in a thin bar around the top of the 
-    // window. The vertical height of the window will be adjusted later. 
+    // Scan for overlapping windows in a thin bar around the top of the
+    // window. The vertical height of the window will be adjusted later.
     let maxHorizw = expandHorizontally(myrect.x + Math.min(SCAN_BOX_SIZE, myrect.width / 2), myrect.y + Math.min(SCAN_BOX_SIZE, myrect.height / 2), myrect.y + Math.min(SCAN_BOX_SIZE, myrect.height / 2) + SCAN_BOX_SIZE, workArea.x, workArea.x + workArea.width, windows);
     let maxHorizh = expandVertically(myrect.y + Math.min(SCAN_BOX_SIZE, myrect.height / 2), maxHorizw.min + OVERLAP_TOLERANCE, maxHorizw.max - OVERLAP_TOLERANCE, workArea.y, workArea.y + workArea.height, windows);
     let maxVerth = expandVertically(myrect.y + Math.min(SCAN_BOX_SIZE, myrect.height / 2), myrect.x + Math.min(SCAN_BOX_SIZE, myrect.width / 2), myrect.x + Math.min(SCAN_BOX_SIZE, myrect.width / 2) + SCAN_BOX_SIZE, workArea.y, workArea.y + workArea.height, windows);
@@ -863,20 +863,20 @@ var MaximizeFlags;
  *****************************************************************/
 // Library imports
 const St = imports.gi.St;
-const Main$1 = imports.ui.main;
-const Shell$1 = imports.gi.Shell;
+const Main = imports.ui.main;
+const Shell = imports.gi.Shell;
 const GObject = imports.gi.GObject;
 const PanelMenu = imports.ui.panelMenu;
-const Meta$2 = imports.gi.Meta;
+const Meta = imports.gi.Meta;
 const Clutter = imports.gi.Clutter;
 const Signals = imports.signals;
-const Workspace = imports.ui.workspace;
+imports.ui.workspace;
 const Mainloop = imports.mainloop;
 // Getter for accesing "get_active_workspace" on GNOME <=2.28 and >= 2.30
-const WorkspaceManager$1 = (global.screen || global.workspace_manager);
+const WorkspaceManager = (global.screen || global.workspace_manager);
 // Extension imports
-const Me$1 = imports.misc.extensionUtils.getCurrentExtension();
-const Settings$1 = Me$1.imports.settings;
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Settings = Me.imports.settings;
 // Globals
 const SETTINGS_GRID_SIZES = 'grid-sizes';
 const SETTINGS_AUTO_CLOSE = 'auto-close';
@@ -938,7 +938,7 @@ let nbCols = 0;
 let nbRows = 0;
 let focusMetaWindow = null;
 let focusConnect = false;
-let settings = Settings$1.get();
+let settings = Settings.get();
 settings.connect('changed', changed_settings);
 let keyControlBound = false;
 let enabled = false;
@@ -982,7 +982,8 @@ const key_bindings_tiling = new Map([
     ['snap-to-neighbors', () => { snapToNeighborsBind(); }],
 ]);
 const key_bindings_auto_tiling = new Map([
-    ['autotile-main', () => { AutoTileMain(); }],
+    ['autotile-main', () => { AutoTileMain('left'); }],
+    ['autotile-main-inverted', () => { AutoTileMain('right'); }],
     ['autotile-1', () => { autoTileNCols(1); }],
     ['autotile-2', () => { autoTileNCols(2); }],
     ['autotile-3', () => { autoTileNCols(3); }],
@@ -1041,6 +1042,8 @@ const keyBindingGlobalResizes = new Map([
     ['action-move-right', () => { keyMoveResizeEvent('move', 'right', true); }],
     ['action-move-up', () => { keyMoveResizeEvent('move', 'up', true); }],
     ['action-move-next-monitor', () => { moveWindowToNextMonitor(); }],
+    ['action-autotile-main', () => { AutoTileMain('left', true); }],
+    ['action-autotile-main-inverted', () => { AutoTileMain('right', true); }],
 ]);
 class App {
     constructor() {
@@ -1052,16 +1055,16 @@ class App {
     }
     enable() {
         this.gridShowing = false;
-        tracker = Shell$1.WindowTracker.get_default();
+        tracker = Shell.WindowTracker.get_default();
         initSettings();
         const gridWidget = (new St.BoxLayout({ style_class: `${theme}__preview` }));
         this.gridWidget = gridWidget;
-        Main$1.uiGroup.add_actor(gridWidget);
+        Main.uiGroup.add_actor(gridWidget);
         this.initGrids(gridWidget);
         log("Create Button on Panel");
         launcher = new GTileStatusButton(`${theme}__icon`);
         if (gridSettings[SETTINGS_SHOW_ICON]) {
-            Main$1.panel.addToStatusArea("GTileStatusButton", launcher);
+            Main.panel.addToStatusArea("GTileStatusButton", launcher);
         }
         bind(keyBindings);
         if (gridSettings[SETTINGS_GLOBAL_AUTO_TILING]) {
@@ -1074,10 +1077,10 @@ class App {
             bind(keyBindingGlobalResizes);
         }
         if (monitorsChangedConnect) {
-            Main$1.layoutManager.disconnect(monitorsChangedConnect);
+            Main.layoutManager.disconnect(monitorsChangedConnect);
         }
         log("Connecting monitors-changed");
-        monitorsChangedConnect = Main$1.layoutManager.connect('monitors-changed', () => {
+        monitorsChangedConnect = Main.layoutManager.connect('monitors-changed', () => {
             log("Reinitializing grids on monitors-changed");
             this.destroyGrids();
             this.initGrids(gridWidget);
@@ -1101,7 +1104,7 @@ class App {
             log("initGrids adding grid key " + key);
             // TODO: addChrome is poorly documented. I can't find any reference
             // to it in the gjs-docs site.
-            Main$1.layoutManager.addChrome(grid.actor, { trackFullscreen: true });
+            Main.layoutManager.addChrome(grid.actor, { trackFullscreen: true });
             grid.actor.set_opacity(0);
             grid.hide(true);
             log("Connect hide-tiling for monitor " + monitorIdx);
@@ -1114,7 +1117,7 @@ class App {
         for (let gridKey in this.gridsByMonitorKey) {
             const grid = this.gridsByMonitorKey[gridKey];
             grid.hide(true);
-            Main$1.layoutManager.removeChrome(grid.actor);
+            Main.layoutManager.removeChrome(grid.actor);
             log("Disconnect hide-tiling for monitor " + grid.monitor_idx);
             grid.disconnect(grid.connectHideTiling);
             delete this.gridsByMonitorKey[gridKey];
@@ -1191,6 +1194,7 @@ class App {
                     x: pos_x,
                     y: pos_y,
                     transition: Clutter.AnimationMode.EASE_OUT_QUAD,
+                    /*onComplete:updateRegions*/
                 });
             }
         }
@@ -1293,7 +1297,7 @@ class App {
         this._hideGridLines();
         if (monitorsChangedConnect) {
             log("Disconnecting monitors-changed");
-            Main$1.layoutManager.disconnect(monitorsChangedConnect);
+            Main.layoutManager.disconnect(monitorsChangedConnect);
             monitorsChangedConnect = false;
         }
         unbind(keyBindings);
@@ -1306,7 +1310,7 @@ class App {
         }
         launcher === null || launcher === void 0 ? void 0 : launcher.destroy();
         launcher = null;
-        Main$1.uiGroup.remove_actor(this.gridWidget);
+        Main.uiGroup.remove_actor(this.gridWidget);
         this.destroyGrids();
         resetFocusMetaWindow();
         log("Extention disable completed");
@@ -1347,7 +1351,7 @@ class App {
             }
             this.gridLinesTimeout = null;
             for (let tile of this.gridTiles) {
-                Main$1.uiGroup.remove_actor(tile);
+                Main.uiGroup.remove_actor(tile);
             }
         }
         this.gridTiles = [];
@@ -1374,7 +1378,7 @@ class App {
                 newGridWidget.x = posX;
                 newGridWidget.y = 0;
                 this.gridTiles.push(newGridWidget);
-                Main$1.uiGroup.add_actor(newGridWidget);
+                Main.uiGroup.add_actor(newGridWidget);
                 log(`Grid vertical line of size ${tileWidth}:${tileHeight} is drawn at ${posX}:0 (monitor offset ${monitor.x}:${monitor.y})`);
             }
             for (let u = 1; u <= gridSize.height; u++) {
@@ -1385,7 +1389,7 @@ class App {
                 newGridWidget.x = 0;
                 newGridWidget.y = posY;
                 this.gridTiles.push(newGridWidget);
-                Main$1.uiGroup.add_actor(newGridWidget);
+                Main.uiGroup.add_actor(newGridWidget);
                 log(`Grid horizontal line of size ${tileWidth}:${tileHeight} is drawn at 0:${posY} (monitor offset ${monitor.x}:${monitor.y})`);
             }
         }
@@ -1603,9 +1607,9 @@ function resetFocusMetaWindow() {
     focusMetaWindow = null;
 }
 function reset_window(metaWindow) {
-    metaWindow.unmaximize(Meta$2.MaximizeFlags.HORIZONTAL);
-    metaWindow.unmaximize(Meta$2.MaximizeFlags.VERTICAL);
-    metaWindow.unmaximize(Meta$2.MaximizeFlags.BOTH);
+    metaWindow.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+    metaWindow.unmaximize(Meta.MaximizeFlags.VERTICAL);
+    metaWindow.unmaximize(Meta.MaximizeFlags.BOTH);
 }
 function _getInvisibleBorderPadding(metaWindow) {
     let outerRect = metaWindow.get_frame_rect();
@@ -1626,7 +1630,7 @@ function move_maximize_window(metaWindow, x, y) {
     x = x - borderX;
     y = y - borderY;
     metaWindow.move_frame(true, x, y);
-    metaWindow.maximize(Meta$2.MaximizeFlags.HORIZONTAL | Meta$2.MaximizeFlags.VERTICAL);
+    metaWindow.maximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
 }
 /**
  * Resizes window considering margin settings
@@ -1663,8 +1667,8 @@ function getNotFocusedWindowsOfMonitor(monitor) {
         }
         let appName = app.get_name();
         return !contains(excludedApplications, appName)
-            && w.meta_window.get_window_type() == Meta$2.WindowType.NORMAL
-            && w.meta_window.get_workspace() == WorkspaceManager$1.get_active_workspace()
+            && w.meta_window.get_window_type() == Meta.WindowType.NORMAL
+            && w.meta_window.get_workspace() == WorkspaceManager.get_active_workspace()
             && w.meta_window.showing_on_its_workspace()
             && monitors[w.meta_window.get_monitor()] == monitor
             && focusMetaWindow != w.meta_window;
@@ -1695,18 +1699,18 @@ function getFocusApp() {
     if (contains(excludedApplications, focusedAppName)) {
         return null;
     }
-    return WorkspaceManager$1.get_active_workspace().list_windows().find((window) => window.has_focus()) || null;
+    return WorkspaceManager.get_active_workspace().list_windows().find((window) => window.has_focus()) || null;
 }
 function getFocusWindow() {
     const focus_app = tracker.focus_app;
     if (!focus_app || excludedApplications[focus_app.get_name()]) {
         return null;
     }
-    return WorkspaceManager$1.get_active_workspace().list_windows()
+    return WorkspaceManager.get_active_workspace().list_windows()
         .find(w => w.has_focus());
 }
 function activeMonitors() {
-    return Main$1.layoutManager.monitors;
+    return Main.layoutManager.monitors;
 }
 /**
  * Determine if the given monitor is the primary monitor.
@@ -1714,7 +1718,7 @@ function activeMonitors() {
  * @returns {boolean} True if the given monitor is the primary monitor.
  * */
 function isPrimaryMonitor(monitor) {
-    return Main$1.layoutManager.primaryMonitor.x == monitor.x && Main$1.layoutManager.primaryMonitor.y == monitor.y;
+    return Main.layoutManager.primaryMonitor.x == monitor.x && Main.layoutManager.primaryMonitor.y == monitor.y;
 }
 function getWorkAreaByMonitor(monitor) {
     const monitors = activeMonitors();
@@ -1746,7 +1750,7 @@ function workAreaRectByMonitorIndex(monitorIndex) {
  * @deprecated Use {@link workAreaRectByMonitorIndex} instead.
  */
 function getWorkArea(monitor, monitor_idx) {
-    const wkspace = WorkspaceManager$1.get_active_workspace();
+    const wkspace = WorkspaceManager.get_active_workspace();
     const work_area = wkspace.get_work_area_for_monitor(monitor_idx);
     const insets = getMonitorInsets(getMonitorTier(monitor));
     return {
@@ -1803,7 +1807,7 @@ function keySetTiling() {
         const monitors = activeMonitors();
         let mind = focusMetaWindow.get_monitor();
         let monitor = monitors[mind];
-        let mkey = getMonitorKey(monitor);
+        getMonitorKey(monitor);
         const grid = globalApp.getGrid(monitor);
         log("In grid " + grid);
         (_b = (_a = grid === null || grid === void 0 ? void 0 : grid.elementsDelegate) === null || _a === void 0 ? void 0 : _a.currentElement) === null || _b === void 0 ? void 0 : _b._onButtonPress();
@@ -1896,7 +1900,7 @@ function presetResize(presetName, settingName) {
         return;
     }
     // parse the preset string (grid size, left-upper-corner, right-down-corner)
-    let gridSize = tileSpecs[0].gridSize;
+    tileSpecs[0].gridSize;
     // handle preset variants (if there are any)
     let variantCount = tileSpecs.length;
     if (variantCount > 1) {
@@ -2138,17 +2142,18 @@ class AutoTileMainAndList extends ActionButton {
     }
 }
 Signals.addSignalMethods(AutoTileMainAndList.prototype);
-function AutoTileMain() {
-    let preset = "AutoTileMain";
-    log("AutoTileMain");
+function AutoTileMain(tile_direction = 'left', is_global = false) {
+    let preset = "AutoTileMain-" + tile_direction;
+    log(preset);
     let window = getFocusApp();
     if (!window) {
         log("No focused window - ignoring keyboard shortcut AutoTileMain");
         return;
     }
+    focusMetaWindow = window;
     reset_window(window);
     let mind = window.get_monitor();
-    let work_area = getWorkAreaByMonitorIdx(mind);
+    getWorkAreaByMonitorIdx(mind);
     const monitors = activeMonitors();
     let monitor = monitors[mind];
     let workArea = getWorkAreaByMonitor(monitor);
@@ -2182,7 +2187,19 @@ function AutoTileMain() {
     let mainRatio = ps_variants[lastResizeInfo.variantIndex];
     let mainWidth = workArea.width * mainRatio;
     let minorWidth = workArea.width - mainWidth;
-    moveResizeWindowWithMargins(focusMetaWindow, workArea.x, workArea.y, mainWidth, workArea.height);
+    let mainX = 0;
+    let minorX = 0;
+    switch (tile_direction) {
+        case 'left':
+            mainX = 0;
+            minorX = mainWidth;
+            break;
+        case 'right':
+            mainX = minorWidth;
+            minorX = 0;
+            break;
+    }
+    moveResizeWindowWithMargins(focusMetaWindow, workArea.x + mainX, workArea.y, mainWidth, workArea.height);
     let winHeight = workArea.height / notFocusedwindows.length;
     let countWin = 0;
     log("AutoTileMain MonitorHeight: " + monitor.height + ":" + notFocusedwindows.length);
@@ -2190,7 +2207,7 @@ function AutoTileMain() {
         let metaWindow = notFocusedwindows[windowIdx].meta_window;
         let newOffset = workArea.y + (countWin * winHeight);
         reset_window(metaWindow);
-        moveResizeWindowWithMargins(metaWindow, workArea.x + mainWidth, newOffset, minorWidth, winHeight);
+        moveResizeWindowWithMargins(metaWindow, workArea.x + minorX, newOffset, minorWidth, winHeight);
         countWin++;
     }
     log("AutoTileMain done");
@@ -2225,7 +2242,7 @@ function autoTileNCols(cols) {
     }
     reset_window(window);
     let mind = window.get_monitor();
-    let work_area = getWorkAreaByMonitorIdx(mind);
+    getWorkAreaByMonitorIdx(mind);
     const monitors = activeMonitors();
     let monitor = monitors[mind];
     let workArea = getWorkAreaByMonitor(monitor);
@@ -2482,9 +2499,9 @@ class Grid {
         this.interceptHide = true;
         this.elementsDelegate.reset();
         let time = (gridSettings[SETTINGS_ANIMATION]) ? 0.3 : 0;
-        Main$1.uiGroup.set_child_above_sibling(this.actor, null);
-        Main$1.layoutManager.removeChrome(this.actor);
-        Main$1.layoutManager.addChrome(this.actor);
+        Main.uiGroup.set_child_above_sibling(this.actor, null);
+        Main.layoutManager.removeChrome(this.actor);
+        Main.layoutManager.addChrome(this.actor);
         //this.actor.y = 0 ;
         if (time > 0) {
             this.actor.scale_y = 0;

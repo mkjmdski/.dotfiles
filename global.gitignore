@@ -12,7 +12,7 @@
 #############
 .idea/
 *.iml
-
+.vscode
 
 # NPM #
 node_modules/

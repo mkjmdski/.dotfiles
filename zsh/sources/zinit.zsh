@@ -45,8 +45,6 @@ HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
 bindkey '^[OA' history-substring-search-up
 bindkey '^[OB' history-substring-search-down
 
-zinit light peterhurford/git-it-on.zsh
-
 zinit light denysdovhan/spaceship-prompt
 
 zinit light MichaelAquilina/zsh-you-should-use
