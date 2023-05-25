@@ -148,7 +148,7 @@ if [[ $commands[glab] ]]; then
         fi
         glab mr create --push --remove-source-branch --title="$title" --yes --no-editor --description="$body"
     }
-    glab-repo='glab repo view --web --branch $(git current-branch)'
+    alias glab-repo='glab repo view --web --branch $(git current-branch)'
 fi
 
 if [[ $commands[gh] ]]; then
