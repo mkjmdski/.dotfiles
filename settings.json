@@ -75,5 +75,6 @@
   "jupyter.interactiveWindow.codeLens.enableGotoCell": false,
   "jupyter.interactiveWindow.cellMarker.decorateCells": false,
   "redhat.telemetry.enabled": false,
-  "window.zoomLevel": 1
+  "window.zoomLevel": 1,
+  "explorer.confirmDragAndDrop": false
 }

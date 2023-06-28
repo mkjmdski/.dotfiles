@@ -70,7 +70,7 @@ if [[ $commands[tfenv] ]]; then
     tfenv_root=$(echo $(which tfenv) | rev | cut -d/ -f 3- | rev)
     tf_ver="${tfenv_root}/version"
     if [ -f "$tf_ver" ]; then
-        tf_ver="${tfenv_root}/versions/$(cat $tf_ver)/terraform"
+        tf_ver="${tfenv_root}/versions/$(/bin/cat $tf_ver)/terraform"
         complete -o nospace -C $tf_ver terraform
     elif [[ $commands[terraform] ]]; then
         complete -o nospace -C $(which terraform) terraform

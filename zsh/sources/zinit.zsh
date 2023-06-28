@@ -55,10 +55,10 @@ zinit light hlissner/zsh-autopair
 zinit light Tarrasch/zsh-bd
 zinit light brymck/print-alias
 
-if [ "$DOTFILES_CONF_jira" = "true" ]; then
-    zinit ice from"gh-r" as"program" mv"jira* -> jira"
-    zinit load go-jira/jira
-fi
+# if [ "$DOTFILES_CONF_jira" = "true" ]; then
+#     zinit ice from"gh-r" as"program" mv"jira* -> jira"
+#     zinit load go-jira/jira
+# fi
 
 zinit ice from"gh-r" as"program" mv"yaml2json* -> yaml2json"
 zinit load wakeful/yaml2json
@@ -73,8 +73,7 @@ if uname | grep -iq darwin; then
     zinit load MitMaro/git-interactive-rebase-tool
 fi
 
-zinit ice from"gh-r" as"program" mv"jq* -> jq"
-zinit load stedolan/jq
+zinit ice from"gh-r" as"program" bpick"jq-linux64" mv"jq-linux64 -> jq"; zinit load jqlang/jq
 
 function _ls-aliases() {
     alias ls="colorls --almost-all --git-status --group-directories-first"
@@ -89,9 +88,6 @@ zinit load zdharma-continuum/null
 
 zinit ice from"gh-r" as"program" mv"peco* -> peco" pick"peco/peco"
 zinit load peco/peco
-
-zinit ice from"gh-r" as"program" bpick"*.tar.gz" mv"gopass* -> gopass" pick"gopass/gopass"
-zinit load gopasspw/gopass
 
 zinit ice from"gh-r" as"program"
 zinit load dduan/tre
