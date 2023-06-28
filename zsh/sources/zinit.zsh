@@ -89,6 +89,7 @@ zinit load zdharma-continuum/null
 zinit ice from"gh-r" as"program" mv"peco* -> peco" pick"peco/peco"
 zinit load peco/peco
 
+# to fix
 zinit ice from"gh-r" as"program"
 zinit load dduan/tre
 
