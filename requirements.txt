@@ -1,8 +1,6 @@
-git+https://github.com/jeffkaufman/icdiff.git@release-2.0.4
+git+https://github.com/jeffkaufman/icdiff.git@release-2.0.6
 # https://github.com/drbild/json2yaml
-json2yaml==1.1.1
-# linters
-black==20.8b1
+json2yaml==1.2.0
 # https://github.com/docker/compose
 docker-compose==1.27.4
 # https://github.com/dmerejkowsky/tsrc
