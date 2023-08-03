@@ -73,7 +73,14 @@ if uname | grep -iq darwin; then
     zinit load MitMaro/git-interactive-rebase-tool
 fi
 
-zinit ice from"gh-r" as"program" bpick"jq-linux64" mv"jq-linux64 -> jq"; zinit load jqlang/jq
+if uname | grep -iq darwin; then
+    if ! [[ $commands[jq] ]]; then
+        brew install jq
+    fi
+    # zinit ice from"gh-r" as"program" ver"1.6"; zinit load jqlang/jq
+else
+    zinit ice from"gh-r" as"program" bpick"jq-linux64" mv"jq-linux64 -> jq"; zinit load jqlang/jq
+fi
 
 function _ls-aliases() {
     alias ls="colorls --almost-all --git-status --group-directories-first"
