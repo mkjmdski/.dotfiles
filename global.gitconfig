@@ -9,9 +9,6 @@
 	# editor = subl -n -w
 	# editor = atom --wait
 
-[gpg]
-	format = ssh
-
 #### COLORS DEFINITIONS
 [color]
 	ui = auto
