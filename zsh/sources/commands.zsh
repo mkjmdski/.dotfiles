@@ -78,7 +78,8 @@ if [[ $commands[tfenv] ]]; then
 fi
 
 if [[ $commands[terragrunt] ]]; then
-    alias tg="terragrunt"
+    glab_token=$(/bin/cat ~/.config/glab-cli/config.yml | yq -rc '.hosts["gitlab.com"].token')
+    alias tg="export GITLAB_USER=mkjmdski-covantis; export GITLAB_ACCESS_TOKEN=$glab_token; terragrunt"
 fi
 
 if [[ $commands[pydf] ]]; then
