@@ -77,6 +77,10 @@ if [[ $commands[tfenv] ]]; then
     fi
 fi
 
+if [[ $commands[terragrunt] ]]; then
+    alias tg="terragrunt"
+fi
+
 if [[ $commands[pydf] ]]; then
     alias df="pydf"
 fi
