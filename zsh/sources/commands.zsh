@@ -151,7 +151,7 @@ if [[ $commands[glab] ]]; then
         if [ -z "$title" ]; then
             title="$(git log -1 --pretty=%B)"
         fi
-        glab mr create --push --remove-source-branch --title="$title" --yes --no-editor --description="$body"
+        glab mr create --push --remove-source-branch --squash-before-merge --title="$title" --yes --no-editor --description="$body"
     }
     alias glab-repo='glab repo view --web --branch $(git current-branch)'
 fi
