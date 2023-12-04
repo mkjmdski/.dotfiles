@@ -122,6 +122,7 @@
 	c = "checkout -"
 	main = "!f() { git remote show origin | sed -n '/HEAD branch/s/.*: //p' ; }; f"
 	cmain = "!f() { git checkout $(git main) ; }; f"
+	rebase-main = "!f() { git cmain; git pull ; git c ; git rebase $(git main) ; }; f"
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
