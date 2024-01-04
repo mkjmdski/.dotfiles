@@ -298,7 +298,7 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
     )
     export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
     # https://krew.sigs.k8s.io/plugins/
-    for plugin in ctx ns tree view-secret cert-manager stern service-tree restart podevents node-shell modify-secret kurt ingress-nginx grep fuzzy debug-shell; do
+    for plugin in tree view-secret cert-manager stern service-tree restart podevents node-shell modify-secret kurt ingress-nginx grep fuzzy debug-shell; do
         kubectl krew install $plugin
     done
 

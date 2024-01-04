@@ -121,6 +121,13 @@ if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
     zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*.tar.gz" mv "kubectl-debug* -> kubectl-debug" pick "kubectl-debug/kubectl-debug"
     zinit load aylei/kubectl-debug
 
+    zinit ice from"gh-r" as"program" bpick"*$(uname | tr '[:upper:]' '[:lower:]')*"
+    zinit load sbstp/kubie
+
+    if [ -f ~/.zinit/plugins/sbstp---kubie/kubie-* ]; then
+        mv  ~/.zinit/plugins/sbstp---kubie/kubie-* ~/.zinit/plugins/sbstp---kubie/kubie
+    fi
+
     # zinit ice from"gh-r" as"program" mv"stern* -> stern"
     # zinit load wercker/stern
     if [ "$DOTFILES_CONF_azure" = "true" ]; then
