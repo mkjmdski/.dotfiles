@@ -6,6 +6,10 @@ source $sources/spaceship.zsh
 
 source ~/.zinit/bin/zinit.zsh
 
+while read -r file; do
+  . $file
+done< <(find $DOTFILES/zsh/bash -type f)
+
 # initialise completions with ZSH's compinit
 autoload -Uz compinit
 compinit
