@@ -113,7 +113,8 @@ zinit ice from"gh-r" as"program" mv"terragrunt* -> terragrunt"
 zinit load gruntwork-io/terragrunt
 
 if [ "$DOTFILES_CONF_kubectl" = "true" ]; then
-    zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
+    # loaded manually
+    # zinit snippet OMZ::plugins/kubectl/kubectl.plugin.zsh
 
     zinit ice from"gh-r" as"program" bpick"*$(uname)*.tar.gz" mv "kubecolor* -> kubecolor" pick "kubecolor/kubecolor"
     zinit load hidetatz/kubecolor

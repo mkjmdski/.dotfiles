@@ -37,23 +37,23 @@ setopt chase_links
 
 autoload -U add-zsh-hook
 
-load-nvmrc() {
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
+# load-nvmrc() {
+#   local node_version="$(nvm version)"
+#   local nvmrc_path="$(nvm_find_nvmrc)"
 
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(/bin/cat "${nvmrc_path}")")
+#   if [ -n "$nvmrc_path" ]; then
+#     local nvmrc_node_version=$(nvm version "$(/bin/cat "${nvmrc_path}")")
 
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
+#     if [ "$nvmrc_node_version" = "N/A" ]; then
+#       nvm install
+#     elif [ "$nvmrc_node_version" != "$node_version" ]; then
+#       nvm use
+#     fi
+#   elif [ "$node_version" != "$(nvm version default)" ]; then
+#     echo "Reverting to nvm default version"
+#     nvm use default
+#   fi
+# }
 
 # what to do when change location
 standard-chpwd() {
@@ -75,4 +75,4 @@ if [[ $commands[nvm] ]]; then
 fi
 
 add-zsh-hook chpwd standard-chpwd
-load-nvmrc
+# load-nvmrc

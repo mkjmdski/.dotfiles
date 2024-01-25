@@ -123,6 +123,7 @@
 	main = "!f() { git remote show origin | sed -n '/HEAD branch/s/.*: //p' ; }; f"
 	cmain = "!f() { git checkout $(git main) ; }; f"
 	rebase-main = "!f() { git cmain; git pull ; git c ; git rebase $(git main) ; }; f"
+	conflicted = "diff --name-only --diff-filter=U --relative"
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
