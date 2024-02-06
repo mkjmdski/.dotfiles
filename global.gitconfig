@@ -92,6 +92,8 @@
 #### ALIASES
 [alias]
 	p = "!f(){ git push || (git pull && git push) ; }; f"
+	pu = "!f() { if ! git is-clean; then git st; git pull; git pop; else git pull; fi; }; f"
+	hard = "!f() { git reset --hard origin/$(git current-branch) ; }; f"
 	a = add --all
 	m = commit --message
 	cam = "!f(){ git add -A && git commit -m \"$@\" ; }; f"
@@ -117,7 +119,7 @@
 	overwrite = !git a && git amend && git force
 	merge-rebase = "!f() { actual=$(git current-branch) && git checkout $1 && git rebase $actual && git force && git checkout $actual && git merge $1 ; }; f"
 	squash-branch = "!f() { git reset $(git merge-base ${2:-master} $(git current-branch)) ; git a ; git m ${1:-$(git log -1 --pretty=%B)} ; }; f"
-	is-clean = "!f() { if ! git diff --exit-code &> /dev/null || [[ ! -z "$(git ls-files --other --directory --exclude-standard)" ]]; then exit 1; fi ; }; f"
+	is-clean = "!f() { if ! git diff --exit-code --quiet || [[ ! -z "$(git ls-files --other --directory --exclude-standard)" ]]; then exit 1; fi ; }; f"
 	message = "log -1 --pretty=%B"
 	c = "checkout -"
 	main = "!f() { git remote show origin | sed -n '/HEAD branch/s/.*: //p' ; }; f"
