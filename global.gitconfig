@@ -108,6 +108,7 @@
 	st = stash save --include-untracked
 	pop = stash pop
 	push-u = "!f(){ git push -u ${1-origin} $(git current-branch) ; }; f"
+	push-mr = "!f(){ git push -u ${1-origin} $(git current-branch) -o merge_request.create ; }; f"
 	amend = commit --amend --no-edit
 	force = push --force-with-lease
 	log-line = log --pretty=format:\"%C(yellow)%h %ar %C(auto)%d %Creset %s, %Cblue%cn\" --graph --all

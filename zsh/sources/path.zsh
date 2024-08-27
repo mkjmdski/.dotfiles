@@ -55,6 +55,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
 
     if uname | grep -iq darwin; then
         export PATH="$(brew --prefix gnu-sed)/libexec/gnubin:$PATH"
+        export PATH="$(brew --prefix bash)/bin:$PATH"
     fi
 
     # Add custom bin files
