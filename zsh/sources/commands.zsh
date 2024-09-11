@@ -251,8 +251,13 @@ if [[ $commands[tfenv] ]]; then
 fi
 
 if [[ $commands[terragrunt] ]]; then
-    glab_token=$(/bin/cat ~/.config/glab-cli/config.yml | yq -rc '.hosts["gitlab.com"].token')
+    glab_token=$(/bin/cat ~/.config/glab-cli/config-2.yml | yq -r '.token')
+    # glab_token=$(/bin/cat ~/.config/glab-cli/config.yml | yq -r '.hosts["gitlab.com"].token')
     alias tg="export GITLAB_USER=mkjmdski-covantis; export GITLAB_ACCESS_TOKEN=$glab_token; terragrunt"
+fi
+
+if [[ $commands[code] ]]; then
+    alias code="code --disable-gpu"
 fi
 
 if [[ $commands[pydf] ]]; then

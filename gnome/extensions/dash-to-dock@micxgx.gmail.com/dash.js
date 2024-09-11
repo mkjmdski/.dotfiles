@@ -1,32 +1,42 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
+import {
+    Clutter,
+    Gio,
+    GLib,
+    GObject,
+    Shell,
+    St,
+} from './dependencies/gi.js';
 
-const AppDisplay = imports.ui.appDisplay;
-const AppFavorites = imports.ui.appFavorites;
-const Dash = imports.ui.dash;
-const DND = imports.ui.dnd;
-const IconGrid = imports.ui.iconGrid;
-const Main = imports.ui.main;
-const PopupMenu = imports.ui.popupMenu;
-const Util = imports.misc.util;
-const Workspace = imports.ui.workspace;
+import {
+    AppFavorites,
+    Dash,
+    DND,
+    Main,
+} from './dependencies/shell/ui.js';
 
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Docking = Me.imports.docking;
-const Utils = Me.imports.utils;
-const AppIcons = Me.imports.appIcons;
-const Locations = Me.imports.locations;
+import {
+    Util,
+} from './dependencies/shell/misc.js';
 
-const DASH_ANIMATION_TIME = Dash.DASH_ANIMATION_TIME;
-const DASH_ITEM_LABEL_HIDE_TIME = Dash.DASH_ITEM_LABEL_HIDE_TIME;
-const DASH_ITEM_HOVER_TIMEOUT = Dash.DASH_ITEM_HOVER_TIMEOUT;
+import {
+    AppIcons,
+    Docking,
+    Theming,
+    Utils,
+} from './imports.js';
+
+// module "Dash" does not export DASH_ANIMATION_TIME
+// so we just define it like it is defined in Dash;
+// taken from https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/dash.js
+const DASH_ANIMATION_TIME = 200;
+const DASH_VISIBILITY_TIMEOUT = 3;
+
+const Labels = Object.freeze({
+    SHOW_MOUNTS: Symbol('show-mounts'),
+    FIRST_LAST_CHILD_WORKAROUND: Symbol('first-last-child-workaround'),
+});
 
 /**
  * Extend DashItemContainer
@@ -34,124 +44,58 @@ const DASH_ITEM_HOVER_TIMEOUT = Dash.DASH_ITEM_HOVER_TIMEOUT;
  * - set label position based on dash orientation
  *
  */
-let MyDashItemContainer = GObject.registerClass(
-class DashToDock_MyDashItemContainer extends Dash.DashItemContainer {
+const DockDashItemContainer = GObject.registerClass(
+class DockDashItemContainer extends Dash.DashItemContainer {
+    _init(position) {
+        super._init();
+
+        this.label?.add_style_class_name(Theming.PositionStyleClass[position]);
+        if (Docking.DockManager.settings.customThemeShrink)
+            this.label?.add_style_class_name('shrink');
+    }
 
     showLabel() {
         return AppIcons.itemShowLabel.call(this);
     }
+
+    // we override the method show taken from:
+    // https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/dash.js
+    // in order to apply a little modification at the end of the animation
+    // which makes sure that the icon background is not blurry
+    show(animate) {
+        if (this.child == null)
+            return;
+
+        this.ease({
+            scale_x: 1,
+            scale_y: 1,
+            opacity: 255,
+            duration: animate ? DASH_ANIMATION_TIME : 0,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => {
+                // when the animation is ended, we simulate
+                // a hover to gain back focus and unblur the
+                // background
+                this.set_hover(true);
+            },
+        });
+    }
 });
 
-/**
- * This class is a fork of the upstream DashActor class (ui.dash.js)
- *
- * Summary of changes:
- * - modified chldBox calculations for when 'show-apps-at-top' option is checked
- * - handle horizontal dash
- */
-var MyDashActor = GObject.registerClass(
-class DashToDock_MyDashActor extends St.Widget {
-
-    _init() {
-        // a prefix is required to avoid conflicting with the parent class variable
-        this._rtl = (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL);
-
-        this._position = Utils.getPosition();
-        this._isHorizontal = ((this._position == St.Side.TOP) ||
-                               (this._position == St.Side.BOTTOM));
-
-        let layout = new Clutter.BoxLayout({
-            orientation: this._isHorizontal ? Clutter.Orientation.HORIZONTAL : Clutter.Orientation.VERTICAL
-        });
-
-        super._init({
-            name: 'dash',
-            layout_manager: layout,
-            clip_to_allocation: true,
-            ...(this._isHorizontal ? {
-                x_align: Clutter.ActorAlign.CENTER,
-            } : {
-                y_align: Clutter.ActorAlign.CENTER,
-            })
-        });
-
-        // Since we are usually visible but not usually changing, make sure
-        // most repaint requests don't actually require us to repaint anything.
-        // This saves significant CPU when repainting the screen.
-        this.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
-    }
-
-    vfunc_allocate(box, flags) {
-        let contentBox = this.get_theme_node().get_content_box(box);
-        let availWidth = contentBox.x2 - contentBox.x1;
-        let availHeight = contentBox.y2 - contentBox.y1;
-
-        Docking.DockManager.useNewAllocation ?
-            this.set_allocation(box) : this.set_allocation(box, flags);
-
-        let [appIcons, showAppsButton] = this.get_children();
-        let [, showAppsNatHeight] = showAppsButton.get_preferred_height(availWidth);
-        let [, showAppsNatWidth] = showAppsButton.get_preferred_width(availHeight);
-
-        let offset_x = this._isHorizontal?showAppsNatWidth:0;
-        let offset_y = this._isHorizontal?0:showAppsNatHeight;
-
-        let childBox = new Clutter.ActorBox();
-        let settings = Docking.DockManager.settings;
-        if ((settings.get_boolean('show-apps-at-top') && !this._isHorizontal)
-            || (settings.get_boolean('show-apps-at-top') && !this._rtl)
-            || (!settings.get_boolean('show-apps-at-top') && this._isHorizontal && this._rtl)) {
-            childBox.x1 = contentBox.x1 + offset_x;
-            childBox.y1 = contentBox.y1 + offset_y;
-            childBox.x2 = contentBox.x2;
-            childBox.y2 = contentBox.y2;
-            Docking.DockManager.useNewAllocation ?
-                appIcons.allocate(childBox) : appIcons.allocate(childBox, flags);
-
-            childBox.y1 = contentBox.y1;
-            childBox.x1 = contentBox.x1;
-            childBox.x2 = contentBox.x1 + showAppsNatWidth;
-            childBox.y2 = contentBox.y1 + showAppsNatHeight;
-            Docking.DockManager.useNewAllocation ?
-                showAppsButton.allocate(childBox) : showAppsButton.allocate(childBox, flags);
-        } else {
-            childBox.x1 = contentBox.x1;
-            childBox.y1 = contentBox.y1;
-            childBox.x2 = contentBox.x2 - offset_x;
-            childBox.y2 = contentBox.y2 - offset_y;
-            Docking.DockManager.useNewAllocation ?
-                appIcons.allocate(childBox) : appIcons.allocate(childBox, flags);
-
-            childBox.x2 = contentBox.x2;
-            childBox.y2 = contentBox.y2;
-            childBox.x1 = contentBox.x2 - showAppsNatWidth;
-            childBox.y1 = contentBox.y2 - showAppsNatHeight;
-            Docking.DockManager.useNewAllocation ?
-                showAppsButton.allocate(childBox) : showAppsButton.allocate(childBox, flags);
+const DockDashIconsVerticalLayout = GObject.registerClass(
+    class DockDashIconsVerticalLayout extends Clutter.BoxLayout {
+        _init() {
+            super._init({
+                orientation: Clutter.Orientation.VERTICAL,
+            });
         }
-    }
 
-    vfunc_get_preferred_width(forHeight) {
-        // We want to request the natural width of all our children
-        // as our natural width, so we chain up to StWidget (which
-        // then calls BoxLayout), but we only request the showApps
-        // button as the minimum size
+        vfunc_get_preferred_height(container, forWidth) {
+            const [natHeight] = super.vfunc_get_preferred_height(container, forWidth);
+            return [natHeight, 0];
+        }
+    });
 
-        let [, natWidth] = super.vfunc_get_preferred_width(forHeight);
-
-        let themeNode = this.get_theme_node();
-        let adjustedForHeight = themeNode.adjust_for_height(forHeight);
-        let [, showAppsButton] = this.get_children();
-        let [minWidth] = showAppsButton.get_preferred_width(adjustedForHeight);
-        [minWidth] = themeNode.adjust_preferred_width(minWidth, natWidth);
-
-        return [minWidth, natWidth];
-    }
-
-    vfunc_get_preferred_height(forWidth) {
-        return Dash.DashActor.prototype.vfunc_get_preferred_height.call(this, forWidth);
-    }
-});
 
 const baseIconSizes = [16, 22, 24, 32, 48, 64, 96, 128];
 
@@ -166,88 +110,137 @@ const baseIconSizes = [16, 22, 24, 32, 48, 64, 96, 128];
  * - hide showApps label when the custom menu is shown.
  * - add scrollview
  *   ensure actor is visible on keyfocus inseid the scrollview
- * - add 128px icon size, might be usefull for hidpi display
+ * - add 128px icon size, might be useful for hidpi display
  * - sync minimization application target position.
  * - keep running apps ordered.
  */
-var MyDash = GObject.registerClass({
+export const DockDash = GObject.registerClass({
+    Properties: {
+        'requires-visibility': GObject.ParamSpec.boolean(
+            'requires-visibility', 'requires-visibility', 'requires-visibility',
+            GObject.ParamFlags.READWRITE,
+            false),
+    },
     Signals: {
+        'menu-opened': {},
         'menu-closed': {},
         'icon-size-changed': {},
-    }
-}, class DashToDock_MyDash extends St.Bin {
-
-    _init(remoteModel, monitorIndex) {
+    },
+}, class DockDash extends St.Widget {
+    _init(monitorIndex) {
         // Initialize icon variables and size
+        super._init({
+            name: 'dash',
+            offscreen_redirect: Clutter.OffscreenRedirect.ALWAYS,
+            layout_manager: new Clutter.BinLayout(),
+        });
+
+        this._maxWidth = -1;
         this._maxHeight = -1;
-        this.iconSize = Docking.DockManager.settings.get_int('dash-max-icon-size');
+        this.iconSize = Docking.DockManager.settings.dashMaxIconSize;
         this._availableIconSizes = baseIconSizes;
         this._shownInitially = false;
         this._initializeIconSize(this.iconSize);
+        this._signalsHandler = new Utils.GlobalSignalsHandler(this);
 
-        this._remoteModel = remoteModel;
+        this._separator = null;
+
         this._monitorIndex = monitorIndex;
         this._position = Utils.getPosition();
-        this._isHorizontal = ((this._position == St.Side.TOP) ||
-                               (this._position == St.Side.BOTTOM));
-        this._signalsHandler = new Utils.GlobalSignalsHandler();
+        this._isHorizontal = (this._position === St.Side.TOP) ||
+                               (this._position === St.Side.BOTTOM);
 
         this._dragPlaceholder = null;
         this._dragPlaceholderPos = -1;
         this._animatingPlaceholdersCount = 0;
         this._showLabelTimeoutId = 0;
         this._resetHoverTimeoutId = 0;
-        this._ensureAppIconVisibilityTimeoutId = 0;
         this._labelShowing = false;
 
-        this._container = new MyDashActor();
+        this._dashContainer = new St.BoxLayout({
+            name: 'dashtodockDashContainer',
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            vertical: !this._isHorizontal,
+            y_expand: this._isHorizontal,
+            x_expand: !this._isHorizontal,
+        });
+
         this._scrollView = new St.ScrollView({
             name: 'dashtodockDashScrollview',
-            hscrollbar_policy: St.PolicyType.NEVER,
-            vscrollbar_policy: St.PolicyType.NEVER,
-            enable_mouse_scrolling: false
+            hscrollbar_policy: this._isHorizontal ? St.PolicyType.EXTERNAL : St.PolicyType.NEVER,
+            vscrollbar_policy: this._isHorizontal ?  St.PolicyType.NEVER : St.PolicyType.EXTERNAL,
+            x_expand: this._isHorizontal,
+            y_expand: !this._isHorizontal,
+            enable_mouse_scrolling: false,
         });
 
         this._scrollView.connect('scroll-event', this._onScrollEvent.bind(this));
 
-        let rtl = Clutter.get_default_text_direction() == Clutter.TextDirection.RTL;
+        this._boxContainer = new St.BoxLayout({
+            name: 'dashtodockBoxContainer',
+            x_align: Clutter.ActorAlign.FILL,
+            y_align: Clutter.ActorAlign.FILL,
+            vertical: !this._isHorizontal,
+        });
+        this._boxContainer.add_style_class_name(Theming.PositionStyleClass[this._position]);
+
+        const rtl = Clutter.get_default_text_direction() === Clutter.TextDirection.RTL;
         this._box = new St.BoxLayout({
             vertical: !this._isHorizontal,
             clip_to_allocation: false,
+            ...!this._isHorizontal ? {layout_manager: new DockDashIconsVerticalLayout()} : {},
             x_align: rtl ? Clutter.ActorAlign.END : Clutter.ActorAlign.START,
-            y_align: Clutter.ActorAlign.START
+            y_align: this._isHorizontal ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START,
+            y_expand: !this._isHorizontal,
+            x_expand: this._isHorizontal,
         });
         this._box._delegate = this;
-        this._container.add_actor(this._scrollView);
-        this._scrollView.add_actor(this._box);
+        this._boxContainer.add_child(this._box);
+        Utils.addActor(this._scrollView, this._boxContainer);
+        this._dashContainer.add_child(this._scrollView);
 
-        // Create a wrapper around the real showAppsIcon in order to add a popupMenu.
-        this._showAppsIcon = new AppIcons.MyShowAppsIcon();
-        this._showAppsIcon.show();
+        this._showAppsIcon = new AppIcons.DockShowAppsIcon(this._position);
+        this._showAppsIcon.show(false);
         this._showAppsIcon.icon.setIconSize(this.iconSize);
+        this._showAppsIcon.x_expand = false;
+        this._showAppsIcon.y_expand = false;
+        this.showAppsButton.connect('notify::hover', a => {
+            if (this._showAppsIcon.get_parent() === this._boxContainer)
+                this._ensureItemVisibility(a);
+        });
+        if (!this._isHorizontal)
+            this._showAppsIcon.y_align = Clutter.ActorAlign.START;
         this._hookUpLabel(this._showAppsIcon);
         this._showAppsIcon.connect('menu-state-changed', (_icon, opened) => {
             this._itemMenuStateChanged(this._showAppsIcon, opened);
         });
+        this.updateShowAppsButton();
 
-        this._container.add_actor(this._showAppsIcon);
-
-        super._init({
-            child: this._container,
-            x_align: Clutter.ActorAlign.START,
-            y_align: Clutter.ActorAlign.START,
+        this._background = new St.Widget({
+            style_class: 'dash-background',
+            y_expand: this._isHorizontal,
+            x_expand: !this._isHorizontal,
         });
 
-        // Update minimization animation target position on allocation of the
-        // container and on scrollview change.
-        this._box.connect('notify::allocation', this._updateAppsIconGeometry.bind(this));
-        let scrollViewAdjustment = this._isHorizontal ? this._scrollView.hscroll.adjustment : this._scrollView.vscroll.adjustment;
-        scrollViewAdjustment.connect('notify::value', this._updateAppsIconGeometry.bind(this));
+        const sizerBox = new Clutter.Actor();
+        sizerBox.add_constraint(new Clutter.BindConstraint({
+            source: this._isHorizontal ? this._showAppsIcon.icon : this._dashContainer,
+            coordinate: Clutter.BindCoordinate.HEIGHT,
+        }));
+        sizerBox.add_constraint(new Clutter.BindConstraint({
+            source: this._isHorizontal ? this._dashContainer : this._showAppsIcon.icon,
+            coordinate: Clutter.BindCoordinate.WIDTH,
+        }));
+        this._background.add_child(sizerBox);
+
+        this.add_child(this._background);
+        this.add_child(this._dashContainer);
 
         this._workId = Main.initializeDeferredWork(this._box, this._redisplay.bind(this));
 
         this._shellSettings = new Gio.Settings({
-            schema_id: 'org.gnome.shell'
+            schema_id: 'org.gnome.shell',
         });
 
         this._appSystem = Shell.AppSystem.get_default();
@@ -260,139 +253,146 @@ var MyDash = GObject.registerClass({
             () => {
                 AppFavorites.getAppFavorites().reload();
                 this._queueRedisplay();
-            }
+            },
         ], [
             AppFavorites.getAppFavorites(),
             'changed',
-            this._queueRedisplay.bind(this)
+            this._queueRedisplay.bind(this),
         ], [
             this._appSystem,
             'app-state-changed',
-            this._queueRedisplay.bind(this)
+            this._queueRedisplay.bind(this),
         ], [
             Main.overview,
             'item-drag-begin',
-            this._onDragBegin.bind(this)
+            this._onItemDragBegin.bind(this),
         ], [
             Main.overview,
             'item-drag-end',
-            this._onDragEnd.bind(this)
+            this._onItemDragEnd.bind(this),
         ], [
             Main.overview,
             'item-drag-cancelled',
-            this._onDragCancelled.bind(this)
+            this._onItemDragCancelled.bind(this),
+        ], [
+            Main.overview,
+            'window-drag-begin',
+            this._onWindowDragBegin.bind(this),
+        ], [
+            Main.overview,
+            'window-drag-cancelled',
+            this._onWindowDragEnd.bind(this),
+        ], [
+            Main.overview,
+            'window-drag-end',
+            this._onWindowDragEnd.bind(this),
         ]);
 
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
     vfunc_get_preferred_height(forWidth) {
-        let [minHeight, natHeight] = super.vfunc_get_preferred_height.call(this, forWidth);
+        const [minHeight, natHeight] = super.vfunc_get_preferred_height.call(this, forWidth);
         if (!this._isHorizontal && this._maxHeight !== -1 && natHeight > this._maxHeight)
-            return [minHeight, this._maxHeight]
+            return [minHeight, this._maxHeight];
         else
-            return [minHeight, natHeight]
+            return [minHeight, natHeight];
     }
 
     vfunc_get_preferred_width(forHeight) {
-        let [minWidth, natWidth] = super.vfunc_get_preferred_width.call(this, forHeight);
-        if (this._isHorizontal && this._maxHeight !== -1 && natWidth > this._maxHeight)
-            return [minWidth, this._maxHeight]
+        const [minWidth, natWidth] = super.vfunc_get_preferred_width.call(this, forHeight);
+        if (this._isHorizontal && this._maxWidth !== -1 && natWidth > this._maxWidth)
+            return [minWidth, this._maxWidth];
         else
-            return [minWidth, natWidth]
+            return [minWidth, natWidth];
+    }
+
+    get _container() {
+        return this._dashContainer;
     }
 
     _onDestroy() {
         this.iconAnimator.destroy();
-        this._signalsHandler.destroy();
+
+        if (this._requiresVisibilityTimeout) {
+            GLib.source_remove(this._requiresVisibilityTimeout);
+            delete this._requiresVisibilityTimeout;
+        }
+
+        if (this._ensureActorVisibilityTimeoutId) {
+            GLib.source_remove(this._ensureActorVisibilityTimeoutId);
+            delete this._ensureActorVisibilityTimeoutId;
+        }
     }
 
-    _onDragBegin() {
-        return Dash.Dash.prototype._onDragBegin.call(this, ...arguments);
+
+    _onItemDragBegin(...args) {
+        return Dash.Dash.prototype._onItemDragBegin.call(this, ...args);
     }
 
-    _onDragCancelled() {
-        return Dash.Dash.prototype._onDragCancelled.call(this, ...arguments);
+    _onItemDragCancelled(...args) {
+        return Dash.Dash.prototype._onItemDragCancelled.call(this, ...args);
     }
 
-    _onDragEnd() {
-        return Dash.Dash.prototype._onDragEnd.call(this, ...arguments);
+    _onItemDragEnd(...args) {
+        return Dash.Dash.prototype._onItemDragEnd.call(this, ...args);
     }
 
-    _endDrag() {
-        return Dash.Dash.prototype._endDrag.call(this, ...arguments);
+    _endItemDrag(...args) {
+        return Dash.Dash.prototype._endItemDrag.call(this, ...args);
     }
 
-    _onDragMotion() {
-        return Dash.Dash.prototype._onDragMotion.call(this, ...arguments);
+    _onItemDragMotion(...args) {
+        return Dash.Dash.prototype._onItemDragMotion.call(this, ...args);
     }
 
-    _appIdListToHash() {
-        return Dash.Dash.prototype._appIdListToHash.call(this, ...arguments);
+    _appIdListToHash(...args) {
+        return Dash.Dash.prototype._appIdListToHash.call(this, ...args);
     }
 
-    _queueRedisplay() {
-        return Dash.Dash.prototype._queueRedisplay.call(this, ...arguments);
+    _queueRedisplay(...args) {
+        return Dash.Dash.prototype._queueRedisplay.call(this, ...args);
     }
 
-    _hookUpLabel() {
-        return Dash.Dash.prototype._hookUpLabel.call(this, ...arguments);
+    _hookUpLabel(...args) {
+        return Dash.Dash.prototype._hookUpLabel.call(this, ...args);
     }
 
-    _syncLabel() {
-        return Dash.Dash.prototype._syncLabel.call(this, ...arguments);
+    _syncLabel(...args) {
+        return Dash.Dash.prototype._syncLabel.call(this, ...args);
     }
 
-    _clearDragPlaceholder() {
-        return Dash.Dash.prototype._clearDragPlaceholder.call(this, ...arguments);
+    _clearDragPlaceholder(...args) {
+        return Dash.Dash.prototype._clearDragPlaceholder.call(this, ...args);
     }
 
-    _clearEmptyDropTarget() {
-        return Dash.Dash.prototype._clearEmptyDropTarget.call(this, ...arguments);
-    }
-
-    setMaxHeight(maxHeight) {
-        if (this._maxHeight != maxHeight)
-            this._queueRedisplay();
-        this._maxHeight = maxHeight;
+    _clearEmptyDropTarget(...args) {
+        return Dash.Dash.prototype._clearEmptyDropTarget.call(this, ...args);
     }
 
     handleDragOver(source, actor, x, y, time) {
         let ret;
-        if (!this._isHorizontal) {
-            Object.defineProperty(this._box, 'height', {
-                configurable: true,
+        if (this._isHorizontal) {
+            ret = Dash.Dash.prototype.handleDragOver.call(this, source, actor, x, y, time);
+
+            if (ret === DND.DragMotionResult.CONTINUE)
+                return ret;
+        } else {
+            const propertyInjections = new Utils.PropertyInjectionsHandler();
+            propertyInjections.add(this._box, 'width', {
                 get: () => this._box.get_children().reduce((a, c) => a + c.height, 0),
             });
 
-            ret = Dash.Dash.prototype.handleDragOver.call(this, source, actor, x, y, time);
-
-            delete this._box.height;
-
-            if (ret == DND.DragMotionResult.CONTINUE)
-                return ret;
-        } else {
-            Object.defineProperty(this._box, 'height', {
-                configurable: true,
-                get: () => this._box.get_children().reduce((a, c) => a + c.width, 0),
-            });
-
-            let replacedPlaceholderHeight = false;
             if (this._dragPlaceholder) {
-                replacedPlaceholderHeight = true;
-                Object.defineProperty(this._dragPlaceholder, 'height', {
-                    configurable: true,
-                    get: () => this._dragPlaceholder.width,
+                propertyInjections.add(this._dragPlaceholder, 'width', {
+                    get: () => this._dragPlaceholder.height,
                 });
             }
 
             ret = Dash.Dash.prototype.handleDragOver.call(this, source, actor, y, x, time);
+            propertyInjections.destroy();
 
-            delete this._box.height;
-            if (replacedPlaceholderHeight && this._dragPlaceholder)
-                delete this._dragPlaceholder.height;
-
-            if (ret == DND.DragMotionResult.CONTINUE)
+            if (ret === DND.DragMotionResult.CONTINUE)
                 return ret;
 
             if (this._dragPlaceholder) {
@@ -400,84 +400,133 @@ var MyDash = GObject.registerClass({
                 this._dragPlaceholder.child.set_height(this.iconSize);
 
                 let pos = this._dragPlaceholderPos;
-                if (this._isHorizontal && (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL))
+                if (this._isHorizontal &&
+                    Clutter.get_default_text_direction() === Clutter.TextDirection.RTL)
                     pos = this._box.get_children() - 1 - pos;
 
-                if (pos != this._dragPlaceholderPos) {
+                if (pos !== this._dragPlaceholderPos) {
                     this._dragPlaceholderPos = pos;
                     this._box.set_child_at_index(this._dragPlaceholder,
-                        this._dragPlaceholderPos)
+                        this._dragPlaceholderPos);
                 }
             }
         }
 
         if (this._dragPlaceholder) {
-            // Ensure the next and previous icon are visible when moving the placeholder
-            // (I assume there's room for both of them)
-            if (this._dragPlaceholderPos > 0)
+            // Ensure the next and previous icon are visible when moving the
+            // placeholder (we're assuming there's room for both of them)
+            const children = this._box.get_children();
+            if (this._dragPlaceholderPos > 0) {
                 ensureActorVisibleInScrollView(this._scrollView,
-                    this._box.get_children()[this._dragPlaceholderPos - 1]);
+                    children[this._dragPlaceholderPos - 1]);
+            }
 
-            if (this._dragPlaceholderPos < this._box.get_children().length - 1)
+            if (this._dragPlaceholderPos >= -1 &&
+                this._dragPlaceholderPos < children.length - 1) {
                 ensureActorVisibleInScrollView(this._scrollView,
-                    this._box.get_children()[this._dragPlaceholderPos + 1]);
+                    children[this._dragPlaceholderPos + 1]);
+            }
         }
 
         return ret;
     }
 
-    acceptDrop() {
-        return Dash.Dash.prototype.acceptDrop.call(this, ...arguments);
+    acceptDrop(...args) {
+        return Dash.Dash.prototype.acceptDrop.call(this, ...args);
+    }
+
+    _onWindowDragBegin(...args) {
+        return Dash.Dash.prototype._onWindowDragBegin.call(this, ...args);
+    }
+
+    _onWindowDragEnd(...args) {
+        return Dash.Dash.prototype._onWindowDragEnd.call(this, ...args);
     }
 
     _onScrollEvent(actor, event) {
         // If scroll is not used because the icon is resized, let the scroll event propagate.
-        if (!Docking.DockManager.settings.get_boolean('icon-size-fixed'))
+        if (!Docking.DockManager.settings.iconSizeFixed)
             return Clutter.EVENT_PROPAGATE;
 
         // reset timeout to avid conflicts with the mousehover event
-        if (this._ensureAppIconVisibilityTimeoutId > 0) {
-            GLib.source_remove(this._ensureAppIconVisibilityTimeoutId);
-            this._ensureAppIconVisibilityTimeoutId = 0;
-        }
+        this._ensureItemVisibility(null);
 
         // Skip to avoid double events mouse
-        if (event.is_pointer_emulated())
+        // TODO: Horizontal events are emulated, potentially due to a conflict
+        // with the workspace switching gesture.
+        if (!this._isHorizontal && event.is_pointer_emulated())
             return Clutter.EVENT_STOP;
 
-        let adjustment, delta;
+
+        let adjustment, delta = 0;
 
         if (this._isHorizontal)
             adjustment = this._scrollView.get_hscroll_bar().get_adjustment();
         else
             adjustment = this._scrollView.get_vscroll_bar().get_adjustment();
 
-        let increment = adjustment.step_increment;
+        const increment = adjustment.step_increment;
 
-        switch (event.get_scroll_direction()) {
-        case Clutter.ScrollDirection.UP:
-            delta = -increment;
-            break;
-        case Clutter.ScrollDirection.DOWN:
-            delta = +increment;
-            break;
-        case Clutter.ScrollDirection.SMOOTH:
-            let [dx, dy] = event.get_scroll_delta();
-            delta = dy * increment;
-            // Also consider horizontal component, for instance touchpad
-            if (this._isHorizontal)
-                delta += dx * increment;
-            break;
+        if (this._isHorizontal) {
+            switch (event.get_scroll_direction()) {
+            case Clutter.ScrollDirection.LEFT:
+                delta = -increment;
+                break;
+            case Clutter.ScrollDirection.RIGHT:
+                delta = Number(increment);
+                break;
+            case Clutter.ScrollDirection.SMOOTH: {
+                const [dx] = event.get_scroll_delta();
+                delta = dx * increment;
+                break;
+            }
+            }
+        } else {
+            switch (event.get_scroll_direction()) {
+            case Clutter.ScrollDirection.UP:
+                delta = -increment;
+                break;
+            case Clutter.ScrollDirection.DOWN:
+                delta = Number(increment);
+                break;
+            case Clutter.ScrollDirection.SMOOTH: {
+                const [, dy] = event.get_scroll_delta();
+                delta = dy * increment;
+                break;
+            }
+            }
         }
 
-        adjustment.set_value(adjustment.get_value() + delta);
+        const value = adjustment.get_value();
+
+        // TODO: Remove this if possible.
+        if (Number.isNaN(value))
+            adjustment.set_value(delta);
+        else
+            adjustment.set_value(value + delta);
 
         return Clutter.EVENT_STOP;
     }
 
+    _ensureItemVisibility(actor) {
+        if (actor?.hover) {
+            const destroyId =
+                actor.connect('destroy', () => this._ensureItemVisibility(null));
+            this._ensureActorVisibilityTimeoutId = GLib.timeout_add(
+                GLib.PRIORITY_DEFAULT, 100, () => {
+                    actor.disconnect(destroyId);
+                    ensureActorVisibleInScrollView(this._scrollView, actor);
+                    this._ensureActorVisibilityTimeoutId = 0;
+                    return GLib.SOURCE_REMOVE;
+                });
+        } else if (this._ensureActorVisibilityTimeoutId) {
+            GLib.source_remove(this._ensureActorVisibilityTimeoutId);
+            this._ensureActorVisibilityTimeoutId = 0;
+        }
+    }
+
     _createAppItem(app) {
-        let appIcon = new AppIcons.MyAppIcon(this._remoteModel, app,
-            this._monitorIndex, this.iconAnimator);
+        const appIcon = new AppIcons.makeAppIcon(app, this._monitorIndex, this.iconAnimator);
 
         if (appIcon._draggable) {
             appIcon._draggable.connect('drag-begin', () => {
@@ -488,42 +537,40 @@ var MyDash = GObject.registerClass({
             });
         }
 
-        appIcon.connect('menu-state-changed', (appIcon, opened) => {
+        appIcon.connect('menu-state-changed', (_, opened) => {
             this._itemMenuStateChanged(item, opened);
         });
 
-        let item = new MyDashItemContainer();
+        const item = new DockDashItemContainer(this._position);
         item.setChild(appIcon);
 
-        appIcon.connect('notify::hover', () => {
-            if (appIcon.hover) {
-                this._ensureAppIconVisibilityTimeoutId = GLib.timeout_add(
-                    GLib.PRIORITY_DEFAULT, 100, () => {
-                    ensureActorVisibleInScrollView(this._scrollView, appIcon);
-                    this._ensureAppIconVisibilityTimeoutId = 0;
-                    return GLib.SOURCE_REMOVE;
-                });
-            }
-            else {
-                if (this._ensureAppIconVisibilityTimeoutId > 0) {
-                    GLib.source_remove(this._ensureAppIconVisibilityTimeoutId);
-                    this._ensureAppIconVisibilityTimeoutId = 0;
-                }
-            }
-        });
-
-        appIcon.connect('clicked', (actor) => {
+        appIcon.connect('notify::hover', a => this._ensureItemVisibility(a));
+        appIcon.connect('clicked', actor => {
             ensureActorVisibleInScrollView(this._scrollView, actor);
         });
 
-        appIcon.connect('key-focus-in', (actor) => {
-            let [x_shift, y_shift] = ensureActorVisibleInScrollView(this._scrollView, actor);
+        appIcon.connect('key-focus-in', actor => {
+            const [xShift, yShift] = ensureActorVisibleInScrollView(this._scrollView, actor);
 
             // This signal is triggered also by mouse click. The popup menu is opened at the original
             // coordinates. Thus correct for the shift which is going to be applied to the scrollview.
             if (appIcon._menu) {
-                appIcon._menu._boxPointer.xOffset = -x_shift;
-                appIcon._menu._boxPointer.yOffset = -y_shift;
+                appIcon._menu._boxPointer.xOffset = -xShift;
+                appIcon._menu._boxPointer.yOffset = -yShift;
+            }
+        });
+
+        appIcon.connect('notify::focused', () => {
+            const {settings} = Docking.DockManager;
+            if (appIcon.focused && settings.scrollToFocusedApplication)
+                ensureActorVisibleInScrollView(this._scrollView, item);
+        });
+
+        appIcon.connect('notify::urgent', () => {
+            if (appIcon.urgent) {
+                ensureActorVisibleInScrollView(this._scrollView, item);
+                if (Docking.DockManager.settings.showDockUrgentNotify)
+                    this._requireVisibility();
             }
         });
 
@@ -535,7 +582,23 @@ var MyDash = GObject.registerClass({
         appIcon.icon.setIconSize(this.iconSize);
         this._hookUpLabel(item, appIcon);
 
+        item.connect('notify::position', () => appIcon.updateIconGeometry());
+        item.connect('notify::size', () => appIcon.updateIconGeometry());
+
         return item;
+    }
+
+    _requireVisibility() {
+        this.requiresVisibility = true;
+
+        if (this._requiresVisibilityTimeout)
+            GLib.source_remove(this._requiresVisibilityTimeout);
+
+        this._requiresVisibilityTimeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+            DASH_VISIBILITY_TIMEOUT, () => {
+                this._requiresVisibilityTimeout = 0;
+                this.requiresVisibility = false;
+            });
     }
 
     /**
@@ -546,30 +609,25 @@ var MyDash = GObject.registerClass({
         // icons (i.e. ignoring drag placeholders) and which are not
         // animating out (which means they will be destroyed at the end of
         // the animation)
-        let iconChildren = this._box.get_children().filter(function(actor) {
+        const iconChildren = this._box.get_children().filter(actor => {
             return actor.child &&
                    !!actor.child.icon &&
                    !actor.animatingOut;
         });
 
-        let appIcons = iconChildren.map(function(actor) {
+        const appIcons = iconChildren.map(actor => {
             return actor.child;
         });
 
-      return appIcons;
-    }
-
-    _updateAppsIconGeometry() {
-        let appIcons = this.getAppIcons();
-        appIcons.forEach(function(icon) {
-            icon.updateIconGeometry();
-        });
+        return appIcons;
     }
 
     _itemMenuStateChanged(item, opened) {
         Dash.Dash.prototype._itemMenuStateChanged.call(this, item, opened);
 
-        if (!opened) {
+        if (opened) {
+            this.emit('menu-opened');
+        } else {
             // I want to listen from outside when a menu is closed. I used to
             // add a custom signal to the appIcon, since gnome 3.8 the signal
             // calling this callback was added upstream.
@@ -582,15 +640,16 @@ var MyDash = GObject.registerClass({
         // icons (i.e. ignoring drag placeholders) and which are not
         // animating out (which means they will be destroyed at the end of
         // the animation)
-        let iconChildren = this._box.get_children().filter(function(actor) {
+        const iconChildren = this._box.get_children().filter(actor => {
             return actor.child &&
-                   !!actor.child.icon &&
+                   actor.child._delegate &&
+                   actor.child._delegate.icon &&
                    !actor.animatingOut;
         });
 
         iconChildren.push(this._showAppsIcon);
 
-        if (this._maxHeight == -1)
+        if (this._maxWidth === -1 && this._maxHeight === -1)
             return;
 
         // Check if the container is present in the stage. This avoids critical
@@ -598,174 +657,202 @@ var MyDash = GObject.registerClass({
         if (!this._container.get_stage())
             return;
 
-        let themeNode = this._container.get_theme_node();
-        let maxAllocation = new Clutter.ActorBox({
+        const themeNode = this._dashContainer.get_theme_node();
+        const maxAllocation = new Clutter.ActorBox({
             x1: 0,
             y1: 0,
-            x2: this._isHorizontal ? this._maxHeight : 42 /* whatever */,
-            y2: this._isHorizontal ? 42 : this._maxHeight
+            x2: this._isHorizontal ? this._maxWidth : 42 /* whatever */,
+            y2: this._isHorizontal ? 42 : this._maxHeight,
         });
-        let maxContent = themeNode.get_content_box(maxAllocation);
-        let availHeight;
+        const maxContent = themeNode.get_content_box(maxAllocation);
+        let availSpace;
         if (this._isHorizontal)
-            availHeight = maxContent.x2 - maxContent.x1;
+            availSpace = maxContent.get_width();
         else
-            availHeight = maxContent.y2 - maxContent.y1;
-        let spacing = themeNode.get_length('spacing');
+            availSpace = maxContent.get_height();
 
-        let firstButton = iconChildren[0].child;
-        let firstIcon = firstButton.icon;
+        const spacing = themeNode.get_length('spacing');
+
+        const [{child: firstButton}] = iconChildren;
+        const {child: firstIcon} = firstButton?.icon ?? {child: null};
 
         // if no icons there's nothing to adjust
         if (!firstIcon)
-        	return;
+            return;
 
-        // Enforce the current icon size during the size request
-        firstIcon.setIconSize(this.iconSize);
-        let [, natHeight] = firstButton.get_preferred_height(-1);
-        let [, natWidth] = firstButton.get_preferred_width(-1);
+        // Enforce valid spacings during the size request
+        firstIcon.ensure_style();
+        const [, , iconWidth, iconHeight] = firstIcon.get_preferred_size();
+        const [, , buttonWidth, buttonHeight] = firstButton.get_preferred_size();
 
-        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        let iconSizes = this._availableIconSizes.map(s => s * scaleFactor);
-
-        // Subtract icon padding and box spacing from the available height
-        if (this._isHorizontal)
-            availHeight -= iconChildren.length * (natWidth - this.iconSize * scaleFactor) +
-                           (iconChildren.length - 1) * spacing;
-        else
-            availHeight -= iconChildren.length * (natHeight - this.iconSize * scaleFactor) +
+        if (this._isHorizontal) {
+            // Subtract icon padding and box spacing from the available width
+            availSpace -= iconChildren.length * (buttonWidth - iconWidth) +
                            (iconChildren.length - 1) * spacing;
 
-        let availSize = availHeight / iconChildren.length;
+            if (this._separator) {
+                const [, , separatorWidth] = this._separator.get_preferred_size();
+                availSpace -= separatorWidth + spacing;
+            }
+        } else {
+            // Subtract icon padding and box spacing from the available height
+            availSpace -= iconChildren.length * (buttonHeight - iconHeight) +
+                           (iconChildren.length - 1) * spacing;
 
+            if (this._separator) {
+                const [, , , separatorHeight] = this._separator.get_preferred_size();
+                availSpace -= separatorHeight + spacing;
+            }
+        }
 
-        let newIconSize = this._availableIconSizes[0];
+        const maxIconSize = availSpace / iconChildren.length;
+        const {scaleFactor} = St.ThemeContext.get_for_stage(global.stage);
+        const iconSizes = this._availableIconSizes.map(s => s * scaleFactor);
+
+        let [newIconSize] = this._availableIconSizes;
         for (let i = 0; i < iconSizes.length; i++) {
-            if (iconSizes[i] < availSize)
+            if (iconSizes[i] <= maxIconSize)
                 newIconSize = this._availableIconSizes[i];
         }
 
-        if (newIconSize == this.iconSize)
+        if (newIconSize === this.iconSize)
             return;
 
-        let oldIconSize = this.iconSize;
+        const oldIconSize = this.iconSize;
         this.iconSize = newIconSize;
         this.emit('icon-size-changed');
 
-        let scale = oldIconSize / newIconSize;
+        const scale = oldIconSize / newIconSize;
         for (let i = 0; i < iconChildren.length; i++) {
-            let icon = iconChildren[i].child.icon || iconChildren[i].icon;
+            const {icon} = iconChildren[i].child._delegate;
 
             // Set the new size immediately, to keep the icons' sizes
             // in sync with this.iconSize
             icon.setIconSize(this.iconSize);
 
             // Don't animate the icon size change when the overview
-            // is transitioning, or when initially filling
+            // is transitioning, not visible or when initially filling
             // the dash
-            if (Main.overview.animationInProgress ||
+            if (!Main.overview.visible || Main.overview.animationInProgress ||
                 !this._shownInitially)
                 continue;
 
-            let [targetWidth, targetHeight] = icon.icon.get_size();
+            const [targetWidth, targetHeight] = icon.icon.get_size();
 
             // Scale the icon's texture to the previous size and
             // tween to the new size
             icon.icon.set_size(icon.icon.width * scale,
-                               icon.icon.height * scale);
+                icon.icon.height * scale);
 
             icon.icon.ease({
                 width: targetWidth,
                 height: targetHeight,
-                time: DASH_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD
+                duration: DASH_ANIMATION_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            });
+        }
+
+        if (this._separator) {
+            const animateProperties = this._isHorizontal
+                ? {height: this.iconSize} : {width: this.iconSize};
+
+            this._separator.ease({
+                ...animateProperties,
+                duration: DASH_ANIMATION_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
         }
     }
 
     _redisplay() {
-        let favorites = AppFavorites.getAppFavorites().getFavoriteMap();
+        const favorites = AppFavorites.getAppFavorites().getFavoriteMap();
 
         let running = this._appSystem.get_running();
-        let settings = Docking.DockManager.settings;
+        const dockManager = Docking.DockManager.getDefault();
+        const {settings} = dockManager;
 
-        if (settings.get_boolean('isolate-workspaces') ||
-            settings.get_boolean('isolate-monitors')) {
+        this._scrollView.set({
+            xAlign: Clutter.ActorAlign.FILL,
+            yAlign: Clutter.ActorAlign.FILL,
+        });
+        if (dockManager.settings.dockExtended) {
+            if (!this._isHorizontal) {
+                this._scrollView.yAlign = dockManager.settings.alwaysCenterIcons
+                    ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START;
+            } else {
+                this._scrollView.xAlign = dockManager.settings.alwaysCenterIcons
+                    ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START;
+            }
+        }
+
+        if (settings.isolateWorkspaces ||
+            settings.isolateMonitors) {
             // When using isolation, we filter out apps that have no windows in
             // the current workspace
-            let monitorIndex = this._monitorIndex;
-            running = running.filter(function(_app) {
-                return AppIcons.getInterestingWindows(_app, monitorIndex).length != 0;
+            const monitorIndex = this._monitorIndex;
+            running = running.filter(app =>
+                AppIcons.getInterestingWindows(app.get_windows(), monitorIndex).length);
+        }
+
+        const children = this._box.get_children().filter(actor => {
+            return actor.child &&
+                   actor.child._delegate &&
+                   actor.child._delegate.app;
+        });
+        // Apps currently in the dash
+        let oldApps = children.map(actor => actor.child._delegate.app);
+        // Apps supposed to be in the dash
+        const newApps = [];
+
+        const {showFavorites} = settings;
+        if (showFavorites)
+            newApps.push(...Object.values(favorites));
+
+        if (settings.showRunning) {
+            // We reorder the running apps so that they don't change position on the
+            // dash with every redisplay() call
+
+            // First: add the apps from the oldApps list that are still running
+            oldApps.forEach(oldApp => {
+                const index = running.indexOf(oldApp);
+                if (index > -1) {
+                    const [app] = running.splice(index, 1);
+                    if (!showFavorites || !(app.get_id() in favorites))
+                        newApps.push(app);
+                }
+            });
+
+            // Second: add the new apps
+            running.forEach(app => {
+                if (!showFavorites || !(app.get_id() in favorites))
+                    newApps.push(app);
             });
         }
 
-        let children = this._box.get_children().filter(function(actor) {
-            return actor.child &&
-                   !!actor.child.app;
-        });
-        // Apps currently in the dash
-        let oldApps = children.map(function(actor) {
-            return actor.child.app;
-        });
-        // Apps supposed to be in the dash
-        let newApps = [];
-
-        if (settings.get_boolean('show-favorites')) {
-            for (let id in favorites)
-                newApps.push(favorites[id]);
+        this._signalsHandler.removeWithLabel(Labels.SHOW_MOUNTS);
+        if (dockManager.removables) {
+            this._signalsHandler.addWithLabel(Labels.SHOW_MOUNTS,
+                dockManager.removables, 'changed', this._queueRedisplay.bind(this));
+            dockManager.removables.getApps().forEach(removable => {
+                if (!newApps.includes(removable))
+                    newApps.push(removable);
+            });
+        } else {
+            oldApps = oldApps.filter(app => !app.location || app.isTrash);
         }
 
-        // We reorder the running apps so that they don't change position on the
-        // dash with every redisplay() call
-        if (settings.get_boolean('show-running')) {
-            // First: add the apps from the oldApps list that are still running
-            for (let i = 0; i < oldApps.length; i++) {
-                let index = running.indexOf(oldApps[i]);
-                if (index > -1) {
-                    let app = running.splice(index, 1)[0];
-                    if (settings.get_boolean('show-favorites') && (app.get_id() in favorites))
-                        continue;
-                    newApps.push(app);
-                }
-            }
-            // Second: add the new apps
-            for (let i = 0; i < running.length; i++) {
-                let app = running[i];
-                if (settings.get_boolean('show-favorites') && (app.get_id() in favorites))
-                    continue;
-                newApps.push(app);
-            }
+        if (dockManager.trash) {
+            const trashApp = dockManager.trash.getApp();
+            if (!newApps.includes(trashApp))
+                newApps.push(trashApp);
+        } else {
+            oldApps = oldApps.filter(app => !app.isTrash);
         }
 
-        if (settings.get_boolean('show-mounts')) {
-            if (!this._removables) {
-                this._removables = new Locations.Removables();
-                this._signalsHandler.addWithLabel('show-mounts',
-                    [ this._removables,
-                      'changed',
-                      this._queueRedisplay.bind(this) ]);
-            }
-            Array.prototype.push.apply(newApps, this._removables.getApps());
-        } else if (this._removables) {
-            this._signalsHandler.removeWithLabel('show-mounts');
-            this._removables.destroy();
-            this._removables = null;
-        }
-
-        if (settings.get_boolean('show-trash')) {
-            if (!this._trash) {
-                this._trash = new Locations.Trash();
-                this._signalsHandler.addWithLabel('show-trash',
-                    [ this._trash,
-                      'changed',
-                      this._queueRedisplay.bind(this) ]);
-            }
-            newApps.push(this._trash.getApp());
-        } else if (this._trash) {
-            this._signalsHandler.removeWithLabel('show-trash');
-            this._trash.destroy();
-            this._trash = null;
-        }
+        // Temporary remove the separator so that we don't compute to position icons
+        const oldSeparatorPos = this._box.get_children().indexOf(this._separator);
+        if (this._separator)
+            this._box.remove_child(this._separator);
 
         // Figure out the actual changes to the list of items; we iterate
         // over both the list of items currently in the dash and the list
@@ -784,141 +871,172 @@ var MyDash = GObject.registerClass({
         // to use a more sophisticated algorithm, e.g. Longest Common
         // Subsequence as used by diff.
 
-        let addedItems = [];
-        let removedActors = [];
+        const addedItems = [];
+        const removedActors = [];
 
         let newIndex = 0;
         let oldIndex = 0;
-        while ((newIndex < newApps.length) || (oldIndex < oldApps.length)) {
+        while (newIndex < newApps.length || oldIndex < oldApps.length) {
+            const oldApp = oldApps.length > oldIndex ? oldApps[oldIndex] : null;
+            const newApp = newApps.length > newIndex ? newApps[newIndex] : null;
+
             // No change at oldIndex/newIndex
-            if (oldApps[oldIndex] && oldApps[oldIndex] == newApps[newIndex]) {
+            if (oldApp === newApp) {
                 oldIndex++;
                 newIndex++;
                 continue;
             }
 
             // App removed at oldIndex
-            if (oldApps[oldIndex] && (newApps.indexOf(oldApps[oldIndex]) == -1)) {
+            if (oldApp && !newApps.includes(oldApp)) {
                 removedActors.push(children[oldIndex]);
                 oldIndex++;
                 continue;
             }
 
             // App added at newIndex
-            if (newApps[newIndex] && (oldApps.indexOf(newApps[newIndex]) == -1)) {
-                let newItem = this._createAppItem(newApps[newIndex]);
-                addedItems.push({ app: newApps[newIndex],
-                                  item: newItem,
-                                  pos: newIndex });
+            if (newApp && !oldApps.includes(newApp)) {
+                addedItems.push({
+                    app: newApp,
+                    item: this._createAppItem(newApp),
+                    pos: newIndex,
+                });
                 newIndex++;
                 continue;
             }
 
             // App moved
-            let insertHere = newApps[newIndex + 1] && (newApps[newIndex + 1] == oldApps[oldIndex]);
-            let alreadyRemoved = removedActors.reduce(function(result, actor) {
-                let removedApp = actor.child.app;
-                return result || removedApp == newApps[newIndex];
+            const nextApp = newApps.length > newIndex + 1
+                ? newApps[newIndex + 1] : null;
+            const insertHere = nextApp && nextApp === oldApp;
+            const alreadyRemoved = removedActors.reduce((result, actor) => {
+                const removedApp = actor.child._delegate.app;
+                return result || removedApp === newApp;
             }, false);
 
             if (insertHere || alreadyRemoved) {
-                let newItem = this._createAppItem(newApps[newIndex]);
+                const newItem = this._createAppItem(newApp);
                 addedItems.push({
-                    app: newApps[newIndex],
+                    app: newApp,
                     item: newItem,
-                    pos: newIndex + removedActors.length
+                    pos: newIndex + removedActors.length,
                 });
                 newIndex++;
-            }
-            else {
+            } else {
                 removedActors.push(children[oldIndex]);
                 oldIndex++;
             }
         }
 
-        for (let i = 0; i < addedItems.length; i++)
+        for (let i = 0; i < addedItems.length; i++) {
             this._box.insert_child_at_index(addedItems[i].item,
-                                            addedItems[i].pos);
+                addedItems[i].pos);
+        }
 
         for (let i = 0; i < removedActors.length; i++) {
-            let item = removedActors[i];
+            const item = removedActors[i];
 
             // Don't animate item removal when the overview is transitioning
+            // or hidden
             if (!Main.overview.animationInProgress)
                 item.animateOutAndDestroy();
             else
                 item.destroy();
         }
 
+        // Update separator
+        const nFavorites = Object.keys(favorites).length;
+        const nIcons = children.length + addedItems.length - removedActors.length;
+        if (nFavorites > 0 && nFavorites < nIcons) {
+            if (!this._separator) {
+                this._separator = new St.Widget({
+                    style_class: 'dash-separator',
+                    x_align: this._isHorizontal
+                        ? Clutter.ActorAlign.FILL : Clutter.ActorAlign.CENTER,
+                    y_align: this._isHorizontal
+                        ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.FILL,
+                    width: this._isHorizontal ? -1 : this.iconSize,
+                    height: this._isHorizontal ? this.iconSize : -1,
+                    reactive: true,
+                    track_hover: true,
+                });
+                this._separator.connect('notify::hover', a => this._ensureItemVisibility(a));
+            }
+            let pos = nFavorites + this._animatingPlaceholdersCount;
+            if (this._dragPlaceholder)
+                pos++;
+            const removedFavorites = removedActors.filter(a =>
+                children.indexOf(a) < oldSeparatorPos);
+            pos += removedFavorites.length;
+            this._box.insert_child_at_index(this._separator, pos);
+        } else if (this._separator) {
+            this._separator.destroy();
+            this._separator = null;
+        }
+
         this._adjustIconSize();
 
         // Skip animations on first run when adding the initial set
         // of items, to avoid all items zooming in at once
-
-        let animate = this._shownInitially &&
-            !Main.overview.animationInProgress;
+        const animate = this._shownInitially &&
+            !Main.layoutManager._startingUp;
 
         if (!this._shownInitially)
             this._shownInitially = true;
 
-        for (let i = 0; i < addedItems.length; i++)
-            addedItems[i].item.show(animate);
+        addedItems.forEach(({item}) => item.show(animate));
 
         // Workaround for https://bugzilla.gnome.org/show_bug.cgi?id=692744
         // Without it, StBoxLayout may use a stale size cache
         this._box.queue_relayout();
 
-        // This is required for icon reordering when the scrollview is used.
-        this._updateAppsIconGeometry();
-
         // This will update the size, and the corresponding number for each icon
         this._updateNumberOverlay();
+
+        this.updateShowAppsButton();
     }
 
     _updateNumberOverlay() {
-        let appIcons = this.getAppIcons();
+        const appIcons = this.getAppIcons();
         let counter = 1;
-        appIcons.forEach(function(icon) {
-            if (counter < 10){
+        appIcons.forEach(icon => {
+            if (counter < 10) {
                 icon.setNumberOverlay(counter);
                 counter++;
-            }
-            else if (counter == 10) {
+            } else if (counter === 10) {
                 icon.setNumberOverlay(0);
                 counter++;
-            }
-            else {
+            } else {
                 // No overlay after 10
                 icon.setNumberOverlay(-1);
             }
             icon.updateNumberOverlay();
         });
-
     }
 
     toggleNumberOverlay(activate) {
-        let appIcons = this.getAppIcons();
-        appIcons.forEach(function(icon) {
+        const appIcons = this.getAppIcons();
+        appIcons.forEach(icon => {
             icon.toggleNumberOverlay(activate);
         });
     }
 
-    _initializeIconSize(max_size) {
-        let max_allowed = baseIconSizes[baseIconSizes.length-1];
-        max_size = Math.min(max_size, max_allowed);
+    _initializeIconSize(maxSize) {
+        const maxAllowed = baseIconSizes[baseIconSizes.length - 1];
+        maxSize = Math.min(maxSize, maxAllowed);
 
-        if (Docking.DockManager.settings.get_boolean('icon-size-fixed'))
-            this._availableIconSizes = [max_size];
-        else {
-            this._availableIconSizes = baseIconSizes.filter(function(val) {
-                return (val<max_size);
+        if (Docking.DockManager.settings.iconSizeFixed) {
+            this._availableIconSizes = [maxSize];
+        } else {
+            this._availableIconSizes = baseIconSizes.filter(val => {
+                return val < maxSize;
             });
-            this._availableIconSizes.push(max_size);
+            this._availableIconSizes.push(maxSize);
         }
     }
 
-    setIconSize(max_size, doNotAnimate) {
-        this._initializeIconSize(max_size);
+    setIconSize(maxSize, doNotAnimate) {
+        this._initializeIconSize(maxSize);
 
         if (doNotAnimate)
             this._shownInitially = false;
@@ -927,23 +1045,22 @@ var MyDash = GObject.registerClass({
     }
 
     /**
-     * Reset the displayed apps icon to mantain the correct order when changing
+     * Reset the displayed apps icon to maintain the correct order when changing
      * show favorites/show running settings
      */
     resetAppIcons() {
-        let children = this._box.get_children().filter(function(actor) {
+        const children = this._box.get_children().filter(actor => {
             return actor.child &&
                    !!actor.child.icon;
         });
         for (let i = 0; i < children.length; i++) {
-            let item = children[i];
+            const item = children[i];
             item.destroy();
         }
 
         // to avoid ugly animations, just suppress them like when dash is first loaded.
         this._shownInitially = false;
         this._redisplay();
-
     }
 
     get showAppsButton() {
@@ -951,83 +1068,131 @@ var MyDash = GObject.registerClass({
     }
 
     showShowAppsButton() {
-        this.showAppsButton.visible = true
-        this.showAppsButton.set_width(-1)
-        this.showAppsButton.set_height(-1)
+        this._showAppsIcon.visible = true;
+        this._showAppsIcon.show(true);
+        this.updateShowAppsButton();
     }
 
     hideShowAppsButton() {
-        this.showAppsButton.hide()
-        this.showAppsButton.set_width(0)
-        this.showAppsButton.set_height(0)
+        this._showAppsIcon.visible = false;
+    }
+
+    setMaxSize(maxWidth, maxHeight) {
+        if (this._maxWidth === maxWidth &&
+            this._maxHeight === maxHeight)
+            return;
+
+        this._maxWidth = maxWidth;
+        this._maxHeight = maxHeight;
+        this._queueRedisplay();
+    }
+
+    updateShowAppsButton() {
+        if (this._showAppsIcon.get_parent() && !this._showAppsIcon.visible)
+            return;
+
+        const {settings} = Docking.DockManager;
+        const notifiedProperties = [];
+        const showAppsContainer = settings.showAppsAlwaysInTheEdge || !settings.dockExtended
+            ? this._dashContainer : this._boxContainer;
+
+        this._signalsHandler.addWithLabel(Labels.FIRST_LAST_CHILD_WORKAROUND,
+            showAppsContainer, 'notify',
+            (_obj, pspec) => notifiedProperties.push(pspec.name));
+
+        if (this._showAppsIcon.get_parent() !== showAppsContainer) {
+            this._showAppsIcon.get_parent()?.remove_child(this._showAppsIcon);
+
+            if (Docking.DockManager.settings.showAppsAtTop)
+                showAppsContainer.insert_child_below(this._showAppsIcon, null);
+            else
+                showAppsContainer.insert_child_above(this._showAppsIcon, null);
+        } else if (settings.showAppsAtTop) {
+            showAppsContainer.set_child_below_sibling(this._showAppsIcon, null);
+        } else {
+            showAppsContainer.set_child_above_sibling(this._showAppsIcon, null);
+        }
+
+        this._signalsHandler.removeWithLabel(Labels.FIRST_LAST_CHILD_WORKAROUND);
+
+        // This is indeed ugly, but we need to ensure that the last and first
+        // visible widgets are re-computed by St, that is buggy because of a
+        // mutter issue that is being fixed:
+        // https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2047
+        if (!notifiedProperties.includes('first-child'))
+            showAppsContainer.notify('first-child');
+        if (!notifiedProperties.includes('last-child'))
+            showAppsContainer.notify('last-child');
     }
 });
 
 
 /**
  * This is a copy of the same function in utils.js, but also adjust horizontal scrolling
- * and perform few further cheks on the current value to avoid changing the values when
+ * and perform few further checks on the current value to avoid changing the values when
  * it would be clamp to the current one in any case.
  * Return the amount of shift applied
+ *
+ * @param scrollView
+ * @param actor
  */
 function ensureActorVisibleInScrollView(scrollView, actor) {
-    let adjust_v = true;
-    let adjust_h = true;
+    // access to scrollView.[hv]scroll was deprecated in gnome 46
+    // instead, adjustment can be accessed directly
+    // keep old way for backwards compatibility (gnome <= 45)
+    const vAdjustment = scrollView.vadjustment ?? scrollView.vscroll.adjustment;
+    const hAdjustment = scrollView.hadjustment ?? scrollView.hscroll.adjustment;
+    const {value: vValue0, pageSize: vPageSize, upper: vUpper} = vAdjustment;
+    const {value: hValue0, pageSize: hPageSize, upper: hUpper} = hAdjustment;
+    let [hValue, vValue] = [hValue0, vValue0];
+    let vOffset = 0;
+    let hOffset = 0;
 
-    let vadjustment = scrollView.get_vscroll_bar().get_adjustment();
-    let hadjustment = scrollView.get_hscroll_bar().get_adjustment();
-    let [vvalue, vlower, vupper, vstepIncrement, vpageIncrement, vpageSize] = vadjustment.get_values();
-    let [hvalue, hlower, hupper, hstepIncrement, hpageIncrement, hpageSize] = hadjustment.get_values();
-
-    let [hvalue0, vvalue0] = [hvalue, vvalue];
-
-    let voffset = 0;
-    let hoffset = 0;
-    let fade = scrollView.get_effect('fade');
+    const fade = scrollView.get_effect('fade');
     if (fade) {
-        voffset = fade.vfade_offset;
-        hoffset = fade.hfade_offset;
+        vOffset = fade.fade_margins.top;
+        hOffset = fade.fade_margins.left;
     }
 
-    let box = actor.get_allocation_box();
-    let y1 = box.y1, y2 = box.y2, x1 = box.x1, x2 = box.x2;
+    const box = actor.get_allocation_box();
+    let {y1} = box, {y2} = box, {x1} = box, {x2} = box;
 
     let parent = actor.get_parent();
-    while (parent != scrollView) {
+    while (parent !== scrollView) {
         if (!parent)
             throw new Error('Actor not in scroll view');
 
-        let box = parent.get_allocation_box();
-        y1 += box.y1;
-        y2 += box.y1;
-        x1 += box.x1;
-        x2 += box.x1;
+        const parentBox = parent.get_allocation_box();
+        y1 += parentBox.y1;
+        y2 += parentBox.y1;
+        x1 += parentBox.x1;
+        x2 += parentBox.x1;
         parent = parent.get_parent();
     }
 
-    if (y1 < vvalue + voffset)
-        vvalue = Math.max(0, y1 - voffset);
-    else if (vvalue < vupper - vpageSize && y2 > vvalue + vpageSize - voffset)
-        vvalue = Math.min(vupper -vpageSize, y2 + voffset - vpageSize);
+    if (y1 < vValue + vOffset)
+        vValue = Math.max(0, y1 - vOffset);
+    else if (vValue < vUpper - vPageSize && y2 > vValue + vPageSize - vOffset)
+        vValue = Math.min(vUpper - vPageSize, y2 + vOffset - vPageSize);
 
-    if (x1 < hvalue + hoffset)
-        hvalue = Math.max(0, x1 - hoffset);
-    else if (hvalue < hupper - hpageSize && x2 > hvalue + hpageSize - hoffset)
-        hvalue = Math.min(hupper - hpageSize, x2 + hoffset - hpageSize);
+    if (x1 < hValue + hOffset)
+        hValue = Math.max(0, x1 - hOffset);
+    else if (hValue < hUpper - hPageSize && x2 > hValue + hPageSize - hOffset)
+        hValue = Math.min(hUpper - hPageSize, x2 + hOffset - hPageSize);
 
-    if (vvalue !== vvalue0) {
-        vadjustment.ease(vvalue, {
+    if (vValue !== vValue0) {
+        vAdjustment.ease(vValue, {
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            duration: Util.SCROLL_TIME
+            duration: Util.SCROLL_TIME,
         });
     }
 
-    if (hvalue !== hvalue0) {
-        hadjustment.ease(hvalue, {
+    if (hValue !== hValue0) {
+        hAdjustment.ease(hValue, {
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            duration: Util.SCROLL_TIME
+            duration: Util.SCROLL_TIME,
         });
     }
 
-    return [hvalue- hvalue0, vvalue - vvalue0];
+    return [hValue - hValue0, vValue - vValue0];
 }

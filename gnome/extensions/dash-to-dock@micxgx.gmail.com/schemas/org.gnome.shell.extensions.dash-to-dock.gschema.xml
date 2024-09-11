@@ -9,7 +9,10 @@
     <value value='5' nick='previews'/>
     <value value='6' nick='minimize-or-previews'/>
     <value value='7' nick='focus-or-previews'/>
-    <value value='8' nick='quit'/>
+    <value value='8' nick='focus-or-appspread'/>
+    <value value='9' nick='focus-minimize-or-previews'/>
+    <value value='10' nick='focus-minimize-or-appspread'/>
+    <value value='11' nick='quit'/>
   </enum>
   <enum id='org.gnome.shell.extensions.dash-to-dock.scrollAction'>
     <value value='0' nick='do-nothing'/>
@@ -28,6 +31,7 @@
     <value value='0' nick='ALL_WINDOWS'/>
     <value value='1' nick='FOCUS_APPLICATION_WINDOWS'/>
     <value value='2' nick='MAXIMIZED_WINDOWS'/>
+    <value value='3' nick='ALWAYS_ON_TOP'/>
   </enum>
   <enum id='org.gnome.shell.extensions.dash-to-dock.transparency-mode'>
     <value value='0' nick='DEFAULT'/>
@@ -43,10 +47,12 @@
     <value value='5' nick='SOLID'/>
     <value value='6' nick='CILIORA'/>
     <value value='7' nick='METRO'/>
+    <value value='8' nick='BINARY'/>
+    <value value='9' nick='DOT'/>
   </enum>
   <schema path="/org/gnome/shell/extensions/dash-to-dock/" id="org.gnome.shell.extensions.dash-to-dock">
     <key name="dock-position" enum="org.gnome.shell.extensions.dash-to-dock.position">
-      <default>'LEFT'</default>
+      <default>'BOTTOM'</default>
       <summary>Dock position</summary>
       <description>Dock is shown on the Left, Right, Top or Bottom side of the screen.</description>
     </key>
@@ -64,6 +70,11 @@
       <default>0.20</default>
       <summary>Show delay</summary>
       <description>Sets the delay after the mouse left the dock before hiding it.</description>
+    </key>
+    <key type="b" name="disable-overview-on-startup">
+      <default>false</default>
+      <summary>Do not show overview on startup</summary>
+      <description>Whether to show or not the overview during startup animation.</description>
     </key>
     <key type="b" name="custom-background-color">
       <default>false</default>
@@ -110,6 +121,11 @@
       <summary>Opacity of the dash background</summary>
       <description>Sets the opacity of the dash background  when in autohide mode.</description>
     </key>
+    <key type="b" name="manualhide">
+      <default>false</default>
+      <summary>Dock not shown on desktop</summary>
+      <description>Enable or disable manualhide mode</description>
+    </key>
     <key type="b" name="intellihide">
       <default>true</default>
       <summary>Dock dodges windows</summary>
@@ -140,6 +156,11 @@
       <summary>Enable autohide in fullscreen mode.</summary>
       <description>Enable autohide in fullscreen mode.</description>
     </key>
+    <key type="b" name="show-dock-urgent-notify">
+      <default>true</default>
+      <summary>Show dock for urgent notifications.</summary>
+      <description>Show dock when urgent notifications are received.</description>
+    </key>
     <key type="b" name="dock-fixed">
       <default>false</default>
       <summary>Dock always visible</summary>
@@ -155,10 +176,15 @@
       <summary>Maximum dash icon size</summary>
       <description>Set the allowed maximum dash icon size. Allowed range: 16..64.</description>
     </key>
+    <key type="d" name="preview-size-scale">
+      <default>0</default>
+      <summary>Preview size scale</summary>
+      <description>Set the allowed maximum dash preview size scale. Allowed range: 0,00..1,00.</description>
+    </key>
     <key type="b" name="icon-size-fixed">
       <default>false</default>
       <summary>Fixed icon size</summary>
-      <description>Keep the icon size fived by scrolling the dock.</description>
+      <description>Keep the icon size fixed by scrolling the dock.</description>
     </key>
     <key type="b" name="apply-custom-theme">
       <default>false</default>
@@ -198,17 +224,32 @@
     <key type="b" name="isolate-workspaces">
       <default>false</default>
       <summary>Provide workspace isolation</summary>
-      <description>Dash shows only windows from the currentworkspace</description>
+      <description>Dash shows only windows from the current workspace, this is applied only if gnome-shell 'current-workspace-only' app-switcher settings is disabled</description>
+    </key>
+    <key type="b" name="workspace-agnostic-urgent-windows">
+      <default>true</default>
+      <summary>Show urgent windows on each workspace</summary>
+      <description>Show or hide urgent windows on each workspace in the dash</description>
     </key>
     <key type="b" name="isolate-monitors">
       <default>false</default>
       <summary>Provide monitor isolation</summary>
       <description>Dash shows only windows from the monitor</description>
     </key>
+    <key type="b" name="scroll-to-focused-application">
+      <default>true</default>
+      <summary>Scroll to focused application</summary>
+      <description>Ensure that the focused application icon is always visible in the dash</description>
+    </key>
     <key type="b" name="show-windows-preview">
       <default>true</default>
       <summary>Show preview of the open windows</summary>
       <description>Replace open windows list with windows previews</description>
+    </key>
+    <key type="b" name="default-windows-preview-to-open">
+      <default>false</default>
+      <summary>Open windows preview by default</summary>
+      <description>Window previews will show windows by default, rather than hide them behind a drop dowm menu.</description>
     </key>
     <key type="b" name="show-favorites">
       <default>true</default>
@@ -225,6 +266,26 @@
       <summary>Show mounted volumes and devices</summary>
       <description>Show or hide mounted volume and device icons in the dash</description>
     </key>
+    <key type="b" name="show-mounts-only-mounted">
+      <default>true</default>
+      <summary>Only show mounted volumes and devices</summary>
+      <description>Show or hide unmounted volume and device icons in the dash</description>
+    </key>
+    <key type="b" name="show-mounts-network">
+      <default>false</default>
+      <summary>Show network mounted volumes</summary>
+      <description>Show or hide network volumes in the dash</description>
+    </key>
+    <key type="b" name="isolate-locations">
+      <default>true</default>
+      <summary>Isolate volumes, devices and trash windows</summary>
+      <description>Consider volume, devices and trash as different application windows and not part of the file manager</description>
+    </key>
+    <key type="b" name="dance-urgent-applications">
+      <default>true</default>
+      <summary>Wiggle urgent applications</summary>
+      <description>Wiggle urgent application icons in the dash</description>
+    </key>
     <key type="b" name="show-show-apps-button">
       <default>true</default>
       <summary>Show applications button</summary>
@@ -232,13 +293,12 @@
     </key>
     <key type="b" name="show-apps-at-top">
       <default>false</default>
-      <summary>Show application button at top</summary>
-      <description>Show application button at top of the dash</description>
+      <summary>Show application button on the left</summary>
+      <description>Show application button on the left of the dash</description>
     </key>
-    <key type="b" name="animate-show-apps">
+    <key type="b" name="show-apps-always-in-the-edge">
       <default>true</default>
-      <summary>Animate Show Applications from the desktop</summary>
-      <description>Animate Show Applications from the desktop</description>
+      <summary>Show application button on the edge when using centered panel mode</summary>
     </key>
     <key type="b" name="bolt-support">
       <default>true</default>
@@ -247,16 +307,25 @@
     </key>
     <key type="d" name="height-fraction">
       <default>0.90</default>
-      <summary>Dock max height (fraction of available space)</summary>
+      <summary>Dock max height/width (fraction of available space)</summary>
     </key>
     <key type="b" name="extend-height">
       <default>false</default>
-      <summary>Extend the dock container to all the available height</summary>
+      <summary>Extend the dock container to all the available height/width</summary>
+    </key>
+    <key type="b" name="always-center-icons">
+      <default>false</default>
+      <summary>Center icons when dock container is extended to all the available size</summary>
     </key>
     <key type="i" name="preferred-monitor">
-      <default>-1</default>
-      <summary>Monitor on which putting the dock</summary>
-      <description>Set on which monitor to put the dock, use -1 for the primary one</description>
+      <default>-2</default>
+      <summary>DEPRECATED: Monitor on which putting the dock (by index)</summary>
+      <description>Set on which monitor to put the dock, use -1 for the primary one. Use -2 refer to the 'preferred-monitor-by-connector' setting instead (this is the preferred value).</description>
+    </key>
+    <key type="s" name="preferred-monitor-by-connector">
+      <default>"primary"</default>
+      <summary>Monitor on which putting the dock (by connector)</summary>
+      <description>Set on which monitor to put the dock, for example 'DisplayPort-0'. Use 'primary' for primary one. This setting is only used if 'preferred-monitor' is -2.</description>
     </key>
     <key type="b" name="multi-monitor">
       <default>false</default>
@@ -545,6 +614,31 @@
       <default>false</default>
       <summary>Enable unity7 like glossy backlit items</summary>
       <description>Emulate the unity7 backlit glossy items behaviour</description>
+    </key>
+    <key name="apply-glossy-effect" type="b">
+      <default>true</default>
+      <summary>Enable glossy effect</summary>
+      <description>Toggle the glossy effect of the unity7 backlit feature.</description>
+    </key>
+    <key name="hide-tooltip" type="b">
+      <default>false</default>
+      <summary>Hide application tooltip</summary>
+      <description>Hide tooltip when hovering application in the dash.</description>
+    </key>
+    <key name="show-icons-emblems" type="b">
+      <default>true</default>
+      <summary>Show application icons emblems</summary>
+      <description>Show application icons emblems such as notification counters an progress bars.</description>
+    </key>
+    <key name="show-icons-notifications-counter" type="b">
+      <default>true</default>
+      <summary>Show the number of unread notifications in icons</summary>
+      <description>Show application icons emblems such as notification</description>
+    </key>
+    <key name="application-counter-overrides-notifications" type="b">
+      <default>true</default>
+      <summary>Wether the application-provioded counter via Unity API should override the notifications or be summed to it</summary>
+      <description>If an application provides a counter through the Unity API, then such value will be used. Otherwise the counter will be summed with the unread notification numbers (if enabled)</description>
     </key>
   </schema>
 </schemalist>

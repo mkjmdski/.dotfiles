@@ -29,7 +29,7 @@ if [ ! "$PATH_LOADED" = "true" ]; then
     eval $(parse-yaml $DOTFILES/config.yaml DOTFILES_CONF_)
 
     # We want to extend path once
-    export EDITOR="$(which nvim)"
+    export EDITOR="code --wait"
 
     # export GPG_TTY=$(tty) # Use actual tty when prompting for GPG passwords
     export LANG=en_US.UTF-8 # Default language

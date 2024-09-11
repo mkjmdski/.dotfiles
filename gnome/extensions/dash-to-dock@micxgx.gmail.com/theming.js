@@ -1,26 +1,20 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const Signals = imports.signals;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
+import {
+    Clutter,
+    GObject,
+    Meta,
+    St,
+} from './dependencies/gi.js';
 
-const AppDisplay = imports.ui.appDisplay;
-const AppFavorites = imports.ui.appFavorites;
-const Dash = imports.ui.dash;
-const DND = imports.ui.dnd;
-const IconGrid = imports.ui.iconGrid;
-const Main = imports.ui.main;
-const PopupMenu = imports.ui.popupMenu;
-const Util = imports.misc.util;
-const Workspace = imports.ui.workspace;
+import {Main} from './dependencies/shell/ui.js';
 
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Docking = Me.imports.docking;
-const Utils = Me.imports.utils;
+import {
+    Docking,
+    Utils,
+} from './imports.js';
+
+const {signals: Signals} = imports;
 
 /*
  * DEFAULT:  transparency given by theme
@@ -30,16 +24,26 @@ const Utils = Me.imports.utils;
 const TransparencyMode = {
     DEFAULT:  0,
     FIXED:    1,
-    DYNAMIC:  3
+    DYNAMIC:  3,
 };
+
+const Labels = Object.freeze({
+    TRANSPARENCY: Symbol('transparency'),
+});
+
+export const PositionStyleClass = Object.freeze([
+    'top',
+    'right',
+    'bottom',
+    'left',
+]);
 
 /**
  * Manage theme customization and custom theme support
  */
-var ThemeManager = class DashToDock_ThemeManager {
-
+export class ThemeManager {
     constructor(dock) {
-        this._signalsHandler = new Utils.GlobalSignalsHandler();
+        this._signalsHandler = new Utils.GlobalSignalsHandler(this);
         this._bindSettingsChanges();
         this._actor = dock;
         this._dash = dock.dash;
@@ -51,31 +55,31 @@ var ThemeManager = class DashToDock_ThemeManager {
 
         this._signalsHandler.add([
             // When theme changes re-obtain default background color
-            St.ThemeContext.get_for_stage (global.stage),
+            St.ThemeContext.get_for_stage(global.stage),
             'changed',
-            this.updateCustomTheme.bind(this)
+            this.updateCustomTheme.bind(this),
         ], [
             // update :overview pseudoclass
             Main.overview,
             'showing',
-            this._onOverviewShowing.bind(this)
+            this._onOverviewShowing.bind(this),
         ], [
             Main.overview,
             'hiding',
-            this._onOverviewHiding.bind(this)
+            this._onOverviewHiding.bind(this),
         ]);
 
         this._updateCustomStyleClasses();
 
         // destroy themeManager when the managed actor is destroyed (e.g. extension unload)
         // in order to disconnect signals
-        this._actor.connect('destroy', this.destroy.bind(this));
-
+        this._signalsHandler.add(this._actor, 'destroy', () => this.destroy());
     }
 
     destroy() {
-        this._signalsHandler.destroy();
+        this.emit('destroy');
         this._transparency.destroy();
+        this._destroyed = true;
     }
 
     _onOverviewShowing() {
@@ -87,61 +91,60 @@ var ThemeManager = class DashToDock_ThemeManager {
     }
 
     _updateDashOpacity() {
-        let newAlpha = Docking.DockManager.settings.get_double('background-opacity');
+        const newAlpha = Docking.DockManager.settings.backgroundOpacity;
 
-        let [backgroundColor, borderColor] = this._getDefaultColors();
+        const [backgroundColor, borderColor] = this._getDefaultColors();
 
-        if (backgroundColor==null)
+        if (!backgroundColor)
             return;
 
         // Get the background and border alphas. We check the background alpha
         // for a minimum of .001 to prevent division by 0 errors
-        let backgroundAlpha = Math.max(Math.round(backgroundColor.alpha/2.55)/100, .001);
-        let borderAlpha = Math.round(borderColor.alpha/2.55)/100;
+        const backgroundAlpha = Math.max(Math.round(backgroundColor.alpha / 2.55) / 100, .001);
+        let borderAlpha = Math.round(borderColor.alpha / 2.55) / 100;
 
         // The border and background alphas should remain in sync
         // We also limit the borderAlpha to a maximum of 1 (full opacity)
-        borderAlpha = Math.min((borderAlpha/backgroundAlpha)*newAlpha, 1);
+        borderAlpha = Math.min((borderAlpha / backgroundAlpha) * newAlpha, 1);
 
-        this._customizedBackground = 'rgba(' +
-            backgroundColor.red + ',' +
-            backgroundColor.green + ',' +
-            backgroundColor.blue + ',' +
-            newAlpha + ')';
+        this._customizedBackground = `rgba(${
+            backgroundColor.red},${
+            backgroundColor.green},${
+            backgroundColor.blue},${
+            newAlpha})`;
 
-        this._customizedBorder = 'rgba(' +
-            borderColor.red + ',' +
-            borderColor.green + ',' +
-            borderColor.blue + ',' +
-            borderAlpha + ')';
-
+        this._customizedBorder = `rgba(${
+            borderColor.red},${
+            borderColor.green},${
+            borderColor.blue},${
+            borderAlpha})`;
     }
 
     _getDefaultColors() {
         // Prevent shell crash if the actor is not on the stage.
         // It happens enabling/disabling repeatedly the extension
-        if (!this._dash._container.get_stage())
+        if (!this._dash._background.get_stage())
             return [null, null];
 
         // Remove custom style
-        let oldStyle = this._dash._container.get_style();
-        this._dash._container.set_style(null);
+        const oldStyle = this._dash._background.get_style();
+        this._dash._background.set_style(null);
 
-        let themeNode = this._dash._container.get_theme_node();
-        this._dash._container.set_style(oldStyle);
+        const themeNode = this._dash._background.get_theme_node();
+        this._dash._background.set_style(oldStyle);
 
-        let backgroundColor = themeNode.get_background_color();
+        const backgroundColor = themeNode.get_background_color();
 
         // Just in case the theme has different border colors ..
         // We want to find the inside border-color of the dock because it is
         // the side most visible to the user. We do this by finding the side
         // opposite the position
-        let position = Utils.getPosition();
+        const position = Utils.getPosition();
         let side = position + 2;
         if (side > 3)
             side = Math.abs(side - 4);
 
-        let borderColor = themeNode.get_border_color(side);
+        const borderColor = themeNode.get_border_color(side);
 
         return [backgroundColor, borderColor];
     }
@@ -149,55 +152,67 @@ var ThemeManager = class DashToDock_ThemeManager {
     _updateDashColor() {
         // Retrieve the color. If needed we will adjust it before passing it to
         // this._transparency.
-        let [backgroundColor, borderColor] = this._getDefaultColors();
+        let [backgroundColor] = this._getDefaultColors();
 
-        if (backgroundColor==null)
+        if (!backgroundColor)
             return;
 
-        let settings = Docking.DockManager.settings;
+        const {settings} = Docking.DockManager;
 
-        if (settings.get_boolean('custom-background-color')) {
+        if (settings.customBackgroundColor) {
             // When applying a custom color, we need to check the alpha value,
             // if not the opacity will always be overridden by the color below.
             // Note that if using 'dynamic' transparency modes,
             // the opacity will be set by the opaque/transparent styles anyway.
-            let newAlpha = Math.round(backgroundColor.alpha/2.55)/100;
-            if (settings.get_enum('transparency-mode') == TransparencyMode.FIXED)
-                newAlpha = settings.get_double('background-opacity');
+            let newAlpha = Math.round(backgroundColor.alpha / 2.55) / 100;
 
-            backgroundColor = Clutter.color_from_string(settings.get_string('background-color'))[1];
-            this._customizedBackground = 'rgba(' +
-                backgroundColor.red + ',' +
-                backgroundColor.green + ',' +
-                backgroundColor.blue + ',' +
-                newAlpha + ')';
+            ({backgroundColor} = settings);
+            // backgroundColor is a string like rgb(0,0,0)
+            const [ret, color] = Clutter.Color.from_string(backgroundColor);
+            if (!ret) {
+                logError(new Error(`${backgroundColor} is not a valid color string`));
+                return;
+            }
+
+            if (settings.transparencyMode === TransparencyMode.FIXED) {
+                newAlpha = settings.backgroundOpacity;
+                this._customizedBackground =
+                    `rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha})`;
+            } else {
+                this._customizedBackground = backgroundColor;
+            }
 
             this._customizedBorder = this._customizedBackground;
+
+            color.alpha = newAlpha * 255;
+            this._transparency.setColor(color);
+        } else {
+            // backgroundColor is a Clutter.Color object
+            this._transparency.setColor(backgroundColor);
         }
-        this._transparency.setColor(backgroundColor);
     }
 
     _updateCustomStyleClasses() {
-        let settings = Docking.DockManager.settings;
+        const {settings} = Docking.DockManager;
 
-        if (settings.get_boolean('apply-custom-theme'))
+        if (settings.applyCustomTheme)
             this._actor.add_style_class_name('dashtodock');
         else
             this._actor.remove_style_class_name('dashtodock');
 
-        if (settings.get_boolean('custom-theme-shrink'))
+        if (settings.customThemeShrink)
             this._actor.add_style_class_name('shrink');
         else
             this._actor.remove_style_class_name('shrink');
 
-        if (settings.get_enum('running-indicator-style') !== 0)
+        if (settings.runningIndicatorStyle !== 0)
             this._actor.add_style_class_name('running-dots');
         else
             this._actor.remove_style_class_name('running-dots');
 
         // If not the built-in theme option is not selected
-        if (!settings.get_boolean('apply-custom-theme')) {
-            if (settings.get_boolean('force-straight-corner'))
+        if (!settings.applyCustomTheme) {
+            if (settings.forceStraightCorner)
                 this._actor.add_style_class_name('straight-corner');
             else
                 this._actor.remove_style_class_name('straight-corner');
@@ -207,11 +222,13 @@ var ThemeManager = class DashToDock_ThemeManager {
     }
 
     updateCustomTheme() {
+        if (this._destroyed)
+            throw new Error(`Impossible to update a destroyed ${this.constructor.name}`);
         this._updateCustomStyleClasses();
         this._updateDashOpacity();
         this._updateDashColor();
         this._adjustTheme();
-        this._dash._redisplay();
+        this.emit('updated');
     }
 
     /**
@@ -220,122 +237,100 @@ var ThemeManager = class DashToDock_ThemeManager {
     _adjustTheme() {
         // Prevent shell crash if the actor is not on the stage.
         // It happens enabling/disabling repeatedly the extension
-        if (!this._dash._container.get_stage())
+        if (!this._dash._background.get_stage())
             return;
 
-        let settings = Docking.DockManager.settings;
+        const {settings} = Docking.DockManager;
 
         // Remove prior style edits
-        this._dash._container.set_style(null);
+        this._dash._background.set_style(null);
         this._transparency.disable();
 
         // If built-in theme is enabled do nothing else
-        if (settings.get_boolean('apply-custom-theme'))
+        if (settings.applyCustomTheme)
             return;
 
         let newStyle = '';
-        let position = Utils.getPosition(settings);
+        const position = Utils.getPosition(settings);
 
         // obtain theme border settings
-        let themeNode = this._dash._container.get_theme_node();
-        let borderColor = themeNode.get_border_color(St.Side.TOP);
-        let borderWidth = themeNode.get_border_width(St.Side.TOP);
-        let borderRadius = themeNode.get_border_radius(St.Corner.TOPRIGHT);
+        const themeNode = this._dash._background.get_theme_node();
+        const borderColor = themeNode.get_border_color(St.Side.TOP);
+        const borderWidth = themeNode.get_border_width(St.Side.TOP);
 
         // We're copying border and corner styles to left border and top-left
         // corner, also removing bottom border and bottom-right corner styles
-        let borderInner = '';
-        let borderRadiusValue = '';
         let borderMissingStyle = '';
 
-        if (this._rtl && (position != St.Side.RIGHT))
-            borderMissingStyle = 'border-right: ' + borderWidth + 'px solid ' +
-                   borderColor.to_string() + ';';
-        else if (!this._rtl && (position != St.Side.LEFT))
-            borderMissingStyle = 'border-left: ' + borderWidth + 'px solid ' +
-                   borderColor.to_string() + ';';
-
-        switch (position) {
-        case St.Side.LEFT:
-            borderInner = 'border-left';
-            borderRadiusValue = '0 ' + borderRadius + 'px ' + borderRadius + 'px 0;';
-            break;
-        case St.Side.RIGHT:
-            borderInner = 'border-right';
-            borderRadiusValue = borderRadius + 'px 0 0 ' + borderRadius + 'px;';
-            break;
-        case St.Side.TOP:
-            borderInner = 'border-top';
-            borderRadiusValue = '0 0 ' + borderRadius + 'px ' + borderRadius + 'px;';
-            break;
-        case St.Side.BOTTOM:
-            borderInner = 'border-bottom';
-            borderRadiusValue = borderRadius + 'px ' + borderRadius + 'px 0 0;';
-            break;
+        if (this._rtl && (position !== St.Side.RIGHT)) {
+            borderMissingStyle = `border-right: ${borderWidth}px solid ${
+                borderColor.to_string()};`;
+        } else if (!this._rtl && (position !== St.Side.LEFT)) {
+            borderMissingStyle = `border-left: ${borderWidth}px solid ${
+                borderColor.to_string()};`;
         }
 
-        newStyle = borderInner + ': none;' +
-            'border-radius: ' + borderRadiusValue +
-            borderMissingStyle;
+        newStyle = borderMissingStyle;
 
-        // I do call set_style possibly twice so that only the background gets the transition.
-        // The transition-property css rules seems to be unsupported
-        this._dash._container.set_style(newStyle);
+        if (newStyle) {
+            // I do call set_style possibly twice so that only the background gets the transition.
+            // The transition-property css rules seems to be unsupported
+            this._dash._background.set_style(newStyle);
+        }
 
         // Customize background
-        let fixedTransparency = settings.get_enum('transparency-mode') == TransparencyMode.FIXED;
-        let defaultTransparency = settings.get_enum('transparency-mode') == TransparencyMode.DEFAULT;
+        const fixedTransparency = settings.transparencyMode === TransparencyMode.FIXED;
+        const defaultTransparency = settings.transparencyMode === TransparencyMode.DEFAULT;
         if (!defaultTransparency && !fixedTransparency) {
             this._transparency.enable();
-        }
-        else if (!defaultTransparency || settings.get_boolean('custom-background-color')) {
-            newStyle = newStyle + 'background-color:'+ this._customizedBackground + '; ' +
-                       'border-color:'+ this._customizedBorder + '; ' +
+        } else if (!defaultTransparency || settings.customBackgroundColor) {
+            newStyle = `${newStyle}background-color:${this._customizedBackground}; ` +
+                       `border-color:${this._customizedBorder}; ` +
                        'transition-delay: 0s; transition-duration: 0.250s;';
-            this._dash._container.set_style(newStyle);
+            this._dash._background.set_style(newStyle);
         }
     }
 
     _bindSettingsChanges() {
-        let keys = ['transparency-mode',
-                    'customize-alphas',
-                    'min-alpha',
-                    'max-alpha',
-                    'background-opacity',
-                    'custom-background-color',
-                    'background-color',
-                    'apply-custom-theme',
-                    'custom-theme-shrink',
-                    'custom-theme-running-dots',
-                    'extend-height',
-                    'force-straight-corner'];
+        const keys = ['transparency-mode',
+            'customize-alphas',
+            'min-alpha',
+            'max-alpha',
+            'background-opacity',
+            'custom-background-color',
+            'background-color',
+            'apply-custom-theme',
+            'custom-theme-shrink',
+            'custom-theme-running-dots',
+            'extend-height',
+            'force-straight-corner'];
 
-        keys.forEach(function(key) {
-            this._signalsHandler.add([
-                Docking.DockManager.settings,
-                'changed::' + key,
-                this.updateCustomTheme.bind(this)
-           ]);
-        }, this);
+        this._signalsHandler.add(...keys.map(key => [
+            Docking.DockManager.settings,
+            `changed::${key}`,
+            () => this.updateCustomTheme(),
+        ]));
     }
-};
+}
+Signals.addSignalMethods(ThemeManager.prototype);
 
 /**
  * The following class is based on the following upstream commit:
  * https://git.gnome.org/browse/gnome-shell/commit/?id=447bf55e45b00426ed908b1b1035f472c2466956
  * Transparency when free-floating
  */
-var Transparency = class DashToDock_Transparency {
-
+class Transparency {
     constructor(dock) {
         this._dash = dock.dash;
         this._actor = this._dash._container;
+        this._backgroundActor = this._dash._background;
         this._dockActor = dock;
         this._dock = dock;
         this._panel = Main.panel;
         this._position = Utils.getPosition();
 
-        // All these properties are replaced with the ones in the .dummy-opaque and .dummy-transparent css classes
+        // All these properties are replaced with the ones in the .dummy-opaque
+        // and .dummy-transparent css classes
         this._backgroundColor = '0,0,0';
         this._transparentAlpha = '0.2';
         this._opaqueAlpha = '1';
@@ -343,10 +338,9 @@ var Transparency = class DashToDock_Transparency {
         this._opaqueAlphaBorder = '0.5';
         this._transparentTransition = '0ms';
         this._opaqueTransition = '0ms';
-        this._base_actor_style = "";
+        this._base_actor_style = '';
 
         this._signalsHandler = new Utils.GlobalSignalsHandler();
-        this._injectionsHandler = new Utils.InjectionsHandler();
         this._trackedWindows = new Map();
     }
 
@@ -356,39 +350,48 @@ var Transparency = class DashToDock_Transparency {
         this.disable();
 
         this._base_actor_style = this._actor.get_style();
-        if (this._base_actor_style == null) {
-            this._base_actor_style = "";
+        if (!this._base_actor_style)
+            this._base_actor_style = '';
+
+
+        let addedSignal = 'child-added';
+        let removedSignal = 'child-removed';
+
+        // for compatibility with Gnome Shell 45
+        if (GObject.signal_lookup('actor-added', global.window_group)) {
+            addedSignal = 'actor-added';
+            removedSignal = 'actor-removed';
         }
 
-        this._signalsHandler.addWithLabel('transparency', [
+        this._signalsHandler.addWithLabel(Labels.TRANSPARENCY, [
             global.window_group,
-            'actor-added',
-            this._onWindowActorAdded.bind(this)
+            addedSignal,
+            this._onWindowActorAdded.bind(this),
         ], [
             global.window_group,
-            'actor-removed',
-            this._onWindowActorRemoved.bind(this)
+            removedSignal,
+            this._onWindowActorRemoved.bind(this),
         ], [
             global.window_manager,
             'switch-workspace',
-            this._updateSolidStyle.bind(this)
+            this._updateSolidStyle.bind(this),
         ], [
             Main.overview,
             'hiding',
-            this._updateSolidStyle.bind(this)
+            this._updateSolidStyle.bind(this),
         ], [
             Main.overview,
             'showing',
-            this._updateSolidStyle.bind(this)
+            this._updateSolidStyle.bind(this),
         ]);
 
         // Window signals
-        global.window_group.get_children().filter(function(child) {
+        global.window_group.get_children().filter(child => {
             // An irrelevant window actor ('Gnome-shell') produces an error when the signals are
             // disconnected, therefore do not add signals to it.
             return child instanceof Meta.WindowActor &&
                    child.get_meta_window().get_wm_class() !== 'Gnome-shell';
-        }).forEach(function(win) {
+        }).forEach(function (win) {
             this._onWindowActorAdded(null, win);
         }, this);
 
@@ -404,12 +407,13 @@ var Transparency = class DashToDock_Transparency {
     disable() {
         // ensure I never double-register/inject
         // although it should never happen
-        this._signalsHandler.removeWithLabel('transparency');
+        this._signalsHandler.removeWithLabel(Labels.TRANSPARENCY);
 
-        for (let key of this._trackedWindows.keys())
+        for (const key of this._trackedWindows.keys()) {
             this._trackedWindows.get(key).forEach(id => {
                 key.disconnect(id);
             });
+        }
         this._trackedWindows.clear();
 
         this.emit('transparency-disabled');
@@ -418,11 +422,10 @@ var Transparency = class DashToDock_Transparency {
     destroy() {
         this.disable();
         this._signalsHandler.destroy();
-        this._injectionsHandler.destroy();
     }
 
     _onWindowActorAdded(container, metaWindowActor) {
-        let signalIds = [];
+        const signalIds = [];
         ['notify::allocation', 'notify::visible'].forEach(s => {
             signalIds.push(metaWindowActor.connect(s, this._updateSolidStyle.bind(this)));
         });
@@ -441,14 +444,13 @@ var Transparency = class DashToDock_Transparency {
     }
 
     _updateSolidStyle() {
-        let isNear = this._dockIsNear();
+        const isNear = this._dockIsNear();
         if (isNear) {
-            this._actor.set_style(this._opaque_style);
+            this._backgroundActor.set_style(this._opaque_style);
             this._dockActor.remove_style_class_name('transparent');
             this._dockActor.add_style_class_name('opaque');
-        }
-        else {
-            this._actor.set_style(this._transparent_style);
+        } else {
+            this._backgroundActor.set_style(this._transparent_style);
             this._dockActor.remove_style_class_name('opaque');
             this._dockActor.add_style_class_name('transparent');
         }
@@ -460,12 +462,13 @@ var Transparency = class DashToDock_Transparency {
         if (this._dockActor.has_style_pseudo_class('overview'))
             return false;
         /* Get all the windows in the active workspace that are in the primary monitor and visible */
-        let activeWorkspace = global.workspace_manager.get_active_workspace();
-        let dash = this._dash;
-        let windows = activeWorkspace.list_windows().filter(function(metaWindow) {
+        const activeWorkspace = global.workspace_manager.get_active_workspace();
+        const dash = this._dash;
+        const windows = activeWorkspace.list_windows().filter(metaWindow => {
             return metaWindow.get_monitor() === dash._monitorIndex &&
                    metaWindow.showing_on_its_workspace() &&
-                   metaWindow.get_window_type() != Meta.WindowType.DESKTOP;
+                   metaWindow.get_window_type() !== Meta.WindowType.DESKTOP &&
+                   !metaWindow.skip_taskbar;
         });
 
         /* Check if at least one window is near enough to the panel.
@@ -473,10 +476,10 @@ var Transparency = class DashToDock_Transparency {
          * up when it slides out. This is avoid an ugly transition.
          * */
         let factor = 0;
-        if (!Docking.DockManager.settings.get_boolean('dock-fixed') &&
-            this._dock.getDockState() == Docking.State.HIDDEN)
+        if (!Docking.DockManager.settings.dockFixed &&
+            this._dock.getDockState() === Docking.State.HIDDEN)
             factor = 1;
-        let [leftCoord, topCoord] = this._actor.get_transformed_position();
+        const [leftCoord, topCoord] = this._actor.get_transformed_position();
         let threshold;
         if (this._position === St.Side.LEFT)
             threshold = leftCoord + this._actor.get_width() * (factor + 1);
@@ -487,22 +490,19 @@ var Transparency = class DashToDock_Transparency {
         else
             threshold = topCoord - this._actor.get_height() * factor;
 
-        let scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        let isNearEnough = windows.some((metaWindow) => {
+        const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        const isNearEnough = windows.some(metaWindow => {
             let coord;
             if (this._position === St.Side.LEFT) {
                 coord = metaWindow.get_frame_rect().x;
                 return coord < threshold + 5 * scale;
-            }
-            else if (this._position === St.Side.RIGHT) {
+            } else if (this._position === St.Side.RIGHT) {
                 coord = metaWindow.get_frame_rect().x + metaWindow.get_frame_rect().width;
                 return coord > threshold - 5 * scale;
-            }
-            else if (this._position === St.Side.TOP) {
+            } else if (this._position === St.Side.TOP) {
                 coord = metaWindow.get_frame_rect().y;
                 return coord < threshold + 5 * scale;
-            }
-            else {
+            } else {
                 coord = metaWindow.get_frame_rect().y + metaWindow.get_frame_rect().height;
                 return coord > threshold - 5 * scale;
             }
@@ -514,31 +514,31 @@ var Transparency = class DashToDock_Transparency {
     _updateStyles() {
         this._getAlphas();
 
-        this._transparent_style = this._base_actor_style +
-            'background-color: rgba(' +
-            this._backgroundColor + ', ' + this._transparentAlpha + ');' +
-            'border-color: rgba(' +
-            this._backgroundColor + ', ' + this._transparentAlphaBorder + ');' +
-            'transition-duration: ' + this._transparentTransition + 'ms;';
+        this._transparent_style = `${this._base_actor_style
+        }background-color: rgba(${
+            this._backgroundColor}, ${this._transparentAlpha});` +
+            `border-color: rgba(${
+                this._backgroundColor}, ${this._transparentAlphaBorder});` +
+            `transition-duration: ${this._transparentTransition}ms;`;
 
-        this._opaque_style = this._base_actor_style +
-            'background-color: rgba(' +
-            this._backgroundColor + ', ' + this._opaqueAlpha + ');' +
-            'border-color: rgba(' +
-            this._backgroundColor + ',' + this._opaqueAlphaBorder + ');' +
-            'transition-duration: ' + this._opaqueTransition + 'ms;';
+        this._opaque_style = `${this._base_actor_style
+        }background-color: rgba(${
+            this._backgroundColor}, ${this._opaqueAlpha});` +
+            `border-color: rgba(${
+                this._backgroundColor},${this._opaqueAlphaBorder});` +
+            `transition-duration: ${this._opaqueTransition}ms;`;
 
         this.emit('styles-updated');
     }
 
     setColor(color) {
-        this._backgroundColor = color.red + ',' + color.green + ',' + color.blue;
+        this._backgroundColor = `${color.red},${color.green},${color.blue}`;
         this._updateStyles();
     }
 
     _getAlphas() {
         // Create dummy object and add to the uiGroup to get it to the stage
-        let dummyObject = new St.Bin({
+        const dummyObject = new St.Bin({
             name: 'dashtodockContainer',
         });
         Main.uiGroup.add_child(dummyObject);
@@ -557,14 +557,14 @@ var Transparency = class DashToDock_Transparency {
 
         Main.uiGroup.remove_child(dummyObject);
 
-        let settings = Docking.DockManager.settings;
+        const {settings} = Docking.DockManager;
 
-        if (settings.get_boolean('customize-alphas')) {
-            this._opaqueAlpha = settings.get_double('max-alpha');
+        if (settings.customizeAlphas) {
+            this._opaqueAlpha = settings.maxAlpha;
             this._opaqueAlphaBorder = this._opaqueAlpha / 2;
-            this._transparentAlpha = settings.get_double('min-alpha');
+            this._transparentAlpha = settings.minAlpha;
             this._transparentAlphaBorder = this._transparentAlpha / 2;
         }
     }
-};
+}
 Signals.addSignalMethods(Transparency.prototype);

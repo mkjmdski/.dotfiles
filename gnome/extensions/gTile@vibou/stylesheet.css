@@ -95,7 +95,9 @@
     margin: 0 0 0 5px;
     font-size: 12px;
     line-height: 12px;
+    height: 34px;
 }
+
 .gtile-default__preset-button:first-child {
     margin-left: 0;
 }
@@ -110,15 +112,15 @@
  * Actions container
  */
 
-.gtile-default__action-button--animation {
-    background-image: url("images/icons/light/32/animation.png");
+.gtile-default__action-button--auto-close {
+    background-image: url("images/icons/light/32/auto-close.png");
     background-size: 24px 24px;
     height: 32px;
     width: 32px;
 }
 
-.gtile-default__action-button--auto-close {
-    background-image: url("images/icons/light/32/auto-close.png");
+.gtile-default__action-button--follow-cursor {
+    background-image: url("images/icons/light/32/followcursor.png");
     background-size: 24px 24px;
     height: 32px;
     width: 32px;
@@ -302,6 +304,7 @@
     color: rgba(255, 255, 255, 0.4);
     border-radius: 0px;
     border: 1px rgba(0, 200, 255, 0.4);
+    height: 34px;
 }
 
 .gtile-classic__preset-button:hover,
@@ -316,15 +319,15 @@
   * Actions container
   */
 
-.gtile-classic__action-button--animation {
-    background-image: url("images/icons/light/32/animation.png");
+.gtile-classic__action-button--auto-close {
+    background-image: url("images/icons/light/32/auto-close.png");
     background-size: 36px 36px;
     height: 36px;
     width: 36px;
 }
 
-.gtile-classic__action-button--auto-close {
-    background-image: url("images/icons/light/32/auto-close.png");
+.gtile-classic__action-button--follow-cursor {
+    background-image: url("images/icons/light/32/followcursor.png");
     background-size: 36px 36px;
     height: 36px;
     width: 36px;
@@ -514,7 +517,9 @@
     border-radius: 8px;
     padding: 0 4px;
     margin: 0 0 0 4px;
+    height: 34px;
 }
+
 .gtile-minimal-dark__preset-button:first-child {
     margin-left: 0;
 }
@@ -528,8 +533,8 @@
 /**
 * Actions container
 */
-.gtile-minimal-dark__action-button--animation,
 .gtile-minimal-dark__action-button--auto-close,
+.gtile-minimal-dark__action-button--follow-cursor,
 .gtile-minimal-dark__action-button--main-and-list,
 .gtile-minimal-dark__action-button--two-list{
     background-size: 32px 32px;
@@ -537,12 +542,12 @@
     width:34px;
 }
 
-.gtile-minimal-dark__action-button--animation {
-    background-image: url("images/icons/light/32/animation.png");
-}
-
 .gtile-minimal-dark__action-button--auto-close {
     background-image: url("images/icons/light/32/auto-close.png");
+}
+
+.gtile-minimal-dark__action-button--follow-cursor {
+    background-image: url("images/icons/light/32/followcursor.png");
 }
 
 .gtile-minimal-dark__action-button--main-and-list {
@@ -725,7 +730,9 @@
     border-color: #c9c3bd;
     padding: 0 4px;
     margin: 0 0 0 4px;
+    height: 34px;
 }
+
 .gtile-minimal-light__preset-button:first-child {
     margin-left: 0;
 }
@@ -739,8 +746,8 @@
 /**
 * Actions container
 */
-.gtile-minimal-light__action-button--animation,
 .gtile-minimal-light__action-button--auto-close,
+.gtile-minimal-light__action-button--follow-cursor,
 .gtile-minimal-light__action-button--main-and-list,
 .gtile-minimal-light__action-button--two-list{
     background-size: 32px 32px;
@@ -748,12 +755,12 @@
     width:34px;
 }
 
-.gtile-minimal-light__action-button--animation {
-    background-image: url("images/icons/dark/32/animation.png");
-}
-
 .gtile-minimal-light__action-button--auto-close {
     background-image: url("images/icons/dark/32/auto-close.png");
+}
+
+.gtile-minimal-light__action-button--follow-cursor {
+    background-image: url("images/icons/dark/32/followcursor.png");
 }
 
 .gtile-minimal-light__action-button--main-and-list {

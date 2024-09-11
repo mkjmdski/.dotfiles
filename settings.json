@@ -16,7 +16,7 @@
   "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": true
+    "source.fixAll": "explicit"
   },
   "editor.cursorStyle": "block-outline",
   "editor.largeFileOptimizations": false,
@@ -75,6 +75,8 @@
   "jupyter.interactiveWindow.codeLens.enableGotoCell": false,
   "jupyter.interactiveWindow.cellMarker.decorateCells": false,
   "redhat.telemetry.enabled": false,
+  "explorer.confirmDragAndDrop": false,
   "window.zoomLevel": 1,
-  "explorer.confirmDragAndDrop": false
+  "gitlens.codeLens.authors.command": false,
+  "python.defaultInterpreterPath": "/home/mlodzikos/.dotfiles/venv"
 }

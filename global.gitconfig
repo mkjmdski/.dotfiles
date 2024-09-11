@@ -115,6 +115,7 @@
 	uncommit = reset HEAD~
 	unstage = reset HEAD
 	current-branch = "rev-parse --abbrev-ref HEAD"
+	list-changed-files = "show --name-only"
 	# show changed dirs
 	dirs = "!f(){ git diff --dirstat=files,0 | awk '{print $2}' | sort | uniq ; }; f"
 	overwrite = !git a && git amend && git force
@@ -126,7 +127,9 @@
 	main = "!f() { git remote show origin | sed -n '/HEAD branch/s/.*: //p' ; }; f"
 	cmain = "!f() { git checkout $(git main) ; }; f"
 	rebase-main = "!f() { git cmain; git pull ; git c ; git rebase $(git main) ; }; f"
-	conflicted = "diff --name-only --diff-filter=U --relative"
+	list-conflicted = "diff --name-only --diff-filter=U --relative"
+	open-conflicts = "!f() { code $(git list-conflicted) ; }; f"
+	open-changed = "!f() { code $(git status -s | tail -n +2 | awk '{print $2}') ; }; f"
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
