@@ -22,20 +22,25 @@
         <summary>Application list</summary>
         <description>A list of strings, each containing an application id (desktop file name)</description>
     </key>
-    <key type="b" name="toggle-state">
-        <default>false</default>
-        <summary>Store caffeine toggle state</summary>
-        <description></description>
-    </key>
     <key type="b" name="user-enabled">
         <default>false</default>
         <summary>Store caffeine user state</summary>
         <description></description>
     </key>
+    <key type="ai" name="duration-timer-list">
+        <default>[900, 1800, 3600]</default>
+        <summary>List of duration timer</summary>
+        <description>Specify the short, medium and long duration for the timer countdown (seconds)</description>
+    </key>
+    <key type="b" name="use-custom-duration">
+        <default>false</default>
+        <summary>Use custom duration values for the timer</summary>
+        <description></description>
+    </key>
     <key type="i" name="countdown-timer">
         <default>0</default>
-        <summary>Specify time (minutes) for the timer countdown</summary>
-        <description>Specify time (minutes) for the timer countdown</description>
+        <summary>Specify time (seconds) for the timer countdown</summary>
+        <description>Specify time (seconds) for the timer countdown</description>
     </key>
     <key type="i" name="duration-timer">
         <default>2</default>
@@ -62,10 +67,20 @@
         <summary>Show timer</summary>
         <description>Show timer when enabled/disabled</description>
     </key>
+    <key type="b" name="show-toggle">
+        <default>true</default>
+        <summary>Show toggle</summary>
+        <description>Show the quick settings toggle</description>
+    </key>
     <key type="b" name="enable-fullscreen">
         <default>true</default>
         <summary>Enable when a fullscreen application is running</summary>
         <description>Enable when a fullscreen application is running</description>
+    </key>
+    <key type="b" name="enable-mpris">
+        <default>false</default>
+        <summary>Enable when an application is playing media</summary>
+        <description>Enable when an application is reporting playback status via MPRIS</description>
     </key>
     <key name="nightlight-control" enum="org.gnome.shell.extensions.caffeine.context-control">
         <default>"never"</default>
@@ -109,8 +124,3 @@
     </key>
   </schema>
 </schemalist>
-
-
-
-
-

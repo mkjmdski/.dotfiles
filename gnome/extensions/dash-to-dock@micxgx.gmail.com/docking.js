@@ -40,6 +40,12 @@ import {
     Utils,
 } from './imports.js';
 
+import {Extension} from './dependencies/shell/extensions/extension.js';
+
+// Use __ () and N__() for the extension gettext domain, and reuse
+// the shell domain with the default _() and N_()
+const {gettext: __} = Extension;
+
 const {signals: Signals} = imports;
 
 const DOCK_DWELL_CHECK_INTERVAL = 100;
@@ -245,7 +251,7 @@ const DockedDash = GObject.registerClass({
         this._autohideIsEnabled = null;
         this._intellihideIsEnabled = null;
 
-        // This variable marks if Meta.disable_unredirect_for_display() is called
+        // This variable marks if _disableUnredirect() is called
         // to help restore the original state when intelihide is disabled.
         this._unredirectDisabled = false;
 
@@ -669,9 +675,22 @@ const DockedDash = GObject.registerClass({
         ]);
     }
 
+    _disableUnredirect() {
+        if (!this._unredirectDisabled) {
+            if (Meta.disable_unredirect_for_display !== undefined)
+                Meta.disable_unredirect_for_display(global.display);
+            else if (global.compositor.disable_unredirect !== undefined)
+                global.compositor.disable_unredirect();
+            this._unredirectDisabled = true;
+        }
+    }
+
     _restoreUnredirect() {
         if (this._unredirectDisabled) {
-            Meta.enable_unredirect_for_display(global.display);
+            if (Meta.enable_unredirect_for_display !== undefined)
+                Meta.enable_unredirect_for_display(global.display);
+            else if (global.compositor.enable_unredirect !== undefined)
+                global.compositor.enable_unredirect();
             this._unredirectDisabled = false;
         }
     }
@@ -829,10 +848,8 @@ const DockedDash = GObject.registerClass({
     }
 
     _animateIn(time, delay) {
-        if (!this._unredirectDisabled && this._intellihideIsEnabled) {
-            Meta.disable_unredirect_for_display(global.display);
-            this._unredirectDisabled = true;
-        }
+        if (this._intellihideIsEnabled)
+            this._disableUnredirect();
         this._dockState = State.SHOWING;
         this.dash.iconAnimator.start();
         this._delayedHide = false;
@@ -870,10 +887,8 @@ const DockedDash = GObject.registerClass({
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
                 this._dockState = State.HIDDEN;
-                if (this._intellihideIsEnabled && this._unredirectDisabled) {
-                    Meta.enable_unredirect_for_display(global.display);
-                    this._unredirectDisabled = false;
-                }
+                if (this._intellihideIsEnabled)
+                    this._restoreUnredirect();
                 // Remove queued barrier removal timeout if any
                 if (this._removeBarrierTimeoutId > 0)
                     GLib.source_remove(this._removeBarrierTimeoutId);
@@ -1256,6 +1271,7 @@ const DockedDash = GObject.registerClass({
             this._ignoreHover = this._oldIgnoreHover;
         this._oldIgnoreHover = null;
         this._box.sync_hover();
+        this._updateDashVisibility();
     }
 
     /**
@@ -2511,7 +2527,7 @@ export class DockManager {
 
                 const {id} = this._app;
                 this._toggleFavoriteItem.label.text = this._appFavorites.isFavorite(id)
-                    ? _('Unpin') : _('Pin to Dock');
+                    ? _('Unpin') : __('Pin to Dock');
                 /* eslint-enable no-invalid-this */
             });
     }

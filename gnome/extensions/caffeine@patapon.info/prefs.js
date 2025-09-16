@@ -25,6 +25,7 @@ import Gdk from 'gi://Gdk';
 // Import preferences pages
 import * as GeneralPrefs from './preferences/generalPage.js';
 import * as DisplayPrefs from './preferences/displayPage.js';
+import * as TimerPrefs from './preferences/timerPage.js';
 import * as AppsPrefs from './preferences/appsPage.js';
 
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
@@ -34,8 +35,12 @@ const SettingsKey = {
     SHOW_INDICATOR: 'show-indicator',
     SHOW_NOTIFICATIONS: 'show-notifications',
     SHOW_TIMER: 'show-timer',
+    SHOW_TOGGLE: 'show-toggle',
     DURATION_TIMER_INDEX: 'duration-timer',
+    DURATION_TIMER_LIST: 'duration-timer-list',
+    USE_CUSTOM_DURATION: 'use-custom-duration',
     FULLSCREEN: 'enable-fullscreen',
+    MPRIS: 'enable-mpris',
     RESTORE: 'restore-state',
     NIGHT_LIGHT: 'nightlight-control',
     TOGGLE_SHORTCUT: 'toggle-shortcut',
@@ -58,6 +63,7 @@ export default class CaffeinePrefs extends ExtensionPreferences {
         const settings = this.getSettings();
         const generalPage = new GeneralPrefs.GeneralPage(settings, SettingsKey);
         const displayPage = new DisplayPrefs.DisplayPage(settings, SettingsKey);
+        const timerPage = new TimerPrefs.TimerPage(settings, SettingsKey);
         const appsPage = new AppsPrefs.AppsPage(settings, SettingsKey);
 
         let prefsWidth = settings.get_int(SettingsKey.DEFAULT_WIDTH);
@@ -68,6 +74,7 @@ export default class CaffeinePrefs extends ExtensionPreferences {
 
         window.add(generalPage);
         window.add(displayPage);
+        window.add(timerPage);
         window.add(appsPage);
 
         window.connect('close-request', () => {

@@ -13,7 +13,6 @@
   },
   "window.restoreWindows": "none",
   "files.hotExit": "off",
-  "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
@@ -24,7 +23,6 @@
   "editor.tabCompletion": "on",
   "editor.wordWrap": "on",
   "editor.matchBrackets": "always",
-  "editor.fontSize": 17,
   "explorer.confirmDelete": false,
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
@@ -45,8 +43,6 @@
   },
   "diffEditor.maxComputationTime": 0,
   "python.languageServer": "Pylance",
-  "jupyter.askForLargeDataFrames": false,
-  "jupyter.debugJustMyCode": false,
   "python.analysis.completeFunctionParens": true,
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
@@ -66,17 +62,14 @@
   // },
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
-  "bracket-pair-colorizer-2.depreciation-notice": false,
   "yaml.customTags": [
     "!vault"
   ],
-  "jupyter.interactiveWindow.textEditor.autoMoveToNextCell": false,
-  "jupyter.interactiveWindow.codeLens.enable": false,
-  "jupyter.interactiveWindow.codeLens.enableGotoCell": false,
-  "jupyter.interactiveWindow.cellMarker.decorateCells": false,
   "redhat.telemetry.enabled": false,
   "explorer.confirmDragAndDrop": false,
   "window.zoomLevel": 1,
   "gitlens.codeLens.authors.command": false,
-  "python.defaultInterpreterPath": "/home/mlodzikos/.dotfiles/venv"
+  "python.defaultInterpreterPath": "/home/mlodzikos/.dotfiles/venv",
+  "git.openRepositoryInParentFolders": "always",
+  "github.copilot.nextEditSuggestions.enabled": true
 }

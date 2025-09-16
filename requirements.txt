@@ -1,4 +1,4 @@
-git+https://github.com/jeffkaufman/icdiff.git@release-2.0.6
+git+https://github.com/jeffkaufman/icdiff.git@release-2.0.7
 # https://github.com/drbild/json2yaml
 json2yaml==1.2.0
 # https://github.com/docker/compose

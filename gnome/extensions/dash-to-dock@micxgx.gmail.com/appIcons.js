@@ -22,6 +22,7 @@ import {
 
 import {
     ParentalControlsManager,
+    Util,
 } from './dependencies/shell/misc.js';
 
 import {
@@ -426,9 +427,9 @@ const DockAbstractAppIcon = GObject.registerClass({
     }
 
     popupMenu() {
-        this._removeMenuTimeout();
+        this._removeMenuTimeout?.();
         this.fake_release();
-        this._draggable.fakeRelease();
+        this._draggable.fakeRelease?.();
 
         if (!this._menu) {
             this._menu = new DockAppIconMenu(this);
@@ -937,6 +938,10 @@ const DockAbstractAppIcon = GObject.registerClass({
 
         return [...new Set([...this._urgentWindows, ...interestingWindows])];
     }
+
+    getSnapName() {
+        return this.app.appInfo?.get_string('X-SnapInstanceName');
+    }
 });
 
 const DockAppIcon = GObject.registerClass({
@@ -1175,7 +1180,7 @@ const DockAppIconMenu = class DockAppIconMenu extends PopupMenu.PopupMenu {
                         favs.removeFavorite(app.get_id());
                     });
                 } else {
-                    const item = this._appendMenuItem(_('Pin to Dock'));
+                    const item = this._appendMenuItem(__('Pin to Dock'));
                     item.connect('activate', () => {
                         const favs = AppFavorites.getAppFavorites();
                         favs.addFavorite(app.get_id());
@@ -1184,7 +1189,8 @@ const DockAppIconMenu = class DockAppIconMenu extends PopupMenu.PopupMenu {
             }
 
             if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop') &&
-                (this.sourceActor instanceof DockAppIcon)) {
+                this.sourceActor instanceof DockAppIcon &&
+                !this.sourceActor.getSnapName()) {
                 this._appendSeparator();
                 const item = this._appendMenuItem(_('App Details'));
                 item.connect('activate', () => {
@@ -1202,6 +1208,24 @@ const DockAppIconMenu = class DockAppIconMenu extends PopupMenu.PopupMenu {
                             Main.overview.hide();
                         });
                 });
+            }
+
+            if (this.sourceActor instanceof DockAppIcon) {
+                const snapName = this.sourceActor.getSnapName();
+                const snapStore = snapName
+                    ? Shell.AppSystem.get_default().lookup_app(
+                        'snap-store_snap-store.desktop') : null;
+
+                if (snapStore) {
+                    this._appendSeparator();
+                    const item = this._appendMenuItem(_('App Details'));
+                    item.connect('activate', (_, event) => {
+                        snapStore.activate_full(-1, event.get_time());
+                        Util.spawnApp(
+                            [...snapStore.appInfo.get_commandline().split(' '), snapName]);
+                        Main.overview.hide();
+                    });
+                }
             }
         }
 
@@ -1401,6 +1425,8 @@ export const DockShowAppsIcon = GObject.registerClass({
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
         this._menuTimeoutId = 0;
+
+        this._maybeEnablePopupGestures();
     }
 
     _createIcon(size) {
@@ -1417,13 +1443,23 @@ export const DockShowAppsIcon = GObject.registerClass({
     }
 
     vfunc_button_press_event(...args) {
-        return AppDisplay.AppIcon.prototype.vfunc_button_press_event.call(
-            this.toggleButton, ...args);
+        try {
+            // TODO: Drop this when not supporting GNOME 48 (and older) anymore.
+            return AppDisplay.AppIcon.prototype.vfunc_button_press_event.call(
+                this.toggleButton, ...args);
+        } catch {
+            return Clutter.EVENT_PROPAGATE;
+        }
     }
 
     vfunc_touch_event(...args) {
-        return AppDisplay.AppIcon.prototype.vfunc_touch_event.call(
-            this.toggleButton, ...args);
+        try {
+            // TODO: Drop this when not supporting GNOME 48 (and older) anymore.
+            return AppDisplay.AppIcon.prototype.vfunc_touch_event.call(
+                this.toggleButton, ...args);
+        } catch {
+            return Clutter.EVENT_PROPAGATE;
+        }
     }
 
     showLabel(...args) {
@@ -1443,10 +1479,36 @@ export const DockShowAppsIcon = GObject.registerClass({
     }
 
     _removeMenuTimeout(...args) {
-        AppDisplay.AppIcon.prototype._removeMenuTimeout.call(this, ...args);
+        AppDisplay.AppIcon.prototype._removeMenuTimeout?.call(this, ...args);
+    }
+
+    _hasPopupMenu() {
+        return Docking.DockManager.extension.uuid !== 'ubuntu-dock@ubuntu.com';
+    }
+
+    _maybeEnablePopupGestures() {
+        if (!this._hasPopupMenu())
+            return;
+
+        if (!Clutter.LongPressGesture || !Clutter.ClickGesture)
+            return;
+
+        const longPressGesture = new Clutter.LongPressGesture();
+        longPressGesture.connect('recognize', () => this.popupMenu());
+        this.add_action(longPressGesture);
+
+        const rightClickGesture = new Clutter.ClickGesture({
+            required_button: Clutter.BUTTON_SECONDARY,
+            recognize_on_press: true,
+        });
+        rightClickGesture.connect('recognize', () => this.popupMenu());
+        this.add_action(rightClickGesture);
     }
 
     popupMenu() {
+        if (!this._hasPopupMenu())
+            return false;
+
         this._removeMenuTimeout();
         this.toggleButton.fake_release();
 
@@ -1484,11 +1546,9 @@ class DockShowAppsIconMenu extends DockAppIconMenu {
     _rebuildMenu() {
         this.removeAll();
 
-        /* Translators: %s is "Settings", which is automatically translated. You
-           can also translate the full message if this fits better your language. */
-        const name = __('Dash to Dock %s').format(_('Settings'));
-        const item = this._appendMenuItem(name);
+        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(__('Dash to Dock')));
 
+        const item = this._appendMenuItem(_('Settings'));
         item.connect('activate', () =>
             Docking.DockManager.extension.openPreferences());
     }

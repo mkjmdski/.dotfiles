@@ -10,12 +10,18 @@
   },
   "gettext-domain": "gnome-shell-extension-caffeine",
   "name": "Caffeine",
+  "session-modes": [
+    "unlock-dialog",
+    "user"
+  ],
   "settings-schema": "org.gnome.shell.extensions.caffeine",
   "shell-version": [
     "45",
-    "46"
+    "46",
+    "47",
+    "48"
   ],
   "url": "https://github.com/eonpatapon/gnome-shell-extension-caffeine",
   "uuid": "caffeine@patapon.info",
-  "version": 54
+  "version": 57
 }

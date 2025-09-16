@@ -27,7 +27,8 @@ export class AppIconsDecorator {
     constructor() {
         this._signals = new Utils.GlobalSignalsHandler();
         this._methodInjections = new Utils.InjectionsHandler();
-        this._propertyInjections = new Utils.PropertyInjectionsHandler({allowNewProperty: true});
+        this._propertyInjections = new Utils.PropertyInjectionsHandler(
+            null, {allowNewProperty: true});
         this._indicators = new Set();
 
         this._patchAppIcons();
@@ -145,10 +146,14 @@ export class AppIconsDecorator {
                 if (this.isEmpty())
                     return;
 
-                // Temporarily hide all the menu items a part the Pinning one
-                // while we're updating.
+                // Temporarily hide all the menu items a part the Pinning and
+                // the details one while we're updating.
+                const validItems = [
+                    this._toggleFavoriteItem,
+                    this._detailsItem,
+                ];
                 const items = this._getMenuItems().filter(
-                    i => i !== this._toggleFavoriteItem).map(i =>
+                    i => !validItems.includes(i)).map(i =>
                     i instanceof PopupMenu.PopupMenuBase ? i.actor : i);
                 const itemsVisibility = items.map(i => i.visible);
                 items.forEach(i => (i.visible = false));

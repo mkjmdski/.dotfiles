@@ -48,7 +48,6 @@ bindkey '^[OB' history-substring-search-down
 zinit light denysdovhan/spaceship-prompt
 
 zinit light MichaelAquilina/zsh-you-should-use
-YSU_HARDCORE=0
 
 zinit light hlissner/zsh-autopair
 

@@ -37,6 +37,7 @@
 [push]
 	# When pushing, also push tags whose commit-ishs are now reachable upstream
 	followTags = true
+	autoSetupRemote = true
 
 [tag]
 	# Sort tags as version numbers whenever applicable, so 1.10.2 is AFTER 1.2.0.
