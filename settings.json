@@ -71,5 +71,6 @@
   "gitlens.codeLens.authors.command": false,
   "python.defaultInterpreterPath": "/home/mlodzikos/.dotfiles/venv",
   "git.openRepositoryInParentFolders": "always",
-  "github.copilot.nextEditSuggestions.enabled": true
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "chat.mcp.autostart": "newAndOutdated"
 }
